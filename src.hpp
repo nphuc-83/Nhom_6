@@ -1,3 +1,4 @@
+// src_hpp.txt (added prototypes for save/load/edit/remove)
 #ifndef QUANLY_DIEM_HPP
 #define QUANLY_DIEM_HPP
 
@@ -107,6 +108,9 @@ MonHoc* mh_remove(MonHoc* root, const std::string& mamh);
 MonHoc* mh_find(MonHoc* root, const std::string& mamh);
 void mh_inorder_print(MonHoc* root);
 void mh_clear(MonHoc* root);
+bool mh_edit(const std::string& mamh, const std::string& tenmh, int stclt, int stcth);
+void mh_save_to_file(const std::string& filename);
+void mh_load_from_file(const std::string& filename);
 
 // --- L?p sinh viên ---
 int findLopIndexByCode(const std::string& malop);
@@ -133,4 +137,3 @@ void mh_print_all();  		// CHECK XEM MÔN H?C NH?P ?N CHUA
 } // namespace QuanLyDiem
 
 #endif // QUANLY_DIEM_HPP
-

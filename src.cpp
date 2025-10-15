@@ -1,6 +1,8 @@
+// src_cpp.txt (added implementations for remove, edit, save, load)
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <fstream>
 #include "src.hpp"
 
 using namespace std;
@@ -193,6 +195,125 @@ void mh_clear(MonHoc* root) {
     delete root;
 }
 
+MonHoc* mh_min_value_node(MonHoc* node) {
+    MonHoc* current = node;
+    while (current->left != nullptr)
+        current = current->left;
+    return current;
+}
+
+MonHoc* mh_remove(MonHoc* root, const string& mamh) {
+    if (root == nullptr) return root;
+
+    if (mamh < root->MAMH)
+        root->left = mh_remove(root->left, mamh);
+    else if (mamh > root->MAMH)
+        root->right = mh_remove(root->right, mamh);
+    else {
+        if ((root->left == nullptr) || (root->right == nullptr)) {
+            MonHoc* temp = root->left ? root->left : root->right;
+            if (temp == nullptr) {
+                temp = root;
+                root = nullptr;
+            } else
+                *root = *temp;
+            delete temp;
+        } else {
+            MonHoc* temp = mh_min_value_node(root->right);
+            root->MAMH = temp->MAMH;
+            root->TENMH = temp->TENMH;
+            root->STCLT = temp->STCLT;
+            root->STCTH = temp->STCTH;
+            root->right = mh_remove(root->right, temp->MAMH);
+        }
+    }
+
+    if (root == nullptr) return root;
+
+    mh_update_height(root);
+    int balance = mh_balance(root);
+
+    if (balance > 1 && mh_balance(root->left) >= 0)
+        return mh_right_rotate(root);
+
+    if (balance > 1 && mh_balance(root->left) < 0) {
+        root->left = mh_left_rotate(root->left);
+        return mh_right_rotate(root);
+    }
+
+    if (balance < -1 && mh_balance(root->right) <= 0)
+        return mh_left_rotate(root);
+
+    if (balance < -1 && mh_balance(root->right) > 0) {
+        root->right = mh_right_rotate(root->right);
+        return mh_left_rotate(root);
+    }
+
+    return root;
+}
+
+bool mh_edit(const string& mamh, const string& tenmh, int stclt, int stcth) {
+    MonHoc* node = mh_find(rootMonHoc, mamh);
+    if (!node) return false;
+    node->TENMH = tenmh;
+    node->STCLT = stclt;
+    node->STCTH = stcth;
+    return true;
+}
+
+void mh_save_inorder(MonHoc* root, ofstream& fout) {
+    if (!root) return;
+    mh_save_inorder(root->left, fout);
+    fout << root->MAMH << "|" << root->TENMH << "|" << root->STCLT << "|" << root->STCTH << endl;
+    mh_save_inorder(root->right, fout);
+}
+
+void mh_save_to_file(const string& filename) {
+    ofstream fout(filename);
+    if (!fout) {
+        cout << "Loi mo file de ghi!\n";
+        return;
+    }
+    mh_save_inorder(rootMonHoc, fout);
+    fout.close();
+    cout << "Da luu du lieu vao file thanh cong!\n";
+}
+
+void mh_load_from_file(const string& filename) {
+    ifstream fin(filename);
+    if (!fin) {
+        cout << "Khong tim thay file, bat dau voi cay rong.\n";
+        return;
+    }
+    string line;
+    while (getline(fin, line)) {
+        if (line.empty()) continue;
+        size_t pos1 = line.find('|');
+        if (pos1 == string::npos) continue;
+        string mamh = line.substr(0, pos1);
+        size_t pos2 = line.find('|', pos1 + 1);
+        if (pos2 == string::npos) continue;
+        string tenmh = line.substr(pos1 + 1, pos2 - pos1 - 1);
+        size_t pos3 = line.find('|', pos2 + 1);
+        if (pos3 == string::npos) continue;
+        string stclt_str = line.substr(pos2 + 1, pos3 - pos2 - 1);
+        string stcth_str = line.substr(pos3 + 1);
+        int stclt = stoi(stclt_str);
+        int stcth = stoi(stcth_str);
+        MonHoc* node = new MonHoc;
+        node->MAMH = mamh;
+        node->TENMH = tenmh;
+        node->STCLT = stclt;
+        node->STCTH = stcth;
+        node->left = nullptr;
+        node->right = nullptr;
+        node->height = 1;
+        rootMonHoc = mh_insert(rootMonHoc, node);
+    }
+    fin.close();
+    cout << "Da tai du lieu tu file thanh cong!\n";
+}
+
 // ==================== L?P SINH VIÊN ====================
 
 int findLopIndexByCode(const string& malop) {
@@ -350,4 +471,3 @@ void mh_print_all() {
 }
 
 } // namespace QuanLyDiem
-

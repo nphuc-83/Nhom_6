@@ -1,7 +1,7 @@
 1. quản lí lớp tín chỉ:
 +Điều chỉnh danh sách lớp tín chỉ (thêm/xóa/điều chỉnh) A
 +In danh sách B
-2. quản lí sinh vien:
+2. quản lí sinh viên:
 +Điều chỉnh danh sách lớp học, sinh viên của mỗi lớp (thêm/xóa/điều chỉnh) C
 +In danh sách D
 3. quản lí môn học:

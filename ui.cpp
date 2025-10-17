@@ -2,7 +2,7 @@
 #include "src.hpp"
 #include <limits>
 
-// ===== MENU CHÕNH =====
+// ===== MENU CH√çNH =====
 int QuanLiChucNang() {
     int choice;
     do {
@@ -10,8 +10,13 @@ int QuanLiChucNang() {
         cout << "=====================================\n";
         cout << "  QUAN LI SINH VIEN THEO HE TIN CHI\n";
         cout << "=====================================\n";
+<<<<<<< HEAD
         cout << "1. Quan li lop tin chi\n";
         cout << "2. Quan li lop hoc (tam khoa)\n";
+=======
+        cout << "1. Quan li lop tin chi (tam khoa)\n";
+        cout << "2. Quan li sinh vien (tam khoa)\n";
+>>>>>>> 845bdfe87c9c9393b588e5b9f3378e8b297ed71b
         cout << "3. Quan li mon hoc\n";
         cout << "4. Quan li dang ky lop tin chi (tam khoa)\n";
         cout << "5. Ghi du lieu mon hoc vao file\n";
@@ -156,7 +161,7 @@ int QuanLiLopTinChi() {
 }
 
 
-// ===== MENU QU?N LÕ M‘N H?C =====
+// ===== MENU QU?N L√ç M√îN H?C =====
 int QuanLiMonHoc() {
     int chon;
     do {
@@ -179,10 +184,10 @@ int QuanLiMonHoc() {
                 string MAMH, TENMH;
                 int STCLT, STCTH;
             	QuanLyDiem::mh_print_all();
-                cout << "Vui lÚng nh?p m„ mÙn h?c: "; cin >> MAMH;
-                cout << "Vui lÚng nh?p tÍn mÙn h?c: "; cin.ignore(); getline(cin, TENMH);
-                cout << "Vui lÚng nh?p STCLT: "; cin >> STCLT;
-                cout << "Vui lÚng nh?p STCTH: "; cin >> STCTH;
+                cout << "Vui l√≤ng nh?p m√£ m√¥n h?c: "; cin >> MAMH;
+                cout << "Vui l√≤ng nh?p t√™n m√¥n h?c: "; cin.ignore(); getline(cin, TENMH);
+                cout << "Vui l√≤ng nh?p STCLT: "; cin >> STCLT;
+                cout << "Vui l√≤ng nh?p STCTH: "; cin >> STCTH;
             
                 QuanLyDiem::MonHoc* node = new QuanLyDiem::MonHoc;
 				node->MAMH = MAMH;
@@ -196,16 +201,16 @@ int QuanLiMonHoc() {
                 QuanLyDiem::rootMonHoc = QuanLyDiem::mh_insert(QuanLyDiem::rootMonHoc, node);
                 system("cls");
                 QuanLyDiem::mh_print_all();
-				cout << ">> –„ thÍm mÙn h?c th‡nh cÙng!\n";
+				cout << ">> √ê√£ th√™m m√¥n h?c th√†nh c√¥ng!\n";
                 
                 system("pause");
                 break;
             }
             case 2: {
                 string MAMH;
-                cout << "Vui lÚng nh?p m„ mÙn h?c c?n xÛa: "; cin >> MAMH;
+                cout << "Vui l√≤ng nh?p m√£ m√¥n h?c c?n x√≥a: "; cin >> MAMH;
                 QuanLyDiem::rootMonHoc = QuanLyDiem::mh_remove(QuanLyDiem::rootMonHoc, MAMH);
-                cout << ">> –„ xÛa mÙn h?c (n?u t?n t?i)!\n";
+                cout << ">> √ê√£ x√≥a m√¥n h?c (n?u t?n t?i)!\n";
                 QuanLyDiem::mh_print_all();
                 system("pause");
                 break;
@@ -213,14 +218,14 @@ int QuanLiMonHoc() {
             case 3: {
                 string MAMH, TENMH;
                 int STCLT, STCTH;
-                cout << "Vui lÚng nh?p m„ mÙn h?c c?n ch?nh s?a: "; cin >> MAMH;
-                cout << "Vui lÚng nh?p tÍn mÙn h?c m?i: "; cin.ignore(); getline(cin, TENMH);
-                cout << "Vui lÚng nh?p STCLT m?i: "; cin >> STCLT;
-                cout << "Vui lÚng nh?p STCTH m?i: "; cin >> STCTH;
+                cout << "Vui l√≤ng nh?p m√£ m√¥n h?c c?n ch?nh s?a: "; cin >> MAMH;
+                cout << "Vui l√≤ng nh?p t√™n m√¥n h?c m?i: "; cin.ignore(); getline(cin, TENMH);
+                cout << "Vui l√≤ng nh?p STCLT m?i: "; cin >> STCLT;
+                cout << "Vui l√≤ng nh?p STCTH m?i: "; cin >> STCTH;
                 if (QuanLyDiem::mh_edit(MAMH, TENMH, STCLT, STCTH)) {
-                    cout << ">> –„ ch?nh s?a mÙn h?c th‡nh cÙng!\n";
+                    cout << ">> √ê√£ ch?nh s?a m√¥n h?c th√†nh c√¥ng!\n";
                 } else {
-                    cout << ">> KhÙng tÏm th?y mÙn h?c!\n";
+                    cout << ">> Kh√¥ng t√¨m th?y m√¥n h?c!\n";
                 }
                 QuanLyDiem::mh_print_all();
                 system("pause");

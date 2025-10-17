@@ -13,5 +13,5 @@
 
 
 CHỨC NĂNG HIỆN TẠI:
-+ E, F
++ A, B, E ,F
 + Chưa thêm các điều kiện khi nhập dữ liệu

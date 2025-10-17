@@ -362,98 +362,162 @@ void printAllLop() {
 }
 
 // ==================== ÐANG KÝ ====================
+LopTinChi* dsLopTC = nullptr;
+static int current_id = 1000;
 
 void dk_add_head(DangKy*& head, DangKy* node) {
-    node->next = head;
-    head = node;
+	if (!node) return;
+	node->next = head;
+	head = node;
 }
 
 DangKy* dk_find(DangKy* head, const string& masv) {
-    for (DangKy* p = head; p; p = p->next)
-        if (p->MASV == masv)
-            return p;
-    return nullptr;
+	for (DangKy* p = head; p; p = p->next) {
+		if (p->MASV == masv) return p;
+	}
+	return nullptr;
 }
 
 bool dk_remove(DangKy*& head, const string& masv) {
-    DangKy* cur = head;
-    DangKy* prev = nullptr;
-    while (cur) {
-        if (cur->MASV == masv) {
-            if (!prev) head = cur->next;
-            else prev->next = cur->next;
-            delete cur;
-            return true;
-        }
-        prev = cur;
-        cur = cur->next;
-    }
-    return false;
+	DangKy* p = head;
+	DangKy* prev = nullptr;
+	while (p) {
+		if (p->MASV == masv) {
+			if (prev) prev->next = p->next;
+			else head = p->next;
+			delete p;
+			return true;
+		}
+		prev = p;
+		p = p->next;
+	}
+	return false;
 }
 
 void dk_clear(DangKy*& head) {
-    while (head) {
-        DangKy* t = head;
-        head = head->next;
-        delete t;
-    }
+	while (head) {
+		DangKy* t = head;
+		head = head->next;
+		delete t;
+	}
 }
 
 void dk_print(DangKy* head) {
-    cout << left << setw(16) << "MASV"
-         << setw(8) << "DIEM"
-         << setw(10) << "HUY" << "\n";
-    for (DangKy* p = head; p; p = p->next)
-        cout << left << setw(16) << p->MASV
-             << setw(8) << p->DIEM
-             << setw(10) << (p->huyDangKy ? "YES" : "NO") << "\n";
+	cout << "MASV\t| DIEM\t| HUY\n";
+	cout << "---------------------------\n";
+	if (!head) {
+		cout << "(Chua co sinh vien dang ky)\n";
+		return;
+	}
+	for (DangKy* p = head; p; p = p->next) {
+		cout << p->MASV << "\t| ";
+		if (p->DIEM < 0) cout << "Chua co\t| "; else cout << fixed << setprecision(2) << p->DIEM << "\t| ";
+		cout << (p->HUYDK ? "Co" : "Khong") << "\n";
+		}
 }
 
-// ==================== L?P TÍN CH? ====================
+// ==================== Lop TÍN CHi ====================
 
-int next_MALOPTC() {
-    static int nextID = 1;
-    return nextID++;
-}
+int next_MALOPTC() { return current_id++; } //thay the
 
-LopTinChi* ltc_add(const string& mamh, const string& nk, int hk, int nhom,
-                   int minsv, int maxsv, bool huy) {
-    LopTinChi* node = new LopTinChi;
-    node->MALOPTC = next_MALOPTC();
-    node->MAMH = mamh;
-    node->nienKhoa = stoi(nk.substr(0, 4)); // n?u nk = "2024-2025"
-    node->hocKy = hk;
-    node->nhom = nhom;
-    node->soSV_min = minsv;
-    node->soSV_max = maxsv;
-    node->huyLop = huy;
-    node->next = dsLopTinChiRoot;
-    dsLopTinChiRoot = node;
-    return node;
+LopTinChi* ltc_add(const string& mamh, const string& nk, int hk, int nhom, int minsv, int maxsv, bool huy) {
+	LopTinChi* node = new LopTinChi;
+	node->MALOPTC = next_MALOPTC();
+	node->MAMH = mamh;
+	node->NIENKHOA = nk;
+	node->HOCKY = hk;
+	node->NHOM = nhom;
+	node->SOSVMIN = minsv;
+	node->SOSVMAX = maxsv;
+	node->HUYLOP = huy;
+	node->DSDK = nullptr;
+	node->next = dsLopTC;
+	dsLopTC = node;
+	return node;
 }
 
 LopTinChi* ltc_find_by_id(int id) {
-    for (LopTinChi* p = dsLopTinChiRoot; p; p = p->next)
-        if (p->MALOPTC == id) return p;
-    return nullptr;
+	for (LopTinChi* p = dsLopTC; p; p = p->next) {
+		if (p->MALOPTC == id) return p;
+	}
+	return nullptr;
 }
 
 bool ltc_remove_by_id(int id) {
-    LopTinChi* cur = dsLopTinChiRoot;
-    LopTinChi* prev = nullptr;
-    while (cur) {
-        if (cur->MALOPTC == id) {
-            if (!prev) dsLopTinChiRoot = cur->next;
-            else prev->next = cur->next;
-            dk_clear(cur->dssvdk);
-            delete cur;
-            return true;
-        }
-        prev = cur;
-        cur = cur->next;
-    }
-    return false;
+	LopTinChi* p = dsLopTC;
+	LopTinChi* prev = nullptr;
+	while (p) {
+		if (p->MALOPTC == id) {
+			if (prev) prev->next = p->next;
+			else dsLopTC = p->next;
+			dk_clear(p->DSDK);
+			delete p;
+			return true;
+		}
+		prev = p;
+		p = p->next;
+	}
+	return false;
 }
+
+
+void ltc_print_all() {
+	cout << "MALOPTC | MAMH | NIENKHOA | HK | NHOM | MIN | MAX | HUY\n";
+	cout << "----------------------------------------------------------------\n";
+	if (!dsLopTC) { cout << "(Chua co lop tin chi)\n"; return; }
+	for (LopTinChi* p = dsLopTC; p; p = p->next) {
+		cout << p->MALOPTC << " | " << p->MAMH << " | " << p->NIENKHOA
+			<< " | " << p->HOCKY << " | " << p->NHOM
+			<< " | " << p->SOSVMIN << " | " << p->SOSVMAX
+			<< " | " << (p->HUYLOP ? "Co" : "Khong") << "\n";
+	}
+}
+
+bool ltc_add_registration(int maLopTC, const string& masv) {
+	LopTinChi* ltc = ltc_find_by_id(maLopTC);
+	if (!ltc) return false;
+	if (dk_find(ltc->DSDK, masv)) return false; // da ton tai
+	DangKy* node = new DangKy{masv, -1.0f, false, nullptr};
+	dk_add_head(ltc->DSDK, node);
+	return true;
+}
+
+DangKy* ltc_find_registration(int maLopTC, const string& masv) {
+	LopTinChi* ltc = ltc_find_by_id(maLopTC);
+	if (!ltc) return nullptr;
+	return dk_find(ltc->DSDK, masv);
+}
+
+bool ltc_set_score(int maLopTC, const string& masv, float diem) {
+	DangKy* dk = ltc_find_registration(maLopTC, masv);
+	if (!dk) return false;
+	dk->DIEM = diem;
+	return true;
+}
+
+void ltc_print_filtered(const string& nk, int hk, int nhom, const string& mamh) {
+	bool found = false;
+	for (LopTinChi* p = dsLopTC; p; p = p->next) {
+		if (p->NIENKHOA == nk && p->HOCKY == hk && p->NHOM == nhom && p->MAMH == mamh) {
+			found = true;
+			cout << "\n=== LOP TC Ma: " << p->MALOPTC << " ===\n";
+			ltc_print_all(); // optional: could print only this; keep simple: print registrations next
+			dk_print(p->DSDK);
+		}
+	}
+	if (!found) cout << "(Khong tim thay lop thoa yeu cau)\n";
+}
+
+void ltc_clear_all() {
+	while (dsLopTC) {
+		LopTinChi* t = dsLopTC;
+		dsLopTC = dsLopTC->next;
+		dk_clear(t->DSDK);
+		delete t;
+	}
+}
+
+
 void mh_print_all() {
     cout << "\n===== DANH SÁCH MÔN H?C HI?N CÓ =====\n";
     if (!rootMonHoc) {

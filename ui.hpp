@@ -8,6 +8,7 @@ using namespace std;
 
 int QuanLiChucNang();
 
+int QuanLiLopTinChi();
 
 int QuanLiMonHoc();
 

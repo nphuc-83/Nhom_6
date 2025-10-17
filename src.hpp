@@ -24,10 +24,10 @@ constexpr int MAX_LOP_ARRAY  = 10000;
 // =================== C?U TRÚC D? LI?U ===================
 
 struct DangKy {
-    std::string MASV;
-    float DIEM = 0.0f;
-    bool huyDangKy = false;
-    DangKy* next = nullptr;
+std::string MASV;
+float DIEM; // -1 n?u chua có di?m
+bool HUYDK;
+DangKy* next;
 };
 
 struct SinhVien {
@@ -53,16 +53,22 @@ struct MonHoc {
 
 
 struct LopTinChi {
-    int MALOPTC = 0;
-    std::string MAMH;
-    int nienKhoa = 0;
-    int hocKy = 0;
-    int nhom = 0;
-    int soSV_min = 0;
-    int soSV_max = 0;
-    bool huyLop = false;
-    DangKy* dssvdk = nullptr;
-    LopTinChi* next = nullptr;
+	int MALOPTC;
+	std::string MAMH;
+	std::string NIENKHOA;
+	int HOCKY;
+	int NHOM;
+	int SOSVMIN;
+	int SOSVMAX;
+	bool HUYLOP;
+	DangKy* DSDK; // danh sách dang ký (liên k?t don)
+	LopTinChi* next;
+};
+
+struct DSLopTinChi { //thêm (DSLopTinChi qu?n lý danh sách l?p tín ch?)
+LopTinChi* head;
+int nextID;
+DSLopTinChi();
 };
 
 struct LopSV {
@@ -78,7 +84,7 @@ struct LopSV {
 // =================== BI?N TOÀN C?C ===================
 
 extern MonHoc* rootMonHoc ;
-extern LopTinChi* dsLopTinChiRoot;
+extern LopTinChi* dsLopTC;         //thay the
 extern LopSV* dsLopSV[MAX_LOP_ARRAY];
 extern int soLuongLopSV;
 
@@ -127,10 +133,25 @@ void dk_clear(DangKy*& head);
 void dk_print(DangKy* head);
 
 // --- L?p tín ch? ---
+int nextMaLopTC();
 int next_MALOPTC();
 LopTinChi* ltc_add(const std::string& mamh, const std::string& nk, int hk, int nhom, int minsv, int maxsv, bool huy=false);
 LopTinChi* ltc_find_by_id(int id);
 bool ltc_remove_by_id(int id);
+void ltc_print_all();
+
+// thêm dang ký (MASV) vào l?p (n?u dã có thì không thêm duplicate)
+bool ltc_add_registration(int maLopTC, const std::string& masv);
+// tìm dang ký trong l?p
+DangKy* ltc_find_registration(int maLopTC, const std::string& masv);
+// nh?p/ c?p nh?t di?m cho MASV trong l?p
+bool ltc_set_score(int maLopTC, const std::string& masv, float diem);
+
+// in danh sách theo b? l?c (niên khóa, hoc ky, nhom, mamh)
+void ltc_print_filtered(const std::string& nk, int hk, int nhom, const std::string& mamh);
+
+// gi?i phóng toàn b? ds
+void ltc_clear_all();
 
 
 void mh_print_all();  		// CHECK XEM MÔN H?C NH?P ?N CHUA

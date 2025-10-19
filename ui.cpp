@@ -29,6 +29,9 @@ int QuanLiChucNang() {
         	case 1:
         		QuanLiLopTinChi();
         		break;
+			case 2:
+			    QuanLiLopSV();
+			    break;
             case 3:
                 QuanLiMonHoc();
                 break;
@@ -161,6 +164,8 @@ int QuanLiLopTinChi() {
 }
 
 
+
+
 // ===== MENU QU?N LÍ MÔN H?C =====
 int QuanLiMonHoc() {
     int chon;
@@ -241,4 +246,42 @@ int QuanLiMonHoc() {
         }
     } while (chon != 0);
     return chon;
+}
+
+int QuanLiLopSV (DS_LOPSV &ds) {
+    int chon;
+    do {
+        cout << "\n====== QUAN LI LOP SV  ======\n";
+        cout << "1. Nhap / Cap nhat sinh vien cho 1 lop (Them/Xoa/Hieu chinh)\n";
+        cout << "2. In danh sach sinh vien cua 1 lop theo TEN + HO\n";
+        cout << "0. Thoat\n";
+        cout << "Chon: ";
+        if (!(cin >> chon)) { cin.clear(); cin.ignore(10000, '\n'); chon = -1; }
+        cin.ignore();
+        switch (chon) {
+            case 1: {
+                char maLop[16];
+                cout << "Nhap ma lop: ";
+                cin.getline(maLop, 16);
+                LopSV* lop = timLopTheoMa(ds, maLop);
+                if (!lop) cout << "Lop khong ton tai!\n";
+                else menuCapNhatSV(lop);
+                break;
+            }
+            case 2: {
+                char maLop[16];
+                cout << "Nhap ma lop: ";
+                cin.getline(maLop, 16);
+                LopSV* lop = timLopTheoMa(ds, maLop);
+                if (!lop) cout << "Lop khong ton tai!\n";
+                else inDSSV_TheoTen(lop);
+                break;
+            }
+            case 0:
+                cout << "Thoat chuong trinh.\n";
+                return 0; // 🔹 Trả về giá trị khi thoát
+            default:
+                cout << "Lua chon khong hop le. Thu lai.\n";
+        }
+    } while (true);
 }

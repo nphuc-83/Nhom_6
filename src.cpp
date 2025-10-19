@@ -19,99 +19,6 @@ LopTinChi* dsLopTinChiRoot = nullptr;
 LopSV* dsLopSV[MAX_LOP_ARRAY] = {nullptr};
 int soLuongLopSV = 0;
 
-// ==================== SINH VIÊN ====================
-
-void sv_add_head(SinhVien*& head, SinhVien* node) {
-    node->next = head;
-    head = node;
-}
-
-SinhVien* sv_find(SinhVien* head, const string& masv) {
-    for (SinhVien* p = head; p; p = p->next)
-        if (p->MASV == masv) return p;
-    return nullptr;
-}
-
-bool sv_remove(SinhVien*& head, const string& masv) {
-    SinhVien* cur = head;
-    SinhVien* prev = nullptr;
-    while (cur) {
-        if (cur->MASV == masv) {
-            if (!prev) head = cur->next;
-            else prev->next = cur->next;
-            delete cur;
-            return true;
-        }
-        prev = cur;
-        cur = cur->next;
-    }
-    return false;
-}
-
-bool sv_edit(SinhVien* head, const string& masv, const string& ho,
-             const string& ten, char phai, const string& sodt) {
-    SinhVien* p = sv_find(head, masv);
-    if (!p) return false;
-    p->HO = ho;
-    p->TEN = ten;
-    p->PHAI = phai;
-    p->SODT = sodt;
-    return true;
-}
-
-void sv_print(SinhVien* head) {
-    cout << left << setw(16) << "MASV"
-         << setw(20) << "HO"
-         << setw(12) << "TEN"
-         << setw(8) << "PHAI"
-         << setw(15) << "SODT"
-         << "\n";
-
-    for (SinhVien* p = head; p; p = p->next)
-        cout << left << setw(16) << p->MASV
-             << setw(20) << p->HO
-             << setw(12) << p->TEN
-             << setw(8) << p->PHAI
-             << setw(15) << p->SODT
-             << "\n";
-}
-
-vector<SinhVien*> sv_to_vector(SinhVien* head) {
-    vector<SinhVien*> v;
-    for (SinhVien* p = head; p; p = p->next)
-        v.push_back(p);
-    return v;
-}
-
-void sv_print_sorted_by_name(SinhVien* head) {
-    auto v = sv_to_vector(head);
-    sort(v.begin(), v.end(), [](SinhVien* a, SinhVien* b) {
-        if (a->TEN != b->TEN) return a->TEN < b->TEN;
-        return a->HO < b->HO;
-    });
-    cout << "Danh sach SV sap xep theo TEN + HO:\n";
-    cout << left << setw(16) << "MASV"
-         << setw(20) << "HO"
-         << setw(12) << "TEN"
-         << setw(8) << "PHAI"
-         << setw(15) << "SODT"
-         << "\n";
-    for (auto p : v)
-        cout << left << setw(16) << p->MASV
-             << setw(20) << p->HO
-             << setw(12) << p->TEN
-             << setw(8) << p->PHAI
-             << setw(15) << p->SODT
-             << "\n";
-}
-
-void sv_clear(SinhVien*& head) {
-    while (head) {
-        SinhVien* t = head;
-        head = head->next;
-        delete t;
-    }
-}
 
 // ==================== MÔN H?C (AVL TREE) ====================
 
@@ -315,53 +222,6 @@ void mh_load_from_file(const string& filename) {
     }
     fin.close();
     cout << "Da tai du lieu tu file thanh cong!\n";
-}
-
-// ==================== L?P SINH VIÊN ====================
-
-int findLopIndexByCode(const string& malop) {
-    for (int i = 0; i < MAX_LOP_ARRAY; i++)
-        if (dsLopSV[i] && dsLopSV[i]->MALOP == malop)
-            return i;
-    return -1;
-}
-
-bool addLop(const string& malop, const string& tenlop) {
-    for (int i = 0; i < MAX_LOP_ARRAY; i++) {
-        if (!dsLopSV[i]) {
-            dsLopSV[i] = new LopSV{malop, tenlop, nullptr};
-            soLuongLopSV++;
-            return true;
-        }
-    }
-    return false;
-}
-
-bool removeLop(const string& malop) {
-    int idx = findLopIndexByCode(malop);
-    if (idx == -1) return false;
-    sv_clear(dsLopSV[idx]->dssv);
-    delete dsLopSV[idx];
-    dsLopSV[idx] = nullptr;
-    soLuongLopSV--;
-    return true;
-}
-
-bool editLop(const string& malop, const string& newTen) {
-    int idx = findLopIndexByCode(malop);
-    if (idx == -1) return false;
-    dsLopSV[idx]->TENLOP = newTen;
-    return true;
-}
-
-void printAllLop() {
-    cout << left << setw(16) << "MALOP" << setw(30) << "TENLOP" << "\n";
-    for (int i = 0; i < MAX_LOP_ARRAY; i++) {
-        if (dsLopSV[i]) {
-            cout << left << setw(16) << dsLopSV[i]->MALOP
-                 << setw(30) << dsLopSV[i]->TENLOP << "\n";
-        }
-    }
 }
 
 // ==================== ÐANG KÝ ====================
@@ -582,3 +442,171 @@ LopSV* timLopTheoMa(DS_LOPSV &ds, const char* maLop) {
     }
     return NULL;
 }
+// Tim SV theo masv 
+PTRSV timSVTheoMa(PTRSV first, const char* maSV) {
+    for (PTRSV p = first; p != NULL; p = p->next)
+        if (strcmp(p->sv.MASV, maSV) == 0)
+            return p;
+    return NULL;
+}
+
+// Them SV vao dau danh sach 
+void themSV(PTRSV &first, const SinhVien &sv) {
+    PTRSV p = taoNodeSV(sv);
+    p->next = first;
+    first = p;
+}
+
+// Xoa SV
+bool xoaSV(PTRSV &first, const char* maSV) {
+    PTRSV p = first, prev = NULL;
+    while (p != NULL) {
+        if (strcmp(p->sv.MASV, maSV) == 0) {
+            if (prev == NULL) first = p->next;
+            else prev->next = p->next;
+            delete p;
+            return true;
+        }
+        prev = p;
+        p = p->next;
+    }
+    return false;
+}
+
+// Hieu chinh sv
+bool suaSV(PTRSV first, const char* maSV) {
+    PTRSV p = timSVTheoMa(first, maSV);
+    if (!p) return false;
+    cout << "Nhap ho moi: ";  cin.getline(p->sv.HO, 51);
+    cout << "Nhap ten moi: "; cin.getline(p->sv.TEN, 11);
+    cout << "Nhap phai moi: "; cin.getline(p->sv.PHAI, 4);
+    cout << "Nhap SĐT moi: ";  cin.getline(p->sv.SODT, 16);
+    return true;
+}
+
+// Menu con cho cập nhật sinh viên trong lớp (thêm / xóa / sửa)
+SinhVien nhapThongTinSV() {
+    SinhVien sv;
+    cout << "Nhap ma SV (rong de dung): ";
+    cin.getline(sv.MASV, 16);
+    if (strlen(sv.MASV) == 0) {
+        // trả về struct với MASV rỗng để báo dừng
+        sv.MASV[0] = '\0';
+        return sv;
+    }
+    cout << "Nhap ho: ";  cin.getline(sv.HO, 51);
+    cout << "Nhap ten: "; cin.getline(sv.TEN, 11);
+    cout << "Nhap phai: "; cin.getline(sv.PHAI, 4);
+    cout << "Nhap SĐT: "; cin.getline(sv.SODT, 16);
+    return sv;
+}
+
+// Menu con cho cập nhật sinh viên trong lớp (thêm / xóa / sửa)
+
+void menuCapNhatSV(LopSV* lop) {
+    if (!lop) return;
+    int chon;
+    do {
+        cout << "\n--- CAP NHAT SINH VIEN CHO LOP: " << lop->MALOP << " ---\n";
+        cout << "1. Them sinh vien (nhap nhieu, dung khi MASV rong)\n";
+        cout << "2. Xoa sinh vien\n";
+        cout << "3. Hieu chinh sinh vien\n";
+        cout << "0. Thoat\n";
+        cout << "Chon: ";
+        if (!(cin >> chon)) { cin.clear(); cin.ignore(10000, '\n'); chon = -1; }
+        cin.ignore(); // bỏ kí tự newline sau số
+        switch (chon) {
+            case 1: {
+                // Thêm nhiều SV; dừng khi MASV rỗng
+                while (true) {
+                    SinhVien sv = nhapThongTinSV();
+                    if (strlen(sv.MASV) == 0) {
+                        cout << "Dung nhap sinh vien.\n";
+                        break;
+                    }
+                    // Kiểm tra trùng MASV trong lớp
+                    if (timSVTheoMa(lop->FirstSV, sv.MASV)) {
+                        cout << "Ma SV da ton tai trong lop! Bo qua.\n";
+                        continue;
+                    }
+                    themSV(lop->FirstSV, sv);
+                    cout << "Da them SV: " << sv.MASV << "\n";
+                }
+                break;
+            }
+            case 2: {
+                char ma[16];
+                cout << "Nhap ma SV can xoa: ";
+                cin.getline(ma, 16);
+                if (strlen(ma) == 0) { cout << "Ma rong.\n"; break; }
+                if (xoaSV(lop->FirstSV, ma)) cout << "Xoa thanh cong.\n";
+                else cout << "Khong tim thay SV.\n";
+                break;
+            }
+            case 3: {
+                char ma[16];
+                cout << "Nhap ma SV can hieu chinh: ";
+                cin.getline(ma, 16);
+                if (strlen(ma) == 0) { cout << "Ma rong.\n"; break; }
+                if (suaSV(lop->FirstSV, ma)) cout << "Cap nhat thanh cong.\n";
+                else cout << "Khong tim thay SV.\n";
+                break;
+            }
+            case 0:
+                cout << "Thoat menu cap nhat SV.\n";
+                break;
+            default:
+                cout << "Lua chon khong hop le. Thu lai.\n";
+        }
+    } while (chon != 0);
+}
+
+// -------------------- In DSSV của 1 lớp theo TEN + HO --------------------
+void inDSSV_TheoTen(LopSV* lop) {
+    if (!lop) return;
+    if (!lop->FirstSV) {
+        cout << "Lop khong co sinh vien.\n";
+        return;
+    }
+
+    // 1) Đếm số SV
+    int n = 0;
+    for (PTRSV p = lop->FirstSV; p != NULL; p = p->next) n++;
+
+    // 2) Cấp phát mảng con trỏ đúng kích thước n
+    PTRSV* arr = new PTRSV[n]; // mỗi phần tử trỏ tới nodeSV
+    int idx = 0;
+    for (PTRSV p = lop->FirstSV; p != NULL; p = p->next) {
+        arr[idx++] = p;
+    }
+
+    // 3) Selection sort ảo trên mảng con trỏ theo TEN, nếu bằng thì theo HO
+    for (int i = 0; i < n - 1; i++) {
+        int minIdx = i;
+        for (int j = i + 1; j < n; j++) {
+            int cmpTen = strcmp(arr[j]->sv.TEN, arr[minIdx]->sv.TEN);
+            if (cmpTen < 0) minIdx = j;
+            else if (cmpTen == 0) {
+                if (strcmp(arr[j]->sv.HO, arr[minIdx]->sv.HO) < 0)
+                    minIdx = j;
+            }
+        }
+        if (minIdx != i) {
+            PTRSV tmp = arr[i];
+            arr[i] = arr[minIdx];
+            arr[minIdx] = tmp;
+        }
+    }
+
+    // 4) In kết quả: in MASV và HỌ TÊN
+    cout << "\nDanh sach sinh vien lop " << lop->MALOP << " (theo TEN + HO tang dan):\n";
+    for (int i = 0; i < n; i++) {
+        cout << i + 1 << ". " << arr[i]->sv.MASV << " - " << arr[i]->sv.HO << " " << arr[i]->sv.TEN << "\n";
+    }
+
+    // 5) Giải phóng mảng con trỏ tạm
+    delete[] arr;
+}
+
+
+

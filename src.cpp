@@ -5,18 +5,21 @@
 #include <fstream>
 #include "src.hpp"
 
+
+#define MAX_LOPSV 10000
+
 using namespace std;
 
 namespace QuanLyDiem {
 
-// ==================== BI?N TOÀN C?C ====================
+// ==================== BIEN TOAN CUC ====================
 
 MonHoc* rootMonHoc = nullptr;
 LopTinChi* dsLopTinChiRoot = nullptr;
 LopSV* dsLopSV[MAX_LOP_ARRAY] = {nullptr};
 int soLuongLopSV = 0;
 
-// ==================== SINH VIÊN ====================
+// ==================== SINH VIÃŠN ====================
 
 void sv_add_head(SinhVien*& head, SinhVien* node) {
     node->next = head;
@@ -110,7 +113,7 @@ void sv_clear(SinhVien*& head) {
     }
 }
 
-// ==================== MÔN H?C (AVL TREE) ====================
+// ==================== MÃ”N H?C (AVL TREE) ====================
 
 int mh_height(MonHoc* n) { return n ? n->height : 0; }
 int mh_balance(MonHoc* n) { return n ? mh_height(n->left) - mh_height(n->right) : 0; }
@@ -314,7 +317,7 @@ void mh_load_from_file(const string& filename) {
     cout << "Da tai du lieu tu file thanh cong!\n";
 }
 
-// ==================== L?P SINH VIÊN ====================
+// ==================== L?P SINH VIÃŠN ====================
 
 int findLopIndexByCode(const string& malop) {
     for (int i = 0; i < MAX_LOP_ARRAY; i++)
@@ -361,7 +364,7 @@ void printAllLop() {
     }
 }
 
-// ==================== ÐANG KÝ ====================
+// ==================== ÃANG KÃ ====================
 LopTinChi* dsLopTC = nullptr;
 static int current_id = 1000;
 
@@ -416,7 +419,7 @@ void dk_print(DangKy* head) {
 		}
 }
 
-// ==================== Lop TÍN CHi ====================
+// ==================== Lop TÃN CHi ====================
 
 int next_MALOPTC() { return current_id++; } //thay the
 
@@ -519,9 +522,9 @@ void ltc_clear_all() {
 
 
 void mh_print_all() {
-    cout << "\n===== DANH SÁCH MÔN H?C HI?N CÓ =====\n";
+    cout << "\n===== DANH SÃCH MÃ”N H?C HI?N CÃ“ =====\n";
     if (!rootMonHoc) {
-        cout << "(Danh sách tr?ng)\n";
+        cout << "(Danh sÃ¡ch tr?ng)\n";
         return;
     }
 
@@ -535,3 +538,47 @@ void mh_print_all() {
 }
 
 } // namespace QuanLyDiem
+
+
+//========================QUAN LY LOP SV============================
+
+struct SinhVien {
+	char MASV [16]; char HO[51], ; 
+    char TEN[11];   char  PHAI[4]; 
+    char SODT[16];  char Email [50];
+
+};
+
+struct nodeSV {
+	SinhVien sv;
+	nodeSV *next;
+};
+typedef nodeSV* PTRSV;
+
+struct LopSV  {
+	char MALOP[16] ; 
+    char TENLOP[51] , 
+	PTRSV FirstSV=NULL; 
+};
+
+struct DS_LOPSV {
+	int n=0;
+	LopSV* nodes[MAX_LOPSV];
+};
+
+// Tao node sinh vien moi (cap phat dong)
+PTRSV taoNodeSV(const SinhVien &sv) {
+    PTRSV p = new NodeSV;
+    p->sv = sv;
+    p->next = NULL;
+    return p;
+}
+
+// Tim lop theo ma trong DS_LOPSV (tra ve con tro Ä‘áº¿n LopSV hoac NULL neu khong tim)
+LopSV* timLopTheoMa(DS_LOPSV &ds, const char* maLop) {
+    for (int i = 0; i < ds.n; i++) {
+        if (strcmp(ds.nodes[i]->MALOP, maLop) == 0)
+            return ds.nodes[i];
+    }
+    return NULL;
+}

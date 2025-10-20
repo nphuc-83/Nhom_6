@@ -8,24 +8,24 @@
 
 namespace QuanLyDiem {
 
-// =================== C?U HÃNH CHU?I & GI?I H?N ===================
+// =================== C?U H√åNH CHU?I & GI?I H?N ===================
 
-// constexpr l‡ h?ng s? ki?u an to‡n (du?c ki?m tra t?i compile-time)
-constexpr int MAX_MAMH       = 11;    // M„ mÙn h?c (C10 + '\0')
-constexpr int MAX_TENMH      = 51;    // TÍn mÙn h?c (C50)
-constexpr int MAX_MALOP      = 16;    // M„ l?p (C15)
-constexpr int MAX_MASV       = 16;    // M„ sinh viÍn (C15)
+// constexpr l√† h?ng s? ki?u an to√†n (du?c ki?m tra t?i compile-time)
+constexpr int MAX_MAMH       = 11;    // M√£ m√¥n h?c (C10 + '\0')
+constexpr int MAX_TENMH      = 51;    // T√™n m√¥n h?c (C50)
+constexpr int MAX_MALOP      = 16;    // M√£ l?p (C15)
+constexpr int MAX_MASV       = 16;    // M√£ sinh vi√™n (C15)
 constexpr int MAX_TENLOP     = 51;
 constexpr int MAX_HO         = 51;
 constexpr int MAX_TEN        = 21;
 constexpr int MAX_SODT       = 16;
 constexpr int MAX_LOP_ARRAY  = 10000;
 
-// =================== C?U TR⁄C D? LI?U ===================
+// =================== C?U TR√öC D? LI?U ===================
 
 struct DangKy {
 std::string MASV;
-float DIEM; // -1 n?u chua cÛ di?m
+float DIEM; // -1 n?u chua c√≥ di?m
 bool HUYDK;
 DangKy* next;
 };
@@ -42,8 +42,8 @@ struct SinhVien {
 struct MonHoc {
     std::string MAMH;
     std::string TENMH;
-    int STCLT = 0;               // S? tÌn ch? l˝ thuy?t
-    int STCTH = 0;               // S? tÌn ch? th?c h‡nh
+    int STCLT = 0;               // S? t√≠n ch? l√Ω thuy?t
+    int STCTH = 0;               // S? t√≠n ch? th?c h√†nh
     
     MonHoc* left = nullptr;
     MonHoc* right = nullptr;
@@ -61,11 +61,11 @@ struct LopTinChi {
 	int SOSVMIN;
 	int SOSVMAX;
 	bool HUYLOP;
-	DangKy* DSDK; // danh s·ch dang k˝ (liÍn k?t don)
+	DangKy* DSDK; // danh s√°ch dang k√Ω (li√™n k?t don)
 	LopTinChi* next;
 };
 
-struct DSLopTinChi { //thÍm (DSLopTinChi qu?n l˝ danh s·ch l?p tÌn ch?)
+struct DSLopTinChi { //th√™m (DSLopTinChi qu?n l√Ω danh s√°ch l?p t√≠n ch?)
 LopTinChi* head;
 int nextID;
 DSLopTinChi();
@@ -81,27 +81,28 @@ struct LopSV {
 };
 
 
-// =================== BI?N TO¿N C?C ===================
+// =================== BI?N TO√ÄN C?C ===================
 
 extern MonHoc* rootMonHoc ;
 extern LopTinChi* dsLopTC;         //thay the
 extern LopSV* dsLopSV[MAX_LOP_ARRAY];
 extern int soLuongLopSV;
 
-// =================== NGUY N M?U H¿M ===================
+// =================== NGUY√äN M?U H√ÄM ===================
 
-// --- Sinh viÍn ---
-void sv_add_head(SinhVien*& head, SinhVien* node);
-SinhVien* sv_find(SinhVien* head, const std::string& masv);
-bool sv_remove(SinhVien*& head, const std::string& masv);
-bool sv_edit(SinhVien* head, const std::string& masv, const std::string& ho,
-             const std::string& ten, char phai, const std::string& sodt);
-void sv_print(SinhVien* head);
-std::vector<SinhVien*> sv_to_vector(SinhVien* head);
-void sv_print_sorted_by_name(SinhVien* head);
-void sv_clear(SinhVien*& head);
+// --- Sinh vi√™n ---
+PTRSV taoNodeSV(const SinhVien &sv);
+LopSV* timLopTheoMa(DS_LOPSV &ds, const char* maLop);
+PTRSV timSVTheoMa(PTRSV first, const char* maSV);
+void themSV(PTRSV &first, const SinhVien &sv);
+bool xoaSV(PTRSV &first, const char* maSV);
+bool suaSV(PTRSV first, const char* maSV);
+SinhVien nhapThongTinSV();
+void menuCapNhatSV(LopSV* lop);
+void inDSSV_TheoTen(LopSV* lop);
+void menu_ChucNang_C_D(DS_LOPSV &ds)
 
-// --- MÙn h?c (AVL Tree) ---
+// --- M√¥n h?c (AVL Tree) ---
 int mh_height(MonHoc* n);
 int mh_balance(MonHoc* n);
 void mh_update_height(MonHoc* n);
@@ -118,21 +119,21 @@ bool mh_edit(const std::string& mamh, const std::string& tenmh, int stclt, int s
 void mh_save_to_file(const std::string& filename);
 void mh_load_from_file(const std::string& filename);
 
-// --- L?p sinh viÍn ---
+// --- L?p sinh vi√™n ---
 int findLopIndexByCode(const std::string& malop);
 bool addLop(const std::string& malop, const std::string& tenlop);
 bool removeLop(const std::string& malop);
 bool editLop(const std::string& malop, const std::string& newTen);
 void printAllLop();
 
-// --- –ang k˝ ---
+// --- √êang k√Ω ---
 void dk_add_head(DangKy*& head, DangKy* node);
 DangKy* dk_find(DangKy* head, const std::string& masv);
 bool dk_remove(DangKy*& head, const std::string& masv);
 void dk_clear(DangKy*& head);
 void dk_print(DangKy* head);
 
-// --- L?p tÌn ch? ---
+// --- L?p t√≠n ch? ---
 int nextMaLopTC();
 int next_MALOPTC();
 LopTinChi* ltc_add(const std::string& mamh, const std::string& nk, int hk, int nhom, int minsv, int maxsv, bool huy=false);
@@ -140,21 +141,21 @@ LopTinChi* ltc_find_by_id(int id);
 bool ltc_remove_by_id(int id);
 void ltc_print_all();
 
-// thÍm dang k˝ (MASV) v‡o l?p (n?u d„ cÛ thÏ khÙng thÍm duplicate)
+// th√™m dang k√Ω (MASV) v√†o l?p (n?u d√£ c√≥ th√¨ kh√¥ng th√™m duplicate)
 bool ltc_add_registration(int maLopTC, const std::string& masv);
-// tÏm dang k˝ trong l?p
+// t√¨m dang k√Ω trong l?p
 DangKy* ltc_find_registration(int maLopTC, const std::string& masv);
 // nh?p/ c?p nh?t di?m cho MASV trong l?p
 bool ltc_set_score(int maLopTC, const std::string& masv, float diem);
 
-// in danh s·ch theo b? l?c (niÍn khÛa, hoc ky, nhom, mamh)
+// in danh s√°ch theo b? l?c (ni√™n kh√≥a, hoc ky, nhom, mamh)
 void ltc_print_filtered(const std::string& nk, int hk, int nhom, const std::string& mamh);
 
-// gi?i phÛng to‡n b? ds
+// gi?i ph√≥ng to√†n b? ds
 void ltc_clear_all();
 
 
-void mh_print_all();  		// CHECK XEM M‘N H?C NH?P ?N CHUA
+void mh_print_all();  		// CHECK XEM M√îN H?C NH?P ?N CHUA
 } // namespace QuanLyDiem
 
 #endif // QUANLY_DIEM_HPP

@@ -30,7 +30,7 @@ int QuanLiChucNang() {
         		QuanLiLopTinChi();
         		break;
 			case 2:
-			    QuanLiLopSV();
+			    QuanLiLopSV(DS_LOPSV &ds);
 			    break;
             case 3:
                 QuanLiMonHoc();

@@ -90,17 +90,7 @@ extern int soLuongLopSV;
 
 // =================== NGUYÊN M?U HÀM ===================
 
-// --- Sinh viên ---
-PTRSV taoNodeSV(const SinhVien &sv);
-LopSV* timLopTheoMa(DS_LOPSV &ds, const char* maLop);
-PTRSV timSVTheoMa(PTRSV first, const char* maSV);
-void themSV(PTRSV &first, const SinhVien &sv);
-bool xoaSV(PTRSV &first, const char* maSV);
-bool suaSV(PTRSV first, const char* maSV);
-SinhVien nhapThongTinSV();
-void menuCapNhatSV(LopSV* lop);
-void inDSSV_TheoTen(LopSV* lop);
-void menu_ChucNang_C_D(DS_LOPSV &ds)
+
 
 // --- Môn h?c (AVL Tree) ---
 int mh_height(MonHoc* n);
@@ -119,12 +109,7 @@ bool mh_edit(const std::string& mamh, const std::string& tenmh, int stclt, int s
 void mh_save_to_file(const std::string& filename);
 void mh_load_from_file(const std::string& filename);
 
-// --- L?p sinh viên ---
-int findLopIndexByCode(const std::string& malop);
-bool addLop(const std::string& malop, const std::string& tenlop);
-bool removeLop(const std::string& malop);
-bool editLop(const std::string& malop, const std::string& newTen);
-void printAllLop();
+
 
 // --- Ðang ký ---
 void dk_add_head(DangKy*& head, DangKy* node);
@@ -132,6 +117,18 @@ DangKy* dk_find(DangKy* head, const std::string& masv);
 bool dk_remove(DangKy*& head, const std::string& masv);
 void dk_clear(DangKy*& head);
 void dk_print(DangKy* head);
+
+// --- Sinh viên ---
+PTRSV taoNodeSV(const SinhVien &sv);
+LopSV* timLopTheoMa(DS_LOPSV &ds, const char* maLop);
+PTRSV timSVTheoMa(PTRSV first, const char* maSV);
+void themSV(PTRSV &first, const SinhVien &sv);
+bool xoaSV(PTRSV &first, const char* maSV);
+bool suaSV(PTRSV first, const char* maSV);
+SinhVien nhapThongTinSV();
+void menuCapNhatSV(LopSV* lop);
+void inDSSV_TheoTen(LopSV* lop);
+
 
 // --- L?p tín ch? ---
 int nextMaLopTC();

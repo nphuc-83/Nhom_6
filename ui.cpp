@@ -10,13 +10,9 @@ int QuanLiChucNang() {
         cout << "=====================================\n";
         cout << "  QUAN LI SINH VIEN THEO HE TIN CHI\n";
         cout << "=====================================\n";
-<<<<<<< HEAD
+
         cout << "1. Quan li lop tin chi\n";
         cout << "2. Quan li lop hoc (tam khoa)\n";
-=======
-        cout << "1. Quan li lop tin chi (tam khoa)\n";
-        cout << "2. Quan li sinh vien (tam khoa)\n";
->>>>>>> 845bdfe87c9c9393b588e5b9f3378e8b297ed71b
         cout << "3. Quan li mon hoc\n";
         cout << "4. Quan li dang ky lop tin chi (tam khoa)\n";
         cout << "5. Ghi du lieu mon hoc vao file\n";
@@ -29,9 +25,9 @@ int QuanLiChucNang() {
         	case 1:
         		QuanLiLopTinChi();
         		break;
-			case 2:
-			    QuanLiLopSV(DS_LOPSV &ds);
-			    break;
+        	case 2:
+        		QuanliLopSinhVien();
+        		break;
             case 3:
                 QuanLiMonHoc();
                 break;
@@ -162,13 +158,9 @@ int QuanLiLopTinChi() {
 	} while (chon != 0);
 	return chon;
 }
-
-
-
-
 // ===== MENU QU?N LÍ MÔN H?C =====
 int QuanLiMonHoc() {
-    int chon;
+    int choice;
     do {
     	system("cls");
         cout << "======= QUAN LI MON HOC =======\n";
@@ -180,28 +172,33 @@ int QuanLiMonHoc() {
         cout << "0. Quay lai menu chinh\n";
         cout << "-------------------------------\n";
         cout << "Nhap lua chon: ";
-        cin >> chon;
+        cin >> choice;
 
-        switch (chon) {
+        switch (choice) {
             case 1: {
             	system("cls");
             	cout << "======= QUAN LI MON HOC =======\n";
                 string MAMH, TENMH;
                 int STCLT, STCTH;
             	QuanLyDiem::mh_print_all();
-                cout << "Vui lòng nh?p mã môn h?c: "; cin >> MAMH;
-                cout << "Vui lòng nh?p tên môn h?c: "; cin.ignore(); getline(cin, TENMH);
-                cout << "Vui lòng nh?p STCLT: "; cin >> STCLT;
-                cout << "Vui lòng nh?p STCTH: "; cin >> STCTH;
-            
-                QuanLyDiem::MonHoc* node = new QuanLyDiem::MonHoc;
-				node->MAMH = MAMH;
-				node->TENMH = TENMH;
-				node->STCLT = STCLT;
-				node->STCTH = STCTH;
+            	
+            	
+            	MAMH = checkMa(10,"Vui long nhap Ma Mon Hoc: ");
+				TENMH = checkTen("Vui long nhap ten Mon Hoc: ");
+                STCLT = nhapSTC("s? t�n ch? l� thuy?t");
+				STCTH = nhapSTC("s? t�n ch? th?c h�nh");
+           
+                QuanLyDiem::treeMH node = new QuanLyDiem::nodeMH;
+
+				node->mh.MAMH = MAMH;
+				node->mh.TENMH = TENMH;
+				node->mh.STCLT = STCLT;
+				node->mh.STCTH = STCTH;
+				node->mh.height = 1;
+				
 				node->left = nullptr;
 				node->right = nullptr;
-				node->height = 1;
+
 
                 QuanLyDiem::rootMonHoc = QuanLyDiem::mh_insert(QuanLyDiem::rootMonHoc, node);
                 system("cls");
@@ -213,7 +210,7 @@ int QuanLiMonHoc() {
             }
             case 2: {
                 string MAMH;
-                cout << "Vui lòng nh?p mã môn h?c c?n xóa: "; cin >> MAMH;
+                MAMH = checkMa(10,"Vui long nhap Ma Mon Hoc can xoa: ");
                 QuanLyDiem::rootMonHoc = QuanLyDiem::mh_remove(QuanLyDiem::rootMonHoc, MAMH);
                 cout << ">> Ðã xóa môn h?c (n?u t?n t?i)!\n";
                 QuanLyDiem::mh_print_all();
@@ -223,10 +220,12 @@ int QuanLiMonHoc() {
             case 3: {
                 string MAMH, TENMH;
                 int STCLT, STCTH;
-                cout << "Vui lòng nh?p mã môn h?c c?n ch?nh s?a: "; cin >> MAMH;
-                cout << "Vui lòng nh?p tên môn h?c m?i: "; cin.ignore(); getline(cin, TENMH);
-                cout << "Vui lòng nh?p STCLT m?i: "; cin >> STCLT;
-                cout << "Vui lòng nh?p STCTH m?i: "; cin >> STCTH;
+                cout << "Vui lòng nh?p mã môn h?c c?n ch?nh s?a: ";
+                MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc: ");
+                cout << "Vui lòng nh?p tên môn h?c m?i: "; cin.ignore(); 
+				TENMH = checkTen("Vui long nhap ten Mon Hoc moi: ");
+                STCLT = nhapSTC("Vui l�ng nh?p l?i s? t�n ch? l� thuy?t");
+				STCTH = nhapSTC("Vui l�ng nh?p l?i s? t�n ch? th?c h�nh");
                 if (QuanLyDiem::mh_edit(MAMH, TENMH, STCLT, STCTH)) {
                     cout << ">> Ðã ch?nh s?a môn h?c thành công!\n";
                 } else {
@@ -244,44 +243,137 @@ int QuanLiMonHoc() {
             case 0: cout << "Quay lai menu chinh...\n"; break;
             default: cout << "Lua chon khong hop le!\n"; break;
         }
-    } while (chon != 0);
-    return chon;
+    } while (choice != 0);
+    return choice;
 }
 
-int QuanLiLopSV (DS_LOPSV &ds) {
-    int chon;
+int QuanliLopSinhVien() {
+	int choice;
     do {
-        cout << "\n====== QUAN LI LOP SV  ======\n";
-        cout << "1. Nhap / Cap nhat sinh vien cho 1 lop (Them/Xoa/Hieu chinh)\n";
-        cout << "2. In danh sach sinh vien cua 1 lop theo TEN + HO\n";
-        cout << "0. Thoat\n";
-        cout << "Chon: ";
-        if (!(cin >> chon)) { cin.clear(); cin.ignore(10000, '\n'); chon = -1; }
-        cin.ignore();
-        switch (chon) {
+    	system("cls");
+        cout << "======= QUAN LI DANH SACH SINH VIEN =======\n";
+        QuanLyDiem::dssv_print_all();
+        cout << "1. Them lop hoc\n";
+        cout << "2. Xoa lop hoc\n";
+        cout << "3. Dieu chinh lop hoc\n";
+        cout << "4. Cap nhat danh sach lop hoc\n";
+        cout << "0. Quay lai menu chinh\n";
+        cout << "-------------------------------\n";
+        cout << "Nhap lua chon: ";
+        cin >> choice;
+
+        switch (choice) {
             case 1: {
-                char maLop[16];
-                cout << "Nhap ma lop: ";
-                cin.getline(maLop, 16);
-                LopSV* lop = timLopTheoMa(ds, maLop);
-                if (!lop) cout << "Lop khong ton tai!\n";
-                else menuCapNhatSV(lop);
-                break;
+            	system("cls");
+            	cout << "======= QUAN LI DANH SACH SINH VIEN =======\n";
+            	QuanLyDiem::dssv_print_all();
+                string MALOP, TENLOP;
+            	
+				MALOP = checkMa(15,"Vui long nhap Ma Lop Hoc: ");
+				TENLOP = checkTen("Vui long nhap ten Mon Hoc: ");
+				while(true) {
+					if(QuanLyDiem::dssv_insert(MALOP, TENLOP)) {
+						cout << "Them thanh cong\n"; 
+						system("pause");
+						break;	
+					}
+					else {
+						cout << "Danh sach lop da day!\n";
+						system("pause");
+						break;
+					}
+				} 
+				break; 
             }
             case 2: {
-                char maLop[16];
-                cout << "Nhap ma lop: ";
-                cin.getline(maLop, 16);
-                LopSV* lop = timLopTheoMa(ds, maLop);
-                if (!lop) cout << "Lop khong ton tai!\n";
-                else inDSSV_TheoTen(lop);
-                break;
+            	system("cls");
+            	cout << "======= QUAN LI DANH SACH SINH VIEN =======\n";
+            	QuanLyDiem::dssv_print_all();
+                string MALOP;
+            	
+				MALOP = checkMa(15,"Vui long nhap Ma Lop Hoc can xoa: ");
+				while(true) {
+					if(QuanLyDiem::dssv_remove(MALOP)) {
+						cout << "Xoa thanh cong\n"; 
+						system("pause");
+						break;	
+					}
+					else {
+						cout << "Danh sach lop khong ton tai!\n";
+						system("pause");
+						break;
+					}
+				}  
+				break;
             }
-            case 0:
-                cout << "Thoat chuong trinh.\n";
-                return 0; // 🔹 Trả về giá trị khi thoát
-            default:
-                cout << "Lua chon khong hop le. Thu lai.\n";
+            case 3: {
+            	system("cls");
+            	cout << "======= QUAN LI DANH SACH SINH VIEN ===ds====\n";
+            	QuanLyDiem::dssv_print_all();
+                string MALOP;
+                string newTen;
+            	
+				MALOP = checkMa(15,"Vui long nhap Ma Lop Hoc: ");
+				newTen = checkTen("Vui long nhap ten Mon Hoc moi: ");
+				while(true) {
+					if(QuanLyDiem::dssv_edit(MALOP, newTen)) {
+						cout << "Xoa thanh cong\n"; 
+						system("pause");
+						break;	
+					}
+					else {
+						cout << "Danh sach lop khong ton tai!\n";
+						system("pause");
+						break;
+					}
+				}  
+				break;
+            }
+            case 4: {
+			    system("cls");
+			    cout << "======= THEM SINH VIEN VAO LOP =======\n";
+			    QuanLyDiem::dssv_print_all(); // In danh s�ch l?p hi?n c�
+			
+			    string MALOP = checkMa(15, "Vui long nhap Ma Lop Hoc: ");
+			
+			    QuanLyDiem::LopSV* lop = QuanLyDiem::dssv_find(MALOP);
+			    if (lop == nullptr) {
+			        cout << "Lop khong ton tai!\n";
+			        system("pause");
+			        break;
+			    }
+				//in toan bo danh sach sinh vien cua ma lop do roi moi cho cap nhat sinh vien
+			    // Nh?p th�ng tin sinh vi�n
+			    QuanLyDiem::SinhVien sv;
+			    cout << "\n=== Nhap thong tin sinh vien ===\n";
+			    cout << "Ma sinh vien: ";
+			    cin.ignore();
+			    getline(cin, sv.MASV);
+			    cout << "Ho: ";
+			    getline(cin, sv.HO);
+			    cout << "Ten: ";
+			    getline(cin, sv.TEN);
+			    cout << "Phai (Nam/Nu): ";
+			    getline(cin, sv.PHAI);
+			    cout << "So dien thoai: ";
+			    getline(cin, sv.SODT);
+			    cout << "Email: ";
+			    getline(cin, sv.Email);
+			
+			    // G?i h�m th�m SV
+			    if (QuanLyDiem::sv_insert(lop, sv)) {
+			        cout << "\nThem sinh vien thanh cong!\n";
+			    } else {
+			        cout << "\nThem sinh vien that bai (co the do trung ma SV hoac loi khac).\n";
+			    }
+			
+			    system("pause");
+			    break;
+			}
+            case 0: cout << "Quay lai menu chinh...\n"; break;
+            default: cout << "Lua chon khong hop le!\n"; break;
         }
-    } while (true);
-}
+    } while (choice != 0);
+    return choice;
+};
+

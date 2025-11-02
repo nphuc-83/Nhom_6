@@ -10,9 +10,9 @@ int QuanLiChucNang();
 
 int QuanLiLopTinChi();
 
-int QuanLiLopSV();
-
 int QuanLiMonHoc();
+
+int QuanliLopSinhVien();
 
 #endif
 

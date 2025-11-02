@@ -5,62 +5,66 @@
 #include <fstream>
 #include "src.hpp"
 
-
-#define MAX_LOPSV 10000
-
 using namespace std;
 
 namespace QuanLyDiem {
 
-// ==================== BIEN TOAN CUC ====================
+// ==================== BI?N TO¿N C?C ====================
 
-MonHoc* rootMonHoc = nullptr;
+treeMH rootMonHoc;
 LopTinChi* dsLopTinChiRoot = nullptr;
-LopSV* dsLopSV[MAX_LOP_ARRAY] = {nullptr};
+DS_LOPSV* dsLopSV = new DS_LOPSV();
 int soLuongLopSV = 0;
 
+// ==================== M‘N H?C (AVL TREE) ====================
 
-// ==================== M√îN H?C (AVL TREE) ====================
+int mh_height(treeMH n) { return n ? n->mh.height : 0; }
 
-int mh_height(MonHoc* n) { return n ? n->height : 0; }
-int mh_balance(MonHoc* n) { return n ? mh_height(n->left) - mh_height(n->right) : 0; }
+int mh_balance(treeMH n) { return n ? mh_height(n->left) - mh_height(n->right) : 0; }
 
-void mh_update_height(MonHoc* n) {
+void mh_update_height(treeMH n) {
     if (n)
-        n->height = 1 + max(mh_height(n->left), mh_height(n->right));
+        n->mh.height = 1 + max(mh_height(n->left), mh_height(n->right));
 }
 
-MonHoc* mh_right_rotate(MonHoc* y) {
-    MonHoc* x = y->left;
-    MonHoc* T2 = x->right;
+// ---- Quay ph?i ----
+treeMH mh_right_rotate(treeMH y) {
+    treeMH x = y->left;
+    treeMH T2 = x->right;
+
     x->right = y;
     y->left = T2;
+
     mh_update_height(y);
     mh_update_height(x);
     return x;
 }
 
-MonHoc* mh_left_rotate(MonHoc* x) {
-    MonHoc* y = x->right;
-    MonHoc* T2 = y->left;
+// ---- Quay tr·i ----
+treeMH mh_left_rotate(treeMH x) {
+    treeMH y = x->right;
+    treeMH T2 = y->left;
+
     y->left = x;
     x->right = T2;
+
     mh_update_height(x);
     mh_update_height(y);
     return y;
 }
 
-MonHoc* mh_insert(MonHoc* root, MonHoc* node) {
+// ---- ThÍm node m?i (AVL Insert) ----
+treeMH mh_insert(treeMH root, treeMH node) {
     if (!root) return node;
-    
-	if (node->MAMH < root->MAMH)
-	        root->left = mh_insert(root->left, node);
-	else if (node->MAMH > root->MAMH)
-		        root->right = mh_insert(root->right, node);
+
+    if (node->mh.MAMH < root->mh.MAMH)
+        root->left = mh_insert(root->left, node);
+    else if (node->mh.MAMH > root->mh.MAMH)
+        root->right = mh_insert(root->right, node);
     else {
-        root->TENMH = node->TENMH;
-        root->STCLT = node->STCLT;
-        root->STCTH = node->STCTH;
+        root->mh.TENMH = node->mh.TENMH;
+        root->mh.STCLT = node->mh.STCLT;
+        root->mh.STCTH = node->mh.STCTH;
         delete node;
         return root;
     }
@@ -68,60 +72,65 @@ MonHoc* mh_insert(MonHoc* root, MonHoc* node) {
     mh_update_height(root);
     int bal = mh_balance(root);
 
-    if (bal > 1 && node->MAMH < root->left->MAMH) return mh_right_rotate(root);
-    if (bal < -1 && node->MAMH > root->right->MAMH) return mh_left_rotate(root);
-    if (bal > 1 && node->MAMH > root->left->MAMH) {
+    if (bal > 1 && node->mh.MAMH < root->left->mh.MAMH) return mh_right_rotate(root);
+    if (bal < -1 && node->mh.MAMH > root->right->mh.MAMH) return mh_left_rotate(root);
+    if (bal > 1 && node->mh.MAMH > root->left->mh.MAMH) {
         root->left = mh_left_rotate(root->left);
         return mh_right_rotate(root);
     }
-    if (bal < -1 && node->MAMH < root->right->MAMH) {
+    if (bal < -1 && node->mh.MAMH < root->right->mh.MAMH) {
         root->right = mh_right_rotate(root->right);
         return mh_left_rotate(root);
     }
     return root;
 }
 
-MonHoc* mh_find(MonHoc* root, const string& mamh) {
+// ---- TÏm mÙn h?c ----
+treeMH mh_find(treeMH root, const string& mamh) {
     if (!root) return nullptr;
-    if (mamh == root->MAMH) return root;
-    if (mamh < root->MAMH) return mh_find(root->left, mamh);
+    if (mamh == root->mh.MAMH) return root;
+    if (mamh < root->mh.MAMH) return mh_find(root->left, mamh);
     return mh_find(root->right, mamh);
 }
 
-void mh_inorder_print(MonHoc* root) {
+// ---- Duy?t in LNR ----
+void mh_inorder_print(treeMH root) {
     if (!root) return;
     mh_inorder_print(root->left);
-    cout << left << setw(12) << root->MAMH
-         << setw(50) << root->TENMH
-         << setw(6) << root->STCLT
-         << setw(6) << root->STCTH << "\n";
+    cout << left << setw(12) << root->mh.MAMH
+         << setw(50) << root->mh.TENMH
+         << setw(6) << root->mh.STCLT
+         << setw(6) << root->mh.STCTH << "\n";
     mh_inorder_print(root->right);
 }
 
-void mh_clear(MonHoc* root) {
+// ---- Gi?i phÛng c‚y ----
+void mh_clear(treeMH root) {
     if (!root) return;
     mh_clear(root->left);
     mh_clear(root->right);
     delete root;
 }
 
-MonHoc* mh_min_value_node(MonHoc* node) {
-    MonHoc* current = node;
-    while (current->left != nullptr)
+// ---- TÏm node nh? nh?t ----
+treeMH mh_min_value_node(treeMH node) {
+    treeMH current = node;
+    while (current && current->left != nullptr)
         current = current->left;
     return current;
 }
 
-MonHoc* mh_remove(MonHoc* root, const string& mamh) {
+// ---- XÛa node ----
+treeMH mh_remove(treeMH root, const string& mamh) {
     if (root == nullptr) return root;
 
-    if (mamh < root->MAMH)
+    if (mamh < root->mh.MAMH)
         root->left = mh_remove(root->left, mamh);
-    else if (mamh > root->MAMH)
+    else if (mamh > root->mh.MAMH)
         root->right = mh_remove(root->right, mamh);
     else {
         if ((root->left == nullptr) || (root->right == nullptr)) {
-            MonHoc* temp = root->left ? root->left : root->right;
+            treeMH temp = root->left ? root->left : root->right;
             if (temp == nullptr) {
                 temp = root;
                 root = nullptr;
@@ -129,12 +138,12 @@ MonHoc* mh_remove(MonHoc* root, const string& mamh) {
                 *root = *temp;
             delete temp;
         } else {
-            MonHoc* temp = mh_min_value_node(root->right);
-            root->MAMH = temp->MAMH;
-            root->TENMH = temp->TENMH;
-            root->STCLT = temp->STCLT;
-            root->STCTH = temp->STCTH;
-            root->right = mh_remove(root->right, temp->MAMH);
+            treeMH temp = mh_min_value_node(root->right);
+            root->mh.MAMH = temp->mh.MAMH;
+            root->mh.TENMH = temp->mh.TENMH;
+            root->mh.STCLT = temp->mh.STCLT;
+            root->mh.STCTH = temp->mh.STCTH;
+            root->right = mh_remove(root->right, temp->mh.MAMH);
         }
     }
 
@@ -162,19 +171,22 @@ MonHoc* mh_remove(MonHoc* root, const string& mamh) {
     return root;
 }
 
+// ---- S?a thÙng tin mÙn h?c ----
 bool mh_edit(const string& mamh, const string& tenmh, int stclt, int stcth) {
-    MonHoc* node = mh_find(rootMonHoc, mamh);
+    treeMH node = mh_find(rootMonHoc, mamh);
     if (!node) return false;
-    node->TENMH = tenmh;
-    node->STCLT = stclt;
-    node->STCTH = stcth;
+    node->mh.TENMH = tenmh;
+    node->mh.STCLT = stclt;
+    node->mh.STCTH = stcth;
     return true;
 }
 
-void mh_save_inorder(MonHoc* root, ofstream& fout) {
+// ---- Luu c‚y v‡o file (duy?t LNR) ----
+void mh_save_inorder(treeMH root, ofstream& fout) {
     if (!root) return;
     mh_save_inorder(root->left, fout);
-    fout << root->MAMH << "|" << root->TENMH << "|" << root->STCLT << "|" << root->STCTH << endl;
+    fout << root->mh.MAMH << "|" << root->mh.TENMH << "|" 
+         << root->mh.STCLT << "|" << root->mh.STCTH << endl;
     mh_save_inorder(root->right, fout);
 }
 
@@ -189,6 +201,7 @@ void mh_save_to_file(const string& filename) {
     cout << "Da luu du lieu vao file thanh cong!\n";
 }
 
+// ---- T?i d? li?u t? file ----
 void mh_load_from_file(const string& filename) {
     ifstream fin(filename);
     if (!fin) {
@@ -210,21 +223,208 @@ void mh_load_from_file(const string& filename) {
         string stcth_str = line.substr(pos3 + 1);
         int stclt = stoi(stclt_str);
         int stcth = stoi(stcth_str);
-        MonHoc* node = new MonHoc;
-        node->MAMH = mamh;
-        node->TENMH = tenmh;
-        node->STCLT = stclt;
-        node->STCTH = stcth;
-        node->left = nullptr;
-        node->right = nullptr;
-        node->height = 1;
+
+        treeMH node = new nodeMH;
+        node->mh.MAMH = mamh;
+        node->mh.TENMH = tenmh;
+        node->mh.STCLT = stclt;
+        node->mh.STCTH = stcth;
+        node->mh.height = 1;
+        node->left = node->right = nullptr;
+
         rootMonHoc = mh_insert(rootMonHoc, node);
     }
     fin.close();
     cout << "Da tai du lieu tu file thanh cong!\n";
 }
 
-// ==================== √êANG K√ù ====================
+// ==================== SINH VI N ====================
+
+//void sv_add_head(SinhVien*& head, SinhVien* node) {
+//    node->next = head;
+//    head = node;
+//}
+//
+//SinhVien* sv_find(SinhVien* head, const string& masv) {
+//    for (SinhVien* p = head; p; p = p->next)
+//        if (p->MASV == masv) return p;
+//    return nullptr;
+//}
+//
+//bool sv_remove(SinhVien*& head, const string& masv) {
+//    SinhVien* cur = head;
+//    SinhVien* prev = nullptr;
+//    while (cur) {
+//        if (cur->MASV == masv) {
+//            if (!prev) head = cur->next;
+//            else prev->next = cur->next;
+//            delete cur;
+//            return true;
+//        }
+//        prev = cur;
+//        cur = cur->next;
+//    }
+//    return false;
+//}
+//
+//bool sv_edit(SinhVien* head, const string& masv, const string& ho,
+//             const string& ten, char phai, const string& sodt) {
+//    SinhVien* p = sv_find(head, masv);
+//    if (!p) return false;
+//    p->HO = ho;
+//    p->TEN = ten;
+//    p->PHAI = phai;
+//    p->SODT = sodt;
+//    return true;
+//}
+//
+//void sv_print(SinhVien* head) {
+//    cout << left << setw(16) << "MASV"
+//         << setw(20) << "HO"
+//         << setw(12) << "TEN"
+//         << setw(8) << "PHAI"
+//         << setw(15) << "SODT"
+//         << "\n";
+//
+//    for (SinhVien* p = head; p; p = p->next)
+//        cout << left << setw(16) << p->MASV
+//             << setw(20) << p->HO
+//             << setw(12) << p->TEN
+//             << setw(8) << p->PHAI
+//             << setw(15) << p->SODT
+//             << "\n";
+//}
+//
+//vector<SinhVien*> sv_to_vector(SinhVien* head) {
+//    vector<SinhVien*> v;
+//    for (SinhVien* p = head; p; p = p->next)
+//        v.push_back(p);
+//    return v;
+//}
+//
+//void sv_print_sorted_by_name(SinhVien* head) {
+//    auto v = sv_to_vector(head);
+//    sort(v.begin(), v.end(), [](SinhVien* a, SinhVien* b) {
+//        if (a->TEN != b->TEN) return a->TEN < b->TEN;
+//        return a->HO < b->HO;
+//    });
+//    cout << "Danh sach SV sap xep theo TEN + HO:\n";
+//    cout << left << setw(16) << "MASV"
+//         << setw(20) << "HO"
+//         << setw(12) << "TEN"
+//         << setw(8) << "PHAI"
+//         << setw(15) << "SODT"
+//         << "\n";
+//    for (auto p : v)
+//        cout << left << setw(16) << p->MASV
+//             << setw(20) << p->HO
+//             << setw(12) << p->TEN
+//             << setw(8) << p->PHAI
+//             << setw(15) << p->SODT
+//             << "\n";
+//}
+//
+bool sv_insert(LopSV* lop, const SinhVien& sv) {
+        if (lop == nullptr) return false;
+
+        // ki?m tra tr˘ng MASV
+        for (nodeSV* p = lop->FirstSV; p != nullptr; p = p->next) {
+            if (p->sv.MASV == sv.MASV)
+                return false; // tr˘ng m„ SV
+        }
+
+        // t?o node m?i
+        nodeSV* newNode = new nodeSV{ sv, nullptr };
+
+        if (lop->FirstSV == nullptr)
+            lop->FirstSV = newNode;
+        else {
+            nodeSV* q = lop->FirstSV;
+            while (q->next != nullptr) q = q->next;
+            q->next = newNode;
+        }
+
+        return true;
+    }
+void sv_clear(nodeSV*& head) {
+    while (head) {
+        nodeSV* t = head;
+        head = head->next;
+        delete t;
+    }
+}
+// ==================== L?P SINH VI N ====================
+
+int dssv_find_index_lop(const string& malop) {
+    for (int i = 0; i < MAX_LOPSV; i++)
+        if (dsLopSV->nodes[i] && dsLopSV->nodes[i]->MALOP == malop)
+            return i;
+    return -1;
+}
+
+bool dssv_insert(const string& malop, const string& tenlop) {
+	if (dsLopSV->n >= MAX_LOPSV) return false;
+    
+    for (int i = 0; i < MAX_LOPSV; i++) {
+        if (!dsLopSV->nodes[i]) {
+            dsLopSV->nodes[i] = new LopSV{malop, tenlop, nullptr};
+            dsLopSV->n++;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool dssv_remove(const string& malop) {
+    int idx = dssv_find_index_lop(malop);
+    if (idx == -1) return false;
+    sv_clear(dsLopSV->nodes[idx]->FirstSV);
+    delete dsLopSV->nodes[idx];
+    dsLopSV->nodes[idx] = nullptr;
+    dsLopSV->n--;
+    return true;
+}
+
+bool dssv_edit(const string& malop, const string& newTen) {
+    int idx = dssv_find_index_lop(malop);
+    if (idx == -1) return false;
+    dsLopSV->nodes[idx]->TENLOP = newTen;
+    return true;
+}
+
+void dssv_print_all() {
+    if (dsLopSV == nullptr || dsLopSV->n == 0) {
+        cout << endl <<  "DANH SACH LOP RONG!\n" << endl;
+        return;
+    }
+
+    cout << left << setw(10) << "STT"
+         << setw(20) << "MA LOP"
+         << setw(40) << "TEN LOP" << endl;
+    cout << string(70, '-') << endl;
+
+    int count = 0;
+    for (int i = 0; i < MAX_LOPSV; i++) {
+        if (dsLopSV->nodes[i] != nullptr) {
+            cout << left << setw(10) << (++count)
+                 << setw(20) << dsLopSV->nodes[i]->MALOP
+                 << setw(40) << dsLopSV->nodes[i]->TENLOP << endl;
+        }
+    }
+
+    if (count == 0)
+        cout << "Chua co lop nao trong danh sach.\n";
+}
+
+LopSV* dssv_find(std::string &malop) {
+	for (int i = 0; i < MAX_LOPSV; i++) {
+            if (dsLopSV->nodes[i]->MALOP == malop)
+                return dsLopSV->nodes[i];
+        }
+        return nullptr;
+};
+
+// ==================== –ANG K› ====================
 LopTinChi* dsLopTC = nullptr;
 static int current_id = 1000;
 
@@ -279,7 +479,7 @@ void dk_print(DangKy* head) {
 		}
 }
 
-// ==================== Lop T√çN CHi ====================
+// ==================== Lop TÕN CHi ====================
 
 int next_MALOPTC() { return current_id++; } //thay the
 
@@ -382,9 +582,9 @@ void ltc_clear_all() {
 
 
 void mh_print_all() {
-    cout << "\n===== DANH S√ÅCH M√îN H?C HI?N C√ì =====\n";
+    cout << "\n===== DANH S¡CH M‘N H?C HI?N C” =====\n";
     if (!rootMonHoc) {
-        cout << "(Danh s√°ch tr?ng)\n";
+        cout << "(Danh s·ch tr?ng)\n";
         return;
     }
 
@@ -399,214 +599,98 @@ void mh_print_all() {
 
 } // namespace QuanLyDiem
 
+//===== check thong tin can nhap vao ===
 
-//========================QUAN LY LOP SV============================
+string checkMa(int limit, std::string info) {
+    string MAMH;
 
-struct SinhVien {
-	char MASV [16]; char HO[51], ; 
-    char TEN[11];   char  PHAI[4]; 
-    char SODT[16];  char Email [50];
+    while (true) {
+        cout << info;
+        cin >> MAMH;
 
-};
-
-struct nodeSV {
-	SinhVien sv;
-	nodeSV *next;
-};
-typedef nodeSV* PTRSV;
-
-struct LopSV  {
-	char MALOP[16] ; 
-    char TENLOP[51] , 
-	PTRSV FirstSV=NULL; 
-};
-
-struct DS_LOPSV {
-	int n=0;
-	LopSV* nodes[MAX_LOPSV];
-};
-
-// Tao node sinh vien moi (cap phat dong)
-PTRSV taoNodeSV(const SinhVien &sv) {
-    PTRSV p = new NodeSV;
-    p->sv = sv;
-    p->next = NULL;
-    return p;
-}
-
-// Tim lop theo ma trong DS_LOPSV (tra ve con tro ƒë·∫øn LopSV hoac NULL neu khong tim)
-LopSV* timLopTheoMa(DS_LOPSV &ds, const char* maLop) {
-    for (int i = 0; i < ds.n; i++) {
-        if (strcmp(ds.nodes[i]->MALOP, maLop) == 0)
-            return ds.nodes[i];
-    }
-    return NULL;
-}
-// Tim SV theo masv 
-PTRSV timSVTheoMa(PTRSV first, const char* maSV) {
-    for (PTRSV p = first; p != NULL; p = p->next)
-        if (strcmp(p->sv.MASV, maSV) == 0)
-            return p;
-    return NULL;
-}
-
-// Them SV vao dau danh sach 
-void themSV(PTRSV &first, const SinhVien &sv) {
-    PTRSV p = taoNodeSV(sv);
-    p->next = first;
-    first = p;
-}
-
-// Xoa SV
-bool xoaSV(PTRSV &first, const char* maSV) {
-    PTRSV p = first, prev = NULL;
-    while (p != NULL) {
-        if (strcmp(p->sv.MASV, maSV) == 0) {
-            if (prev == NULL) first = p->next;
-            else prev->next = p->next;
-            delete p;
-            return true;
+        // 1?? Ki?m tra d? d‡i
+        if (MAMH.length() > limit) {
+            cout << "? M„ mÙn h?c khÙng du?c qu· 10 k˝ t?.\n";
+            continue;
         }
-        prev = p;
-        p = p->next;
-    }
-    return false;
-}
 
-// Hieu chinh sv
-bool suaSV(PTRSV first, const char* maSV) {
-    PTRSV p = timSVTheoMa(first, maSV);
-    if (!p) return false;
-    cout << "Nhap ho moi: ";  cin.getline(p->sv.HO, 51);
-    cout << "Nhap ten moi: "; cin.getline(p->sv.TEN, 11);
-    cout << "Nhap phai moi: "; cin.getline(p->sv.PHAI, 4);
-    cout << "Nhap SƒêT moi: ";  cin.getline(p->sv.SODT, 16);
-    return true;
-}
-
-// Menu con cho c·∫≠p nh·∫≠t sinh vi√™n trong l·ªõp (th√™m / x√≥a / s·ª≠a)
-SinhVien nhapThongTinSV() {
-    SinhVien sv;
-    cout << "Nhap ma SV (rong de dung): ";
-    cin.getline(sv.MASV, 16);
-    if (strlen(sv.MASV) == 0) {
-        // tr·∫£ v·ªÅ struct v·ªõi MASV r·ªóng ƒë·ªÉ b√°o d·ª´ng
-        sv.MASV[0] = '\0';
-        return sv;
-    }
-    cout << "Nhap ho: ";  cin.getline(sv.HO, 51);
-    cout << "Nhap ten: "; cin.getline(sv.TEN, 11);
-    cout << "Nhap phai: "; cin.getline(sv.PHAI, 4);
-    cout << "Nhap SƒêT: "; cin.getline(sv.SODT, 16);
-    return sv;
-}
-
-// Menu con cho c·∫≠p nh·∫≠t sinh vi√™n trong l·ªõp (th√™m / x√≥a / s·ª≠a)
-
-void menuCapNhatSV(LopSV* lop) {
-    if (!lop) return;
-    int chon;
-    do {
-        cout << "\n--- CAP NHAT SINH VIEN CHO LOP: " << lop->MALOP << " ---\n";
-        cout << "1. Them sinh vien (nhap nhieu, dung khi MASV rong)\n";
-        cout << "2. Xoa sinh vien\n";
-        cout << "3. Hieu chinh sinh vien\n";
-        cout << "0. Thoat\n";
-        cout << "Chon: ";
-        if (!(cin >> chon)) { cin.clear(); cin.ignore(10000, '\n'); chon = -1; }
-        cin.ignore(); // b·ªè k√≠ t·ª± newline sau s·ªë
-        switch (chon) {
-            case 1: {
-                // Th√™m nhi·ªÅu SV; d·ª´ng khi MASV r·ªóng
-                while (true) {
-                    SinhVien sv = nhapThongTinSV();
-                    if (strlen(sv.MASV) == 0) {
-                        cout << "Dung nhap sinh vien.\n";
-                        break;
-                    }
-                    // Ki·ªÉm tra tr√πng MASV trong l·ªõp
-                    if (timSVTheoMa(lop->FirstSV, sv.MASV)) {
-                        cout << "Ma SV da ton tai trong lop! Bo qua.\n";
-                        continue;
-                    }
-                    themSV(lop->FirstSV, sv);
-                    cout << "Da them SV: " << sv.MASV << "\n";
-                }
+        bool hopLe = true;
+        for (char &ch : MAMH) {
+            if (!isalnum((unsigned char)ch)) { // ch? cho ch? ho?c s?
+                hopLe = false;
                 break;
             }
-            case 2: {
-                char ma[16];
-                cout << "Nhap ma SV can xoa: ";
-                cin.getline(ma, 16);
-                if (strlen(ma) == 0) { cout << "Ma rong.\n"; break; }
-                if (xoaSV(lop->FirstSV, ma)) cout << "Xoa thanh cong.\n";
-                else cout << "Khong tim thay SV.\n";
-                break;
-            }
-            case 3: {
-                char ma[16];
-                cout << "Nhap ma SV can hieu chinh: ";
-                cin.getline(ma, 16);
-                if (strlen(ma) == 0) { cout << "Ma rong.\n"; break; }
-                if (suaSV(lop->FirstSV, ma)) cout << "Cap nhat thanh cong.\n";
-                else cout << "Khong tim thay SV.\n";
-                break;
-            }
-            case 0:
-                cout << "Thoat menu cap nhat SV.\n";
-                break;
-            default:
-                cout << "Lua chon khong hop le. Thu lai.\n";
+            ch = toupper((unsigned char)ch); // t? d?ng chuy?n th‡nh in hoa
         }
-    } while (chon != 0);
+
+        if (!hopLe) {
+            cout << "? M„ mÙn h?c ch? du?c ch?a ch? c·i v‡ s? (khÙng cÛ k˝ t? d?c bi?t).\n";
+            continue;
+        }
+
+        // n?u h?p l? thÏ tho·t vÚng l?p
+        break;
+    }
+
+    return MAMH;
 }
 
-// -------------------- In DSSV c·ªßa 1 l·ªõp theo TEN + HO --------------------
-void inDSSV_TheoTen(LopSV* lop) {
-    if (!lop) return;
-    if (!lop->FirstSV) {
-        cout << "Lop khong co sinh vien.\n";
-        return;
-    }
+string checkTen(string info) {
+    string TENMH;
 
-    // 1) ƒê·∫øm s·ªë SV
-    int n = 0;
-    for (PTRSV p = lop->FirstSV; p != NULL; p = p->next) n++;
+    while (true) {
+        cout << info;
+        cin.ignore(); // xo· b? d?m cÚn sÛt
+        getline(cin, TENMH); // cho phÈp kho?ng tr?ng
 
-    // 2) C·∫•p ph√°t m·∫£ng con tr·ªè ƒë√∫ng k√≠ch th∆∞·ªõc n
-    PTRSV* arr = new PTRSV[n]; // m·ªói ph·∫ßn t·ª≠ tr·ªè t·ªõi nodeSV
-    int idx = 0;
-    for (PTRSV p = lop->FirstSV; p != NULL; p = p->next) {
-        arr[idx++] = p;
-    }
+        // 1?? Ki?m tra d? d‡i
+        if (TENMH.length() > 50) {
+            cout << "? TÍn khÙng du?c qu· 50 k˝ t?.\n";
+            continue;
+        }
 
-    // 3) Selection sort ·∫£o tr√™n m·∫£ng con tr·ªè theo TEN, n·∫øu b·∫±ng th√¨ theo HO
-    for (int i = 0; i < n - 1; i++) {
-        int minIdx = i;
-        for (int j = i + 1; j < n; j++) {
-            int cmpTen = strcmp(arr[j]->sv.TEN, arr[minIdx]->sv.TEN);
-            if (cmpTen < 0) minIdx = j;
-            else if (cmpTen == 0) {
-                if (strcmp(arr[j]->sv.HO, arr[minIdx]->sv.HO) < 0)
-                    minIdx = j;
+        bool hopLe = true;
+        for (char &ch : TENMH) {
+            if (!(isalpha((unsigned char)ch) || isspace((unsigned char)ch))) {
+                hopLe = false;
+                break;
             }
+            ch = toupper((unsigned char)ch);
         }
-        if (minIdx != i) {
-            PTRSV tmp = arr[i];
-            arr[i] = arr[minIdx];
-            arr[minIdx] = tmp;
+
+        if (!hopLe) {
+            cout << "? TÍn ch? du?c ch?a ch? c·i v‡ kho?ng tr?ng.\n";
+            continue;
         }
+
+        // N?u h?p l? thÏ tho·t vÚng l?p
+        break;
     }
 
-    // 4) In k·∫øt qu·∫£: in MASV v√† H·ªå T√äN
-    cout << "\nDanh sach sinh vien lop " << lop->MALOP << " (theo TEN + HO tang dan):\n";
-    for (int i = 0; i < n; i++) {
-        cout << i + 1 << ". " << arr[i]->sv.MASV << " - " << arr[i]->sv.HO << " " << arr[i]->sv.TEN << "\n";
-    }
-
-    // 5) Gi·∫£i ph√≥ng m·∫£ng con tr·ªè t·∫°m
-    delete[] arr;
+    return TENMH;
 }
 
+int nhapSTC(const string&tenBien) {
+    int STC;
 
+    while (true) {
+        cout << "Vui lÚng nh?p " << tenBien << ": ";
+        cin >> STC;
 
+        if (cin.fail()) {
+            cout << "? Ch? du?c nh?p s? nguyÍn h?p l?.\n";
+            cin.clear(); // xÛa tr?ng th·i l?i
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // b? ph?n cÚn l?i c?a dÚng
+            continue;
+        }
+
+        if (STC < 0) {
+            cout << "? " << tenBien << " khÙng du?c ‚m.\n";
+            continue;
+        }
+
+        break;
+    }
+
+    return STC;
+}

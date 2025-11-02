@@ -553,11 +553,7 @@ bool ltc_remove_by_id(int id) {
 }
 
 void ltc_print_all() {
-<<<<<<< HEAD
-	cout << left
-=======
     cout << left
->>>>>>> 490717f5a104cc695f12ff2ffa4eabaaa60e989e
          << setw(10) << "MALOPTC" << " | "
          << setw(6)  << "MAMH"    << " | "
          << setw(10) << "NIENKHOA"<< " | "

@@ -9,7 +9,7 @@ int main() {
 	
 	mh_load_from_file("monhoc.txt");
 	
-	treeMH dsmh=NULL;
+//	treeMH dsmh=NULL;
 //  PTRLTC dsltc=NULL;	
 // 	DS_LOPSV dsLopSV;
  	

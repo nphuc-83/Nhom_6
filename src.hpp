@@ -22,12 +22,7 @@ constexpr int MAX_LOPSV  	 = 10000;
 
 // =================== C?U TRÚC D? LI?U ===================
 
-struct DangKy {
-std::string MASV;
-float DIEM; // -1 n?u chua có di?m
-bool HUYDK;
-DangKy* next;
-};
+
 
 //struct SinhVien {
 //    std::string MASV;
@@ -39,9 +34,7 @@ DangKy* next;
 //};
 
 struct SinhVien {
-	std::string MASV; std::string HO; std::string TEN;
-	std::string  PHAI; std::string SODT; std::string Email;
-
+    std::string MASV, HO, TEN, PHAI, SODT, Email;
 };
 struct nodeSV {
 	SinhVien sv;
@@ -77,15 +70,17 @@ struct nodeMH {
 
 typedef nodeMH* treeMH;
 
+struct DangKy {
+	std::string MASV;
+	float DIEM; // -1 n?u chua có di?m
+	bool HUYDK;
+	DangKy* next;		
+};
 
 struct LopTinChi {
 	int MALOPTC;
-	std::string MAMH;
-	std::string NIENKHOA;
-	int HOCKY;
-	int NHOM;
-	int SOSVMIN;
-	int SOSVMAX;
+	std::string MAMH, NIENKHOA;
+	int HOCKY, NHOM, SOSVMIN, SOSVMAX;
 	bool HUYLOP;
 	DangKy* DSDK; // danh sách dang ký (liên k?t don)
 	LopTinChi* next;
@@ -97,21 +92,12 @@ struct DSLopTinChi { //thêm (DSLopTinChi qu?n lý danh sách l?p tín ch?)
 	DSLopTinChi();
 };
 
-//struct LopSV {
-//    std::string MALOP;
-//    std::string TENLOP;
-//    SinhVien* dssv;
-//
-//    LopSV(const std::string& ma, const std::string& ten, SinhVien* ds = nullptr)
-//        : MALOP(ma), TENLOP(ten), dssv(ds) {}
-//};
-
 
 // =================== BI?N TOÀN C?C ===================
 
 extern treeMH rootMonHoc ;
-
-extern LopTinChi* dsLopTC;         //thay the
+extern LopTinChi* dsLopTC;
+extern DS_LOPSV* dsLopSV;
 //extern LopSV* dsLopSV[MAX_LOPSV];
 //extern int soLuongLopSV;
 
@@ -127,7 +113,10 @@ void sv_print(SinhVien* head);
 std::vector<SinhVien*> sv_to_vector(SinhVien* head);
 void sv_print_sorted_by_name(SinhVien* head);
 void sv_clear(SinhVien*& head);
-bool sv_insert(LopSV* lop, const SinhVien &sv);
+
+
+bool sv_insert(LopSV* lop, const SinhVien& sv);
+void sv_print_all_in_class(LopSV* lop);
 // --- L?p sinh viên ---
 int dssv_find_index_lop(const std::string& malop);
 bool dssv_insert(const std::string& malop, const std::string& tenlop);
@@ -137,22 +126,20 @@ LopSV* dssv_find(std::string &malop);
 void dssv_print_all();
 
 // --- Môn h?c (AVL Tree) ---
-int mh_height(MonHoc* n);
-int mh_balance(MonHoc* n);
-void mh_update_height(MonHoc* n);
-MonHoc* mh_right_rotate(MonHoc* y);
-MonHoc* mh_left_rotate(MonHoc* x);
-
+int mh_height(treeMH n);
+int mh_balance(treeMH n);
+void mh_update_height(treeMH n);
+treeMH mh_right_rotate(treeMH y);
+treeMH mh_left_rotate(treeMH x);
 treeMH mh_insert(treeMH root, treeMH node);
-
 treeMH mh_remove(treeMH root, const std::string& mamh);
-MonHoc* mh_find(MonHoc* root, const std::string& mamh);
-void mh_inorder_print(MonHoc* root);
-void mh_clear(MonHoc* root);
+treeMH mh_find(treeMH root, const std::string& mamh);
+void mh_inorder_print(treeMH root);
+void mh_clear(treeMH root);
 bool mh_edit(const std::string& mamh, const std::string& tenmh, int stclt, int stcth);
 void mh_save_to_file(const std::string& filename);
 void mh_load_from_file(const std::string& filename);
-
+void mh_print_all();  		// CHECK XEM MÔN H?C NH?P ?N CHUA
 // --- Ðang ký ---
 void dk_add_head(DangKy*& head, DangKy* node);
 DangKy* dk_find(DangKy* head, const std::string& masv);
@@ -163,7 +150,7 @@ void dk_print(DangKy* head);
 // --- L?p tín ch? ---
 int nextMaLopTC();
 int next_MALOPTC();
-LopTinChi* ltc_add(const std::string& mamh, const std::string& nk, int hk, int nhom, int minsv, int maxsv, bool huy=false);
+LopTinChi* ltc_add(const std::string& mamh, const std::string& nk, int hk, int nhom, int minsv, int maxsv, bool huy = false);
 LopTinChi* ltc_find_by_id(int id);
 bool ltc_remove_by_id(int id);
 void ltc_print_all();
@@ -182,7 +169,7 @@ void ltc_print_filtered(const std::string& nk, int hk, int nhom, const std::stri
 void ltc_clear_all();
 
 
-void mh_print_all();  		// CHECK XEM MÔN H?C NH?P ?N CHUA
+
 } // namespace QuanLyDiem
 
 #endif // QUANLY_DIEM_HPP

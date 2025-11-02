@@ -12,7 +12,7 @@ int QuanLiChucNang() {
         cout << "=====================================\n";
 
         cout << "1. Quan li lop tin chi\n";
-        cout << "2. Quan li lop hoc (tam khoa)\n";
+        cout << "2. Quan li lop hoc\n";
         cout << "3. Quan li mon hoc\n";
         cout << "4. Quan li dang ky lop tin chi (tam khoa)\n";
         cout << "5. Ghi du lieu mon hoc vao file\n";
@@ -72,6 +72,7 @@ int QuanLiLopTinChi() {
 					cout << "3. Sua lop (soSVmin/max, huy)\n";
 					cout << "0. Quay lai\n";
 					cout << "Chon: ";
+					cin >> sub;
 					cin.ignore(numeric_limits<streamsize>::max(), '\n');
 					if (sub == 1) {
 						string mamh, nk; int hk, nhom, minsv, maxsv;
@@ -331,45 +332,105 @@ int QuanliLopSinhVien() {
             }
             case 4: {
 			    system("cls");
-			    cout << "======= THEM SINH VIEN VAO LOP =======\n";
-			    QuanLyDiem::dssv_print_all(); // In danh sách l?p hi?n có
+			    cout << "======= QUAN LY SINH VIEN TRONG LOP =======\n";
+			    QuanLyDiem::dssv_print_all();
 			
-			    string MALOP = checkMa(15, "Vui long nhap Ma Lop Hoc: ");
-			
+			    string MALOP = checkMa(15, "Nhap ma lop can quan ly: ");
 			    QuanLyDiem::LopSV* lop = QuanLyDiem::dssv_find(MALOP);
-			    if (lop == nullptr) {
+			
+			    if (!lop) {
 			        cout << "Lop khong ton tai!\n";
 			        system("pause");
 			        break;
 			    }
-				//in toan bo danh sach sinh vien cua ma lop do roi moi cho cap nhat sinh vien
-			    // Nh?p thông tin sinh viên
-			    QuanLyDiem::SinhVien sv;
-			    cout << "\n=== Nhap thong tin sinh vien ===\n";
-			    cout << "Ma sinh vien: ";
-			    cin.ignore();
-			    getline(cin, sv.MASV);
-			    cout << "Ho: ";
-			    getline(cin, sv.HO);
-			    cout << "Ten: ";
-			    getline(cin, sv.TEN);
-			    cout << "Phai (Nam/Nu): ";
-			    getline(cin, sv.PHAI);
-			    cout << "So dien thoai: ";
-			    getline(cin, sv.SODT);
-			    cout << "Email: ";
-			    getline(cin, sv.Email);
 			
-			    // G?i hàm thêm SV
-			    if (QuanLyDiem::sv_insert(lop, sv)) {
-			        cout << "\nThem sinh vien thanh cong!\n";
-			    } else {
-			        cout << "\nThem sinh vien that bai (co the do trung ma SV hoac loi khac).\n";
-			    }
+			    int subChoice;
+			    do {
+			        system("cls");
+			        QuanLyDiem::sv_print_all_in_class(lop); // ? in danh sách sinh viên b?ng hàm riêng
 			
-			    system("pause");
+			        cout << "\n--- CHUC NANG ---\n";
+			        cout << "1. Them sinh vien\n";
+			        cout << "2. Xoa sinh vien\n";
+			        cout << "3. Sua thong tin sinh vien\n";
+			        cout << "0. Quay lai menu lop\n";
+			        cout << "Chon: ";
+			        cin >> subChoice;
+			        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			
+			        // ===== THÊM SINH VIÊN =====
+			        if (subChoice == 1) {
+			            QuanLyDiem::SinhVien sv;
+			            cout << "\n=== THEM SINH VIEN MOI ===\n";
+			            cout << "Ma SV: "; getline(cin, sv.MASV);
+			            cout << "Ho: "; getline(cin, sv.HO);
+			            cout << "Ten: "; getline(cin, sv.TEN);
+			            cout << "Phai (Nam/Nu): "; getline(cin, sv.PHAI);
+			            cout << "So dien thoai: "; getline(cin, sv.SODT);
+			            cout << "Email: "; getline(cin, sv.Email);
+			
+			            if (QuanLyDiem::sv_insert(lop, sv))
+			                cout << ">> Them thanh cong!\n";
+			            else
+			                cout << ">> Loi: Trung ma sinh vien hoac loi khac!\n";
+			            system("pause");
+			        }
+			
+			        // ===== XÓA SINH VIÊN =====
+			        else if (subChoice == 2) {
+			            string masv;
+			            cout << "\nNhap ma sinh vien can xoa: ";
+			            getline(cin, masv);
+			
+			            QuanLyDiem::nodeSV*& head = lop->FirstSV;
+			            bool found = false;
+			            QuanLyDiem::nodeSV* cur = head;
+			            QuanLyDiem::nodeSV* prev = nullptr;
+			            while (cur) {
+			                if (cur->sv.MASV == masv) {
+			                    if (!prev) head = cur->next;
+			                    else prev->next = cur->next;
+			                    delete cur;
+			                    found = true;
+			                    break;
+			                }
+			                prev = cur;
+			                cur = cur->next;
+			            }
+			            cout << (found ? ">> Da xoa thanh cong!\n" : ">> Khong tim thay sinh vien!\n");
+			            system("pause");
+			        }
+			
+			        // ===== S?A SINH VIÊN =====
+			        else if (subChoice == 3) {
+			            string masv;
+			            cout << "\nNhap ma sinh vien can sua: ";
+			            getline(cin, masv);
+			
+			            QuanLyDiem::nodeSV* p = lop->FirstSV;
+			            while (p && p->sv.MASV != masv) p = p->next;
+			
+			            if (!p) {
+			                cout << ">> Khong tim thay sinh vien!\n";
+			                system("pause");
+			                continue;
+			            }
+			
+			            cout << "=== SUA THONG TIN SINH VIEN ===\n";
+			            cout << "Ho (" << p->sv.HO << "): "; getline(cin, p->sv.HO);
+			            cout << "Ten (" << p->sv.TEN << "): "; getline(cin, p->sv.TEN);
+			            cout << "Phai (" << p->sv.PHAI << "): "; getline(cin, p->sv.PHAI);
+			            cout << "So dien thoai (" << p->sv.SODT << "): "; getline(cin, p->sv.SODT);
+			            cout << "Email (" << p->sv.Email << "): "; getline(cin, p->sv.Email);
+			            cout << ">> Cap nhat thanh cong!\n";
+			            system("pause");
+			        }
+			
+			    } while (subChoice != 0);
+			
 			    break;
 			}
+
             case 0: cout << "Quay lai menu chinh...\n"; break;
             default: cout << "Lua chon khong hop le!\n"; break;
         }

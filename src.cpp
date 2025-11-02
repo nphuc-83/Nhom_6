@@ -11,10 +11,10 @@ namespace QuanLyDiem {
 
 // ==================== BI?N TOÀN C?C ====================
 
-treeMH rootMonHoc;
-LopTinChi* dsLopTinChiRoot = nullptr;
+treeMH rootMonHoc = nullptr;
+LopTinChi* dsLopTC = nullptr;
 DS_LOPSV* dsLopSV = new DS_LOPSV();
-int soLuongLopSV = 0;
+static int current_id = 1000;
 
 // ==================== MÔN H?C (AVL TREE) ====================
 
@@ -87,10 +87,8 @@ treeMH mh_insert(treeMH root, treeMH node) {
 
 // ---- Tìm môn h?c ----
 treeMH mh_find(treeMH root, const string& mamh) {
-    if (!root) return nullptr;
-    if (mamh == root->mh.MAMH) return root;
-    if (mamh < root->mh.MAMH) return mh_find(root->left, mamh);
-    return mh_find(root->right, mamh);
+    if (!root || root->mh.MAMH == mamh) return root;
+    return mamh < root->mh.MAMH ? mh_find(root->left, mamh) : mh_find(root->right, mamh);
 }
 
 // ---- Duy?t in LNR ----
@@ -237,7 +235,21 @@ void mh_load_from_file(const string& filename) {
     fin.close();
     cout << "Da tai du lieu tu file thanh cong!\n";
 }
+void mh_print_all() {
+    cout << "\n===== DANH SÁCH MÔN H?C HI?N CÓ =====\n";
+    if (!rootMonHoc) {
+        cout << "(Danh sách tr?ng)\n";
+        return;
+    }
 
+    cout << left << setw(12) << "MAMH"
+         << setw(50) << "TENMH"
+         << setw(6) << "LT"
+         << setw(6) << "TH" << "\n";
+    cout << string(74, '-') << "\n";
+    mh_inorder_print(rootMonHoc);
+    cout << "======================================\n\n";
+}
 // ==================== SINH VIÊN ====================
 
 //void sv_add_head(SinhVien*& head, SinhVien* node) {
@@ -325,27 +337,16 @@ void mh_load_from_file(const string& filename) {
 //}
 //
 bool sv_insert(LopSV* lop, const SinhVien& sv) {
-        if (lop == nullptr) return false;
-
-        // ki?m tra trùng MASV
-        for (nodeSV* p = lop->FirstSV; p != nullptr; p = p->next) {
-            if (p->sv.MASV == sv.MASV)
-                return false; // trùng mã SV
-        }
-
-        // t?o node m?i
-        nodeSV* newNode = new nodeSV{ sv, nullptr };
-
-        if (lop->FirstSV == nullptr)
-            lop->FirstSV = newNode;
-        else {
-            nodeSV* q = lop->FirstSV;
-            while (q->next != nullptr) q = q->next;
-            q->next = newNode;
-        }
-
-        return true;
+    if (!lop) return false;
+    PTRSV p = lop->FirstSV;
+    while (p) {
+        if (p->sv.MASV == sv.MASV) return false;
+        p = p->next;
     }
+    PTRSV node = new nodeSV{sv, lop->FirstSV};
+    lop->FirstSV = node;
+    return true;
+}
 void sv_clear(nodeSV*& head) {
     while (head) {
         nodeSV* t = head;
@@ -353,26 +354,56 @@ void sv_clear(nodeSV*& head) {
         delete t;
     }
 }
+void sv_print_all_in_class(LopSV* lop) {
+    if (lop == nullptr) {
+        cout << ">> Lop khong ton tai!\n";
+        return;
+    }
+
+    cout << "\n=== DANH SACH SINH VIEN CUA LOP: " 
+         << lop->TENLOP << " (" << lop->MALOP << ") ===\n";
+
+    if (lop->FirstSV == nullptr) {
+        cout << "(Chua co sinh vien nao trong lop)\n";
+        return;
+    }
+
+    cout << left << setw(5) << "STT"
+         << setw(16) << "MASV"
+         << setw(20) << "HO"
+         << setw(12) << "TEN"
+         << setw(8) << "PHAI"
+         << setw(15) << "SODT"
+         << setw(30) << "EMAIL" << "\n";
+    cout << string(106, '-') << "\n";
+
+    int stt = 0;
+    for (nodeSV* p = lop->FirstSV; p != nullptr; p = p->next) {
+        cout << left << setw(5) << ++stt
+             << setw(16) << p->sv.MASV
+             << setw(20) << p->sv.HO
+             << setw(12) << p->sv.TEN
+             << setw(8) << p->sv.PHAI
+             << setw(15) << p->sv.SODT
+             << setw(30) << p->sv.Email << "\n";
+    }
+}
+
+
 // ==================== L?P SINH VIÊN ====================
 
 int dssv_find_index_lop(const string& malop) {
-    for (int i = 0; i < MAX_LOPSV; i++)
-        if (dsLopSV->nodes[i] && dsLopSV->nodes[i]->MALOP == malop)
+    for (int i = 0; i < QuanLyDiem::dsLopSV->n; ++i)
+        if (QuanLyDiem::dsLopSV->nodes[i] && QuanLyDiem::dsLopSV->nodes[i]->MALOP == malop)
             return i;
     return -1;
 }
 
 bool dssv_insert(const string& malop, const string& tenlop) {
-	if (dsLopSV->n >= MAX_LOPSV) return false;
-    
-    for (int i = 0; i < MAX_LOPSV; i++) {
-        if (!dsLopSV->nodes[i]) {
-            dsLopSV->nodes[i] = new LopSV{malop, tenlop, nullptr};
-            dsLopSV->n++;
-            return true;
-        }
-    }
-    return false;
+    if (dsLopSV->n >= MAX_LOPSV) return false;
+    if (dssv_find_index_lop(malop) != -1) return false;
+    dsLopSV->nodes[dsLopSV->n++] = new LopSV(malop, tenlop);
+    return true;
 }
 
 bool dssv_remove(const string& malop) {
@@ -425,8 +456,6 @@ LopSV* dssv_find(std::string &malop) {
 };
 
 // ==================== ÐANG KÝ ====================
-LopTinChi* dsLopTC = nullptr;
-static int current_id = 1000;
 
 void dk_add_head(DangKy*& head, DangKy* node) {
 	if (!node) return;
@@ -523,16 +552,28 @@ bool ltc_remove_by_id(int id) {
 	return false;
 }
 
-
 void ltc_print_all() {
-	cout << "MALOPTC | MAMH | NIENKHOA | HK | NHOM | MIN | MAX | HUY\n";
-	cout << "----------------------------------------------------------------\n";
+	cout << left
+         << setw(10) << "MALOPTC" << " | "
+         << setw(6)  << "MAMH"    << " | "
+         << setw(10) << "NIENKHOA"<< " | "
+         << setw(3)  << "HK"      << " | "
+         << setw(5)  << "NHOM"    << " | "
+         << setw(5)  << "MIN"     << " | "
+         << setw(5)  << "MAX"     << " | "
+         << setw(6)  << "HUY" << endl;
+    cout << string(70, '-') << endl;
 	if (!dsLopTC) { cout << "(Chua co lop tin chi)\n"; return; }
 	for (LopTinChi* p = dsLopTC; p; p = p->next) {
-		cout << p->MALOPTC << " | " << p->MAMH << " | " << p->NIENKHOA
-			<< " | " << p->HOCKY << " | " << p->NHOM
-			<< " | " << p->SOSVMIN << " | " << p->SOSVMAX
-			<< " | " << (p->HUYLOP ? "Co" : "Khong") << "\n";
+		cout << left 
+			 << setw(10) << p->MALOPTC  << " | " 
+			 << setw(6)  << p->MAMH     << " | " 
+			 << setw(10) << p->NIENKHOA << " | " 
+			 << setw(3)  << p->HOCKY    << " | " 
+			 << setw(5)  << p->NHOM     << " | " 
+			 << setw(5)  << p->SOSVMIN  << " | " 
+			 << setw(5)  << p->SOSVMAX  << " | " 
+			 << setw(6)  << (p->HUYLOP ? "Co" : "Khong") << "\n";
 	}
 }
 
@@ -578,23 +619,6 @@ void ltc_clear_all() {
 		dk_clear(t->DSDK);
 		delete t;
 	}
-}
-
-
-void mh_print_all() {
-    cout << "\n===== DANH SÁCH MÔN H?C HI?N CÓ =====\n";
-    if (!rootMonHoc) {
-        cout << "(Danh sách tr?ng)\n";
-        return;
-    }
-
-    cout << left << setw(12) << "MAMH"
-         << setw(50) << "TENMH"
-         << setw(6) << "LT"
-         << setw(6) << "TH" << "\n";
-    cout << string(74, '-') << "\n";
-    mh_inorder_print(rootMonHoc);
-    cout << "======================================\n\n";
 }
 
 } // namespace QuanLyDiem
@@ -694,3 +718,4 @@ int nhapSTC(const string&tenBien) {
 
     return STC;
 }
+

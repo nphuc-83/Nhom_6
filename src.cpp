@@ -525,14 +525,27 @@ bool ltc_remove_by_id(int id) {
 
 
 void ltc_print_all() {
-	cout << "MALOPTC | MAMH | NIENKHOA | HK | NHOM | MIN | MAX | HUY\n";
-	cout << "----------------------------------------------------------------\n";
+    cout << left
+         << setw(10) << "MALOPTC" << " | "
+         << setw(6)  << "MAMH"    << " | "
+         << setw(10) << "NIENKHOA"<< " | "
+         << setw(3)  << "HK"      << " | "
+         << setw(5)  << "NHOM"    << " | "
+         << setw(5)  << "MIN"     << " | "
+         << setw(5)  << "MAX"     << " | "
+         << setw(6)  << "HUY" << endl;
+    cout << string(70, '-') << endl;
 	if (!dsLopTC) { cout << "(Chua co lop tin chi)\n"; return; }
 	for (LopTinChi* p = dsLopTC; p; p = p->next) {
-		cout << p->MALOPTC << " | " << p->MAMH << " | " << p->NIENKHOA
-			<< " | " << p->HOCKY << " | " << p->NHOM
-			<< " | " << p->SOSVMIN << " | " << p->SOSVMAX
-			<< " | " << (p->HUYLOP ? "Co" : "Khong") << "\n";
+		cout << left 
+			 << setw(10) << p->MALOPTC  << " | " 
+			 << setw(6)  << p->MAMH     << " | " 
+			 << setw(10) << p->NIENKHOA << " | " 
+			 << setw(3)  << p->HOCKY    << " | " 
+			 << setw(5)  << p->NHOM     << " | " 
+			 << setw(5)  << p->SOSVMIN  << " | " 
+			 << setw(5)  << p->SOSVMAX  << " | " 
+			 << setw(6)  << (p->HUYLOP ? "Co" : "Khong") << "\n";
 	}
 }
 

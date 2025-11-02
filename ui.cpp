@@ -72,6 +72,7 @@ int QuanLiLopTinChi() {
 					cout << "3. Sua lop (soSVmin/max, huy)\n";
 					cout << "0. Quay lai\n";
 					cout << "Chon: ";
+					cin >> sub;
 					cin.ignore(numeric_limits<streamsize>::max(), '\n');
 					if (sub == 1) {
 						string mamh, nk; int hk, nhom, minsv, maxsv;

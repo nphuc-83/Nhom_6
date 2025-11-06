@@ -1,6 +1,8 @@
 #include "ui.hpp"
 #include "src.hpp"
 #include <limits>
+#include <fstream>
+#include <sstream>
 
 // ===== MENU CH√çNH =====
 int QuanLiChucNang() {
@@ -84,11 +86,60 @@ int QuanLiLopTinChi() {
 						cout << "Nhap soSV max: "; cin >> maxsv; cin.ignore(numeric_limits<streamsize>::max(), '\n');
 						QuanLyDiem::LopTinChi* node = QuanLyDiem::ltc_add(mamh, nk, hk, nhom, minsv, maxsv);
 						cout << "Da them lop tin chi. Ma lop: " << node->MALOPTC << "\n";
+						ofstream file("loptinchi.txt", ios::app); //ghi lop tin chi vao file
+    					if (file.is_open()) {
+        					file << node->MALOPTC  << "|"
+             					 << node->MAMH 	   << "|"
+             					 << node->NIENKHOA << "|"
+					             << node->HOCKY    << "|"
+					             << node->NHOM 	   << "|"
+					             << node->SOSVMIN  << "|"
+					             << node->SOSVMAX  << "\n";
+        			 		file.close();	
+					        cout << "Da ghi lop tin chi vao file thanh cong!\n";
+					    } else {
+					        cout << "Khong mo duoc file de ghi!\n";
+					    }
 						system("pause");
 					} else if (sub == 2) {
 						int id; cout << "Nhap ma lop can xoa: "; cin >> id; cin.ignore(numeric_limits<streamsize>::max(), '\n');
 						if (QuanLyDiem::ltc_remove_by_id(id)) cout << "Da xoa.\n";
 						else cout << "Khong tim thay hoac lop co dang ky.\n";
+						
+					    ifstream fin("loptinchi.txt");
+					    ofstream fout("temp.txt");
+					    string line;
+					    bool found = false;
+					
+					    if (!fin.is_open() || !fout.is_open()) {
+					        cout << "Khong mo duoc file!\n";
+					        system("pause");
+					        return 0;
+					    }
+					
+					    while (getline(fin, line)) {
+					        stringstream ss(line);
+					        string token;
+					        getline(ss, token, '|'); // l?y m„ l?p
+					        int ma = stoi(token);
+					
+					        if (ma != id) {
+					            fout << line << "\n"; // ghi l?i nh?ng dÚng khÙng b? xÛa
+					        } else {
+					            found = true; // tÏm th?y dÚng c?n xÛa
+					        }
+					    }
+					
+					    fin.close();
+					    fout.close();
+					
+					    remove("loptinchi.txt");
+					    rename("temp.txt", "loptinchi.txt");
+					
+					    if (found)
+					        cout << "Da xoa lop tin chi co ma " << id << " khoi file!\n";
+					    else
+					        cout << "Khong tim thay lop tin chi co ma " << id << " trong file!\n";
 						system("pause");
 					} else if (sub == 3) {
 						int id; cout << "Nhap ma lop can sua: "; cin >> id; cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -97,7 +148,40 @@ int QuanLiLopTinChi() {
 						cout << "Nhap soSV min moi: "; cin >> ltc->SOSVMIN;
 						cout << "Nhap soSV max moi: "; cin >> ltc->SOSVMAX;
 						cout << "Huy lop? (0: khong, 1: co): "; cin >> ltc->HUYLOP; cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						cout << "Da cap nhat.\n"; system("pause");
+						cout << "Da cap nhat.\n";
+						ifstream fin("loptinchi.txt");
+					    ofstream fout("temp.txt");
+					    string line;
+					    bool found = false;
+					
+					    while (getline(fin, line)) {
+					        stringstream ss(line);
+					        string token;
+					        getline(ss, token, '|');
+					        int ma = stoi(token);
+					
+					        if (ma == id) {
+					            found = true;
+					            fout << ltc->MALOPTC  << "|"
+					                 << ltc->MAMH     << "|"
+					                 << ltc->NIENKHOA << "|"
+					                 << ltc->HOCKY    << "|"
+					                 << ltc->NHOM     << "|"
+					                 << ltc->SOSVMIN  << "|"
+					                 << ltc->SOSVMAX  << "\n";
+					        } else {
+					            fout << line << "\n";
+					        }
+					    }
+					
+					    fin.close();
+					    fout.close();
+					    remove("loptinchi.txt");
+					    rename("temp.txt", "loptinchi.txt");
+					
+					    if (found) cout << "Da cap nhat thong tin lop trong file!\n";
+					    else cout << "Khong tim thay lop trong file!\n"; 
+						system("pause");
 					}
 				} while (sub != 0);
 				break;

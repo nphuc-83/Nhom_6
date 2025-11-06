@@ -168,6 +168,8 @@ void ltc_print_filtered(const std::string& nk, int hk, int nhom, const std::stri
 // gi?i phóng toàn b? ds
 void ltc_clear_all();
 
+void ltc_load_from_file();
+
 
 
 } // namespace QuanLyDiem

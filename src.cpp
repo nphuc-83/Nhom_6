@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <fstream>
 #include "src.hpp"
+#include <sstream>
 
 using namespace std;
 
@@ -551,6 +552,46 @@ bool ltc_remove_by_id(int id) {
 	}
 	return false;
 }
+void ltc_load_from_file() {
+    // ?? Xóa toàn b? danh sách cu trong b? nh? (tránh b? nhân dôi d? li?u)
+    while (dsLopTC != nullptr) {
+        LopTinChi* temp = dsLopTC;
+        dsLopTC = dsLopTC->next;
+        delete temp;
+    }
+
+    ifstream file("loptinchi.txt");
+    if (!file.is_open()) {
+        cout << "Khong mo duoc file lop tin chi!\n";
+        return;
+    }
+
+    string line;
+    while (getline(file, line)) {
+        if (line.empty()) continue; // b? qua dòng tr?ng
+
+        stringstream ss(line);
+        string token;
+
+        LopTinChi* node = new LopTinChi;
+
+        getline(ss, token, '|'); node->MALOPTC  = stoi(token);
+        getline(ss, node->MAMH, '|');
+        getline(ss, node->NIENKHOA, '|');
+        getline(ss, token, '|'); node->HOCKY    = stoi(token);
+        getline(ss, token, '|'); node->NHOM     = stoi(token);
+        getline(ss, token, '|'); node->SOSVMIN  = stoi(token);
+        getline(ss, token, '|'); node->SOSVMAX  = stoi(token);
+        getline(ss, token, '|'); node->HUYLOP   = stoi(token);
+
+        // ?? Thêm vào d?u danh sách liên k?t
+        node->next = dsLopTC;
+        dsLopTC = node;
+    }
+
+    file.close();
+}
+
 
 void ltc_print_all() {
     cout << left

@@ -188,7 +188,9 @@ int QuanLiLopTinChi() {
 			}
 			case 2: {
 				system("cls");
+				QuanLyDiem::ltc_load_from_file();
 				QuanLyDiem::ltc_print_all();
+				
 				system("pause");
 				break;
 			}

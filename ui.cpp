@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 
+using namespace QuanLyDiem;
 // ===== MENU CH√çNH =====
 int QuanLiChucNang() {
     int choice;
@@ -33,6 +34,9 @@ int QuanLiChucNang() {
             case 3:
                 QuanLiMonHoc();
                 break;
+            case 4:
+                QuanliDangKySinhVien();
+                break;
             case 5:
                 QuanLyDiem::mh_save_to_file("monhoc.txt");
                 system("pause");
@@ -59,10 +63,10 @@ int QuanLiLopTinChi() {
 		cout << "4. Nhap Diem\n";
 		cout << "0. Quay lai menu chinh\n";
 		cout << "-------------------------------\n";
+		cout << "Nhap lua chon: ";
 		cin >> chon;
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		cout << "Nhap lua chon: ";
-
+		
 		switch (chon) {
 			case 1: {
 				int sub;
@@ -84,111 +88,44 @@ int QuanLiLopTinChi() {
 						cout << "Nhap nhom: "; cin >> nhom;
 						cout << "Nhap soSV min: "; cin >> minsv;
 						cout << "Nhap soSV max: "; cin >> maxsv; cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						
 						QuanLyDiem::LopTinChi* node = QuanLyDiem::ltc_add(mamh, nk, hk, nhom, minsv, maxsv);
 						cout << "Da them lop tin chi. Ma lop: " << node->MALOPTC << "\n";
-						ofstream file("loptinchi.txt", ios::app); //ghi lop tin chi vao file
-    					if (file.is_open()) {
-        					file << node->MALOPTC  << "|"
-             					 << node->MAMH 	   << "|"
-             					 << node->NIENKHOA << "|"
-					             << node->HOCKY    << "|"
-					             << node->NHOM 	   << "|"
-					             << node->SOSVMIN  << "|"
-					             << node->SOSVMAX  << "\n";
-        			 		file.close();	
-					        cout << "Da ghi lop tin chi vao file thanh cong!\n";
-					    } else {
-					        cout << "Khong mo duoc file de ghi!\n";
-					    }
+						ltc_save_to_file("loptinchi.txt");
+					    
 						system("pause");
 					} else if (sub == 2) {
-						int id; cout << "Nhap ma lop can xoa: "; cin >> id; cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						if (QuanLyDiem::ltc_remove_by_id(id)) cout << "Da xoa.\n";
-						else cout << "Khong tim thay hoac lop co dang ky.\n";
-						
-					    ifstream fin("loptinchi.txt");
-					    ofstream fout("temp.txt");
-					    string line;
-					    bool found = false;
-					
-					    if (!fin.is_open() || !fout.is_open()) {
-					        cout << "Khong mo duoc file!\n";
-					        system("pause");
-					        return 0;
-					    }
-					
-					    while (getline(fin, line)) {
-					        stringstream ss(line);
-					        string token;
-					        getline(ss, token, '|'); // l?y m„ l?p
-					        int ma = stoi(token);
-					
-					        if (ma != id) {
-					            fout << line << "\n"; // ghi l?i nh?ng dÚng khÙng b? xÛa
-					        } else {
-					            found = true; // tÏm th?y dÚng c?n xÛa
-					        }
-					    }
-					
-					    fin.close();
-					    fout.close();
-					
-					    remove("loptinchi.txt");
-					    rename("temp.txt", "loptinchi.txt");
-					
-					    if (found)
-					        cout << "Da xoa lop tin chi co ma " << id << " khoi file!\n";
-					    else
-					        cout << "Khong tim thay lop tin chi co ma " << id << " trong file!\n";
-						system("pause");
+						int id; cout << "Nhap ma lop can xoa: "; cin >> id; cin.ignore();
+			            if (QuanLyDiem::ltc_remove_by_id(id)) {
+			                cout << "Da xoa.\n";
+			                // GHI FILE SAU KHI X”A
+			                QuanLyDiem::ltc_save_to_file("loptinchi.txt");
+			            } else {
+			                cout << "Khong tim thay hoac lop co dang ky.\n";
+			            }
+			            system("pause");
+			            
 					} else if (sub == 3) {
-						int id; cout << "Nhap ma lop can sua: "; cin >> id; cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						QuanLyDiem::LopTinChi* ltc = QuanLyDiem::ltc_find_by_id(id);
-						if (!ltc) { cout << "Khong tim thay lop.\n"; system("pause"); continue; }
-						cout << "Nhap soSV min moi: "; cin >> ltc->SOSVMIN;
-						cout << "Nhap soSV max moi: "; cin >> ltc->SOSVMAX;
-						cout << "Huy lop? (0: khong, 1: co): "; cin >> ltc->HUYLOP; cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						cout << "Da cap nhat.\n";
-						ifstream fin("loptinchi.txt");
-					    ofstream fout("temp.txt");
-					    string line;
-					    bool found = false;
-					
-					    while (getline(fin, line)) {
-					        stringstream ss(line);
-					        string token;
-					        getline(ss, token, '|');
-					        int ma = stoi(token);
-					
-					        if (ma == id) {
-					            found = true;
-					            fout << ltc->MALOPTC  << "|"
-					                 << ltc->MAMH     << "|"
-					                 << ltc->NIENKHOA << "|"
-					                 << ltc->HOCKY    << "|"
-					                 << ltc->NHOM     << "|"
-					                 << ltc->SOSVMIN  << "|"
-					                 << ltc->SOSVMAX  << "\n";
-					        } else {
-					            fout << line << "\n";
-					        }
-					    }
-					
-					    fin.close();
-					    fout.close();
-					    remove("loptinchi.txt");
-					    rename("temp.txt", "loptinchi.txt");
-					
-					    if (found) cout << "Da cap nhat thong tin lop trong file!\n";
-					    else cout << "Khong tim thay lop trong file!\n"; 
-						system("pause");
+						int id; cout << "Nhap ma lop can sua: "; cin >> id; cin.ignore();
+			            LopTinChi* ltc = QuanLyDiem::ltc_find_by_id(id);
+			            if (!ltc) { cout << "Khong tim thay lop.\n"; system("pause"); continue; }
+			
+			            cout << "Nhap soSV min moi: "; cin >> ltc->SOSVMIN;
+			            cout << "Nhap soSV max moi: "; cin >> ltc->SOSVMAX;
+			            cout << "Huy lop? (0: khong, 1: co): "; cin >> ltc->HUYLOP; cin.ignore();
+			            cout << "Da cap nhat.\n";
+			
+			            // GHI FILE SAU KHI S?A
+			            QuanLyDiem::ltc_save_to_file("loptinchi.txt");
+			
+			            system("pause");
 					}
 				} while (sub != 0);
 				break;
 			}
 			case 2: {
 				system("cls");
-				QuanLyDiem::ltc_load_from_file();
+				QuanLyDiem::ltc_load_from_file("loptinchi.txt");
 				QuanLyDiem::ltc_print_all();
 				
 				system("pause");
@@ -231,7 +168,7 @@ int QuanLiLopTinChi() {
 						cout << "Sinh vien chua dang ky. Co muon them? (1: co / 0: khong): "; int x; cin >> x; cin.ignore(numeric_limits<streamsize>::max(), '\n');
 						if (x == 1) { QuanLyDiem::ltc_add_registration(id, masv); cout << "Da them dang ky.\n"; }
 						else continue;
-					}
+					} // co the bi trung NHOM
 					float diem; cout << "Nhap diem: "; cin >> diem; cin.ignore(numeric_limits<streamsize>::max(), '\n');
 					QuanLyDiem::ltc_set_score(id, masv, diem);
 					cout << "Da cap nhat diem cho " << masv << "\n";
@@ -357,10 +294,11 @@ int QuanliLopSinhVien() {
                 string MALOP, TENLOP;
             	
 				MALOP = checkMa(15,"Vui long nhap Ma Lop Hoc: ");
-				TENLOP = checkTen("Vui long nhap ten Mon Hoc: ");
+				TENLOP = checkTen("Vui long nhap ten Ma Lop Hoc: ");
 				while(true) {
 					if(QuanLyDiem::dssv_insert(MALOP, TENLOP)) {
 						cout << "Them thanh cong\n"; 
+						QuanLyDiem::dssv_save_to_file("lopSV.txt");
 						system("pause");
 						break;	
 					}
@@ -382,6 +320,7 @@ int QuanliLopSinhVien() {
 				while(true) {
 					if(QuanLyDiem::dssv_remove(MALOP)) {
 						cout << "Xoa thanh cong\n"; 
+						QuanLyDiem::dssv_save_to_file("lopSV.txt");
 						system("pause");
 						break;	
 					}
@@ -400,11 +339,12 @@ int QuanliLopSinhVien() {
                 string MALOP;
                 string newTen;
             	
-				MALOP = checkMa(15,"Vui long nhap Ma Lop Hoc: ");
-				newTen = checkTen("Vui long nhap ten Mon Hoc moi: ");
+				MALOP = checkMa(15,"Vui long nhap Ma Lop Hoc can dieu chinh: ");
+				newTen = checkTen("Vui long nhap ten Lop Hoc moi: ");
 				while(true) {
 					if(QuanLyDiem::dssv_edit(MALOP, newTen)) {
-						cout << "Xoa thanh cong\n"; 
+						cout << "Dieu chinh thanh cong\n"; 
+						QuanLyDiem::dssv_save_to_file("lopSV.txt");
 						system("pause");
 						break;	
 					}
@@ -455,8 +395,11 @@ int QuanliLopSinhVien() {
 			            cout << "So dien thoai: "; getline(cin, sv.SODT);
 			            cout << "Email: "; getline(cin, sv.Email);
 			
-			            if (QuanLyDiem::sv_insert(lop, sv))
-			                cout << ">> Them thanh cong!\n";
+			            if (QuanLyDiem::sv_insert(lop, sv)){
+			            	cout << ">> Them thanh cong!\n";
+			                QuanLyDiem::dssv_save_to_file("lopSV.txt");
+						}
+			                
 			            else
 			                cout << ">> Loi: Trung ma sinh vien hoac loi khac!\n";
 			            system("pause");
@@ -484,6 +427,7 @@ int QuanliLopSinhVien() {
 			                cur = cur->next;
 			            }
 			            cout << (found ? ">> Da xoa thanh cong!\n" : ">> Khong tim thay sinh vien!\n");
+			            QuanLyDiem::dssv_save_to_file("lopSV.txt");
 			            system("pause");
 			        }
 			
@@ -509,6 +453,7 @@ int QuanliLopSinhVien() {
 			            cout << "So dien thoai (" << p->sv.SODT << "): "; getline(cin, p->sv.SODT);
 			            cout << "Email (" << p->sv.Email << "): "; getline(cin, p->sv.Email);
 			            cout << ">> Cap nhat thanh cong!\n";
+			            QuanLyDiem::dssv_save_to_file("lopSV.txt");
 			            system("pause");
 			        }
 			
@@ -524,3 +469,139 @@ int QuanliLopSinhVien() {
     return choice;
 };
 
+int QuanliDangKySinhVien() {
+    system("cls");
+
+    // T?I D? LI?U TRU?C KHI DŸNG
+    QuanLyDiem::dssv_load_from_file("lopSV.txt");
+    QuanLyDiem::mh_load_from_file("monhoc.txt");
+    QuanLyDiem::ltc_load_from_file("loptinchi.txt");  // B?T BU?C!
+
+    string masv, nienkhoa;
+    int hocky;
+
+    // Nh?p + ki?m tra thÙng tin SV
+    while (true) {
+        system("cls");
+        cout << "======= NHAP THONG TIN SINH VIEN =======\n";
+        cout << "Nhap Ma Sinh Vien: "; cin >> masv;
+        cout << "Hoc Ky (1/2/3): "; cin >> hocky;
+        cout << "Nien Khoa (vd: 2024-2025): "; cin >> nienkhoa;
+
+        if (QuanLyDiem::dk_check_in4_sv(*QuanLyDiem::dsLopSV, masv, hocky, nienkhoa)) {
+            cout << "SINH VIEN HOP LE!\n";
+            system("pause");
+            break;
+        } else {
+            cout << "Thong tin khong hop le. Vui long nhap lai.\n";
+            system("pause");
+        }
+    }
+
+    int choice;
+    do {
+        system("cls");
+        cout << "======= QUAN LI DANG KY LOP TIN CHI =======\n";
+        QuanLyDiem::dk_registration_table(masv, hocky, nienkhoa);  // –√ S?A
+
+        cout << "\n1. Dang ky lop tin chi\n";
+        cout << "2. Huy dang ky\n";
+        cout << "0. Quay lai menu chinh\n";
+        cout << "------------------------------------\n";
+        cout << "Nhap lua chon: ";
+        cin >> choice;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (choice) {
+            case 1: {
+                int maLopTC;
+                cout << "Nhap MALOPTC can dang ky (0 de thoat): ";
+                cin >> maLopTC;
+                if (maLopTC == 0) break;
+
+                LopTinChi* lop = QuanLyDiem::ltc_find_by_id(maLopTC);
+                if (!lop) {
+                    cout << "Lop khong ton tai!\n";
+                } else if (lop->HUYLOP) {
+                    cout << "Lop da bi huy!\n";
+                } else if (dk_find(lop->DSDK, masv)) {
+                    cout << "Ban da dang ky lop nay roi!\n";
+                } else {
+                    // Ki?m tra si s?
+                    int siSo = 0;
+                    for (DangKy* dk = lop->DSDK; dk; dk = dk->next)
+                        if (!dk->HUYDK) siSo++;
+                    if (siSo >= lop->SOSVMAX) {
+                        cout << "Lop da day!\n";
+                    } else {
+                        QuanLyDiem::ltc_add_registration(maLopTC, masv);
+                        cout << "DANG KY THANH CONG!\n";
+                    }
+                }
+                system("pause");
+                break;
+            }
+            case 2: {
+			    int maLopTC;
+			    cout << "Nhap MALOPTC can HUY dang ky (0 de thoat): ";
+			    cin >> maLopTC;
+			
+			    if (maLopTC == 0) {
+			        system("pause");
+			        break;
+			    }
+			
+			    // TÏm l?p tÌn ch?
+			    LopTinChi* lop = QuanLyDiem::ltc_find_by_id(maLopTC);
+			    if (!lop) {
+			        cout << "Loi: Khong tim thay lop tin chi co ma " << maLopTC << "!\n";
+			        system("pause");
+			        break;
+			    }
+			
+			    // Ki?m tra sinh viÍn d„ dang k˝ chua
+			    DangKy* dk = QuanLyDiem::dk_find(lop->DSDK, masv);
+			    if (!dk) {
+			        cout << "Ban chua dang ky lop nay!\n";
+			        system("pause");
+			        break;
+			    }
+			
+			    // X·c nh?n h?y
+			    int xacNhan;
+			    cout << "Ban co chac chan muon HUY dang ky lop nay khong?\n";
+			    cout << "   -> Ma lop: " << maLopTC << " | Mon: " << lop->MAMH << " | Nhom: " << lop->NHOM << "\n";
+			    cout << "   (1: Co / 0: Khong): ";
+			    cin >> xacNhan;
+			
+			    if (xacNhan != 1) {
+			        cout << "Da huy thao tac.\n";
+			        system("pause");
+			        break;
+			    }
+			
+			    // Th?c hi?n xÛa dang k˝
+			    if (QuanLyDiem::dk_remove(lop->DSDK, masv)) {
+			        cout << "HUY DANG KY THANH CONG!\n";
+			        cout << "   Da xoa dang ky cua sinh vien " << masv << " khoi lop " << maLopTC << "\n";
+			
+			        // T? –?NG GHI FILE SAU KHI H?Y
+			        QuanLyDiem::ltc_save_to_file("loptinchi.txt");
+			    } else {
+			        cout << "LOI: Khong the huy dang ky!\n";
+			    }
+			
+			    system("pause");
+			    break;
+		}
+            case 0:
+                cout << "Quay lai menu chinh...\n";
+                break;
+            default:
+                cout << "Lua chon khong hop le!\n";
+                system("pause");
+        }
+    } while (choice != 0);
+
+    return 0;
+}

@@ -21,18 +21,6 @@ constexpr int MAX_SODT       = 16;
 constexpr int MAX_LOPSV  	 = 10000;
 
 // =================== C?U TRÚC D? LI?U ===================
-
-
-
-//struct SinhVien {
-//    std::string MASV;
-//    std::string HO;
-//    std::string TEN;
-//    char PHAI = 'M';
-//    std::string SODT;
-//    SinhVien* next = nullptr;
-//};
-
 struct SinhVien {
     std::string MASV, HO, TEN, PHAI, SODT, Email;
 };
@@ -98,8 +86,6 @@ struct DSLopTinChi { //thêm (DSLopTinChi qu?n lý danh sách l?p tín ch?)
 extern treeMH rootMonHoc ;
 extern LopTinChi* dsLopTC;
 extern DS_LOPSV* dsLopSV;
-//extern LopSV* dsLopSV[MAX_LOPSV];
-//extern int soLuongLopSV;
 
 // =================== NGUYÊN M?U HÀM ===================
 
@@ -125,6 +111,9 @@ bool dssv_edit(const std::string& malop, const std::string& newTen);
 LopSV* dssv_find(std::string &malop);
 void dssv_print_all();
 
+void dssv_save_to_file(const std::string& filename);
+void dssv_load_from_file(const std::string& filename);
+
 // --- Môn h?c (AVL Tree) ---
 int mh_height(treeMH n);
 int mh_balance(treeMH n);
@@ -140,6 +129,7 @@ bool mh_edit(const std::string& mamh, const std::string& tenmh, int stclt, int s
 void mh_save_to_file(const std::string& filename);
 void mh_load_from_file(const std::string& filename);
 void mh_print_all();  		// CHECK XEM MÔN H?C NH?P ?N CHUA
+
 // --- Ðang ký ---
 void dk_add_head(DangKy*& head, DangKy* node);
 DangKy* dk_find(DangKy* head, const std::string& masv);
@@ -147,6 +137,9 @@ bool dk_remove(DangKy*& head, const std::string& masv);
 void dk_clear(DangKy*& head);
 void dk_print(DangKy* head);
 
+bool dk_check_in4_sv(DS_LOPSV& dsLopSV, std::string& masv, int hocky, std::string& nienkhoa);
+
+void dk_registration_table(const std::string& masv, int hocky, const std::string& nienkhoa);
 // --- L?p tín ch? ---
 int nextMaLopTC();
 int next_MALOPTC();
@@ -168,8 +161,8 @@ void ltc_print_filtered(const std::string& nk, int hk, int nhom, const std::stri
 // gi?i phóng toàn b? ds
 void ltc_clear_all();
 
-void ltc_load_from_file();
-
+void ltc_load_from_file(const std::string& filename = "loptinchi.txt");
+void ltc_save_to_file(const std::string& filename = "loptinchi.txt");
 
 
 } // namespace QuanLyDiem

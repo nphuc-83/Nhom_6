@@ -14,5 +14,7 @@ int QuanLiMonHoc();
 
 int QuanliLopSinhVien();
 
+int QuanliDangKySinhVien();
+
 #endif
 

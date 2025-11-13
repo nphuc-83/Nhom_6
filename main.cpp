@@ -8,7 +8,8 @@ using namespace QuanLyDiem;
 int main() {
 	
 	mh_load_from_file("monhoc.txt");
-	
+	dssv_load_from_file("lopSV.txt");
+	ltc_load_from_file("loptinchi.txt");
 //	treeMH dsmh=NULL;
 //  PTRLTC dsltc=NULL;	
 // 	DS_LOPSV dsLopSV;

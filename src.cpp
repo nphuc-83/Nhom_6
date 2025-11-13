@@ -456,8 +456,106 @@ LopSV* dssv_find(std::string &malop) {
         return nullptr;
 };
 
-// ==================== ÐANG KÝ ====================
+void dssv_save_to_file(const string& filename) {
+    ofstream fout(filename);
+    if (!fout) {
+        cout << "Loi mo file de ghi lopSV!\n";
+        return;
+    }
+    for (int i = 0; i < dsLopSV->n; i++) {
+        LopSV* lop = dsLopSV->nodes[i];
+        fout << lop->MALOP << "|" << lop->TENLOP << "\n";
+        PTRSV p = lop->FirstSV;
+        while (p) {
+            fout << p->sv.MASV << "|" << p->sv.HO << "|" << p->sv.TEN << "|" 
+                 << p->sv.PHAI << "|" << p->sv.SODT << "|" << p->sv.Email << "\n";
+            p = p->next;
+        }
+        fout << "---\n";  // Phân cách gi?a các l?p
+    }
+    fout.close();
+    cout << "Da luu danh sach lop sinh vien vao file thanh cong!\n";
+}
 
+void dssv_load_from_file(const string& filename) {
+    ifstream fin(filename);
+    if (!fin) {
+        cout << "Khong tim thay file lopSV, bat dau voi danh sach rong.\n";
+        return;
+    }
+    string line;
+    LopSV* currentLop = nullptr;
+    while (getline(fin, line)) {
+        if (line.empty()) continue;
+        if (line == "---") {
+            currentLop = nullptr;
+            continue;
+        }
+        stringstream ss(line);
+        string token;
+        vector<string> parts;
+        while (getline(ss, token, '|')) {
+            parts.push_back(token);
+        }
+        if (parts.size() == 2) {  // Dòng l?p: MALOP|TENLOP
+            string malop = parts[0];
+            string tenlop = parts[1];
+            dssv_insert(malop, tenlop);
+            currentLop = dssv_find(malop);
+        } else if (parts.size() == 6 && currentLop) {  // Dòng sinh viên: MASV|HO|TEN|PHAI|SODT|Email
+            SinhVien sv;
+            sv.MASV = parts[0];
+            sv.HO = parts[1];
+            sv.TEN = parts[2];
+            sv.PHAI = parts[3];
+            sv.SODT = parts[4];
+            sv.Email = parts[5];
+            sv_insert(currentLop, sv);
+        }
+    }
+    fin.close();
+    cout << "Da tai du lieu lop sinh vien tu file thanh cong!\n";
+}
+// ==================== ÐANG KÝ ====================
+bool dk_check_in4_sv(DS_LOPSV& dsLopSV, std::string& masv, int hocky, std::string& nienkhoa) {
+    // --- 1. Ki?m tra mã sinh viên ---
+    if (masv.empty()) {
+        cout << "Ma sinh vien khong duoc de trong.\n";
+        return false;
+    } 
+
+    bool found = false;
+    for (int i = 0; i < dsLopSV.n && !found; i++) {
+        PTRSV p = dsLopSV.nodes[i]->FirstSV;
+        while (p != nullptr) {
+            if (p->sv.MASV == masv) {
+                found = true;
+                break; // Tìm th?y -> d?ng duy?t sinh viên
+            }
+            p = p->next;
+        }
+    }
+
+    if (!found) {
+        cout << "Khong tim thay sinh vien co ma: " << masv << endl;
+        return false;
+    }
+
+    // --- 2. Ki?m tra h?c k? ---
+    if (hocky != 1 && hocky != 2 && hocky != 3) {
+        cout << "Hoc ky chi duoc la 1, 2 hoac 3.\n";
+        return false;
+    }
+
+    // --- 3. Ki?m tra d?nh d?ng niên khóa ---
+    // Ð?nh d?ng dúng ph?i là "YYYY-YYYY" (vd: "2024-2025")
+    if (nienkhoa.size() != 9 || nienkhoa[4] != '-') {
+        cout << "Dinh dang nien khoa phai la 'YYYY-YYYY' (vd: 2024-2025).\n";
+        return false;
+    }
+
+    return true;
+}
 void dk_add_head(DangKy*& head, DangKy* node) {
 	if (!node) return;
 	node->next = head;
@@ -509,6 +607,83 @@ void dk_print(DangKy* head) {
 		}
 }
 
+void dk_registration_table(const string& masv, int hocky, const string& nienkhoa) {
+    // 1. Tìm h? tên sinh viên
+    string ho, ten;
+    bool foundSV = false;
+    for (int i = 0; i < dsLopSV->n; ++i) {
+        PTRSV p = dsLopSV->nodes[i]->FirstSV;
+        while (p) {
+            if (p->sv.MASV == masv) {
+                ho = p->sv.HO;
+                ten = p->sv.TEN;
+                foundSV = true;
+                break;
+            }
+            p = p->next;
+        }
+        if (foundSV) break;
+    }
+
+    if (!foundSV) {
+        cout << "Khong tim thay sinh vien co ma: " << masv << endl;
+        return;
+    }
+
+    // 2. In tiêu d?
+    cout << "\n===== DANH SACH LOP TIN CHI MO (HK " << hocky << " - " << nienkhoa << ") =====\n";
+    cout << "Ho ten SV: " << ho << " " << ten << " | Ma SV: " << masv << endl;
+    cout << left
+         << setw(8)  << "MALOPTC"
+         << setw(10) << "MAMH"
+         << setw(30) << "TEN MON"
+         << setw(6)  << "NHOM"
+         << setw(6)  << "SI SO"
+         << setw(8)  << "TRANG THAI"
+         << setw(10) << "DANG KY" << "\n";
+    cout << string(88, '-') << "\n";
+
+    bool foundAny = false;
+    for (LopTinChi* p = dsLopTC; p; p = p->next) {
+        // L?c theo h?c k? + niên khóa
+        if (p->HOCKY != hocky || p->NIENKHOA != nienkhoa) continue;
+
+        foundAny = true;
+
+        // Tìm tên môn
+        treeMH mon = mh_find(rootMonHoc, p->MAMH);
+        string tenMon = mon ? mon->mh.TENMH : "(Khong tim thay)";
+
+        // Ð?m s? sinh viên dã dang ký
+        int siSo = 0;
+        for (DangKy* dk = p->DSDK; dk; dk = dk->next) {
+            if (!dk->HUYDK) siSo++;  // ch? tính chua h?y
+        }
+
+        // Ki?m tra sinh viên này dã dang ký chua
+        bool daDangKy = (dk_find(p->DSDK, masv) != nullptr);
+
+        // Tr?ng thái l?p
+        string trangThai = p->HUYLOP ? "DA HUY" : "MO";
+
+        cout << left
+             << setw(8)  << p->MALOPTC
+             << setw(10) << p->MAMH
+             << setw(30) << tenMon
+             << setw(6)  << p->NHOM
+             << setw(3)  << siSo << "/" << p->SOSVMAX
+             << setw(8)  << trangThai
+             << setw(10) << (daDangKy ? "DA DK" : "CHUA") << "\n";
+    }
+
+    if (!foundAny) {
+        cout << "Khong co lop tin chi nao mo trong hoc ky nay.\n";
+    } else {
+        cout << "\n>> Chon MALOPTC de dang ky. Nhap 0 de thoat.\n";
+    }
+    cout << "========================================================================\n";
+}
+
 // ==================== Lop TÍN CHi ====================
 
 int next_MALOPTC() { return current_id++; } //thay the
@@ -524,6 +699,7 @@ LopTinChi* ltc_add(const string& mamh, const string& nk, int hk, int nhom, int m
 	node->SOSVMAX = maxsv;
 	node->HUYLOP = huy;
 	node->DSDK = nullptr;
+	
 	node->next = dsLopTC;
 	dsLopTC = node;
 	return node;
@@ -552,79 +728,241 @@ bool ltc_remove_by_id(int id) {
 	}
 	return false;
 }
-void ltc_load_from_file() {
-    // ?? Xóa toàn b? danh sách cu trong b? nh? (tránh b? nhân dôi d? li?u)
-    while (dsLopTC != nullptr) {
+//void ltc_load_from_file() {
+//     ?? Xóa toàn b? danh sách cu trong b? nh? (tránh b? nhân dôi d? li?u)
+//    while (dsLopTC != nullptr) {
+//        LopTinChi* temp = dsLopTC;
+//        dsLopTC = dsLopTC->next;
+//        delete temp;
+//    }
+//
+//    ifstream file("loptinchi.txt");
+//    if (!file.is_open()) {
+//        cout << "Khong mo duoc file lop tin chi!\n";
+//        return;
+//    }
+//
+//    string line;
+//    while (getline(file, line)) {
+//        if (line.empty()) continue; // b? qua dòng tr?ng
+//
+//        stringstream ss(line);
+//        string token;
+//
+//        LopTinChi* node = new LopTinChi;
+//
+//        getline(ss, token, '|'); node->MALOPTC  = stoi(token);
+//        getline(ss, node->MAMH, '|');
+//        getline(ss, node->NIENKHOA, '|');
+//        getline(ss, token, '|'); node->HOCKY    = stoi(token);
+//        getline(ss, token, '|'); node->NHOM     = stoi(token);
+//        getline(ss, token, '|'); node->SOSVMIN  = stoi(token);
+//        getline(ss, token, '|'); node->SOSVMAX  = stoi(token);
+//        getline(ss, token, '|'); node->HUYLOP   = stoi(token);
+//
+//        // ?? Thêm vào d?u danh sách liên k?t
+//        node->next = dsLopTC;
+//        dsLopTC = node;
+//    }
+//
+//    file.close();
+//}
+void ltc_save_to_file(const string& filename) {
+    ofstream fout(filename);
+    if (!fout.is_open()) {
+        cout << "Loi: Khong mo duoc file " << filename << " de ghi!\n";
+        return;
+    }
+
+    for (LopTinChi* p = dsLopTC; p; p = p->next) {
+        // Ghi thông tin l?p
+        fout << p->MALOPTC  << "|"
+             << p->MAMH     << "|"
+             << p->NIENKHOA << "|"
+             << p->HOCKY    << "|"
+             << p->NHOM     << "|"
+             << p->SOSVMIN  << "|"
+             << p->SOSVMAX  << "|"
+             << (p->HUYLOP ? 1 : 0) << "\n";
+
+        // Ghi danh sách dang ký
+        for (DangKy* dk = p->DSDK; dk; dk = dk->next) {
+            fout << dk->MASV << "|"
+                 << fixed << setprecision(1) << dk->DIEM << "|"
+                 << (dk->HUYDK ? 1 : 0) << "\n";
+        }
+
+        // Phân cách l?p
+        fout << "---\n";
+    }
+    fout.close();
+}
+// === Ð?C FILE ===
+void ltc_load_from_file(const string& filename) {
+    // Xóa danh sách cu
+    while (dsLopTC) {
         LopTinChi* temp = dsLopTC;
         dsLopTC = dsLopTC->next;
+        dk_clear(temp->DSDK);
         delete temp;
     }
 
-    ifstream file("loptinchi.txt");
-    if (!file.is_open()) {
-        cout << "Khong mo duoc file lop tin chi!\n";
+    ifstream fin(filename);
+    if (!fin.is_open()) {
+        cout << "Khong tim thay file " << filename << ", bat dau voi danh sach rong.\n";
         return;
     }
 
     string line;
-    while (getline(file, line)) {
-        if (line.empty()) continue; // b? qua dòng tr?ng
+    LopTinChi* currentLop = nullptr;
+    int max_id = 999;
+
+    while (getline(fin, line)) {
+        if (line.empty()) continue;
+        if (line == "---") {
+            currentLop = nullptr;
+            continue;
+        }
 
         stringstream ss(line);
+        vector<string> fields;
         string token;
+        while (getline(ss, token, '|')) {
+            fields.push_back(token);
+        }
 
-        LopTinChi* node = new LopTinChi;
+        // Dòng l?p tín ch? (8 tru?ng)
+        if (fields.size() == 8 && currentLop == nullptr) {
+            currentLop = new LopTinChi;
+            currentLop->MALOPTC  = stoi(fields[0]);
+            currentLop->MAMH     = fields[1];
+            currentLop->NIENKHOA = fields[2];
+            currentLop->HOCKY    = stoi(fields[3]);
+            currentLop->NHOM     = stoi(fields[4]);
+            currentLop->SOSVMIN  = stoi(fields[5]);
+            currentLop->SOSVMAX  = stoi(fields[6]);
+            currentLop->HUYLOP   = (stoi(fields[7]) != 0);
+            currentLop->DSDK     = nullptr;
+            currentLop->next     = dsLopTC;
+            dsLopTC              = currentLop;
 
-        getline(ss, token, '|'); node->MALOPTC  = stoi(token);
-        getline(ss, node->MAMH, '|');
-        getline(ss, node->NIENKHOA, '|');
-        getline(ss, token, '|'); node->HOCKY    = stoi(token);
-        getline(ss, token, '|'); node->NHOM     = stoi(token);
-        getline(ss, token, '|'); node->SOSVMIN  = stoi(token);
-        getline(ss, token, '|'); node->SOSVMAX  = stoi(token);
-        getline(ss, token, '|'); node->HUYLOP   = stoi(token);
+            if (currentLop->MALOPTC > max_id) max_id = currentLop->MALOPTC;
 
-        // ?? Thêm vào d?u danh sách liên k?t
-        node->next = dsLopTC;
-        dsLopTC = node;
+        }
+        // Dòng dang ký (3 tru?ng)
+        else if (fields.size() == 3 && currentLop != nullptr) {
+            DangKy* dk = new DangKy;
+            dk->MASV  = fields[0];
+            dk->DIEM  = stof(fields[1]);
+            dk->HUYDK = (stoi(fields[2]) != 0);
+            dk->next  = currentLop->DSDK;
+            currentLop->DSDK = dk;
+        }
     }
 
-    file.close();
+    fin.close();
+    current_id = max_id + 1;
+    cout << "Da tai " << filename << " thanh cong (co DSDK)!\n";
 }
 
+// === T? Ð?NG LOAD KHI KH?I Ð?NG ===
+void ltc_auto_load() {
+    ltc_load_from_file("loptinchi.txt");
+}
 
 void ltc_print_all() {
-    cout << left
-         << setw(10) << "MALOPTC" << " | "
-         << setw(6)  << "MAMH"    << " | "
-         << setw(10) << "NIENKHOA"<< " | "
-         << setw(3)  << "HK"      << " | "
-         << setw(5)  << "NHOM"    << " | "
-         << setw(5)  << "MIN"     << " | "
-         << setw(5)  << "MAX"     << " | "
-         << setw(6)  << "HUY" << endl;
-    cout << string(70, '-') << endl;
-	if (!dsLopTC) { cout << "(Chua co lop tin chi)\n"; return; }
-	for (LopTinChi* p = dsLopTC; p; p = p->next) {
-		cout << left 
-			 << setw(10) << p->MALOPTC  << " | " 
-			 << setw(6)  << p->MAMH     << " | " 
-			 << setw(10) << p->NIENKHOA << " | " 
-			 << setw(3)  << p->HOCKY    << " | " 
-			 << setw(5)  << p->NHOM     << " | " 
-			 << setw(5)  << p->SOSVMIN  << " | " 
-			 << setw(5)  << p->SOSVMAX  << " | " 
-			 << setw(6)  << (p->HUYLOP ? "Co" : "Khong") << "\n";
-	}
+    cout << "\n";
+    cout << string(100, '=') << "\n";
+    cout << "                DANH SACH TAT CA LOP TIN CHI\n";
+    cout << string(100, '=') << "\n";
+
+    if (!dsLopTC) {
+        cout << "       (Chua co lop tin chi nao)\n";
+        cout << string(100, '=') << "\n\n";
+        return;
+    }
+
+    int sttLop = 0;
+    for (LopTinChi* p = dsLopTC; p; p = p->next) {
+        sttLop++;
+        treeMH mon = mh_find(rootMonHoc, p->MAMH);
+        string tenMon = mon ? mon->mh.TENMH : "(Khong tim thay ten mon)";
+
+        // Ð?m si s? hi?n t?i (chua h?y)
+        int siSo = 0;
+        for (DangKy* dk = p->DSDK; dk; dk = dk->next) {
+            if (!dk->HUYDK) siSo++;
+        }
+
+        // In thông tin l?p
+        cout << left
+             << setw(5)  << sttLop
+             << setw(8)  << p->MALOPTC
+             << setw(10) << p->MAMH
+             << setw(28) << tenMon.substr(0, 27)
+             << setw(6)  << p->NHOM
+             << setw(8)  << p->NIENKHOA
+             << setw(4)  << p->HOCKY
+             << setw(6)  << siSo << "/" << p->SOSVMAX
+             << setw(8)  << (p->HUYLOP ? "DA HUY" : "MO")
+             << "\n";
+
+        // In danh sách dang ký
+        if (p->DSDK) {
+            cout << "        +-- Danh sach dang ky (" << siSo << " sinh vien):\n";
+            cout << "        | STT | MASV       | HO TEN                  | DIEM  | TT     \n";
+            cout << "        |-----|------------|-------------------------|-------|--------\n";
+
+            int sttSV = 0;
+            for (DangKy* dk = p->DSDK; dk; dk = dk->next) {
+                if (dk->HUYDK) continue;  // B? qua dã h?y
+                sttSV++;
+
+                // Tìm h? tên sinh viên t? dsLopSV
+                string ho = "", ten = "";
+                for (int i = 0; i < dsLopSV->n; ++i) {
+                    PTRSV sv = dsLopSV->nodes[i]->FirstSV;
+                    while (sv) {
+                        if (sv->sv.MASV == dk->MASV) {
+                            ho = sv->sv.HO;
+                            ten = sv->sv.TEN;
+                            break;
+                        }
+                        sv = sv->next;
+                    }
+                    if (!ho.empty()) break;
+                }
+
+                string hoTen = ho + " " + ten;
+                if (hoTen.length() > 23) hoTen = hoTen.substr(0, 20) + "...";
+
+                cout << "        | " << left
+                     << setw(3)  << sttSV
+                     << "| " << setw(10) << dk->MASV
+                     << "| " << setw(23) << hoTen
+                     << "| " << setw(5)  << (dk->DIEM < 0 ? "Chua" : to_string((int)dk->DIEM))
+                     << "| " << (dk->HUYDK ? "Huy" : "OK") << "\n";
+            }
+        } else {
+            cout << "        +-- Chua co sinh vien dang ky.\n";
+        }
+        cout << "\n";
+    }
+    cout << string(100, '=') << "\n\n";
 }
 
 bool ltc_add_registration(int maLopTC, const string& masv) {
-	LopTinChi* ltc = ltc_find_by_id(maLopTC);
-	if (!ltc) return false;
-	if (dk_find(ltc->DSDK, masv)) return false; // da ton tai
-	DangKy* node = new DangKy{masv, -1.0f, false, nullptr};
-	dk_add_head(ltc->DSDK, node);
-	return true;
+    LopTinChi* ltc = ltc_find_by_id(maLopTC);
+    if (!ltc) return false;
+    if (dk_find(ltc->DSDK, masv)) return false;
+
+    DangKy* node = new DangKy{masv, -1.0f, false, nullptr};
+    dk_add_head(ltc->DSDK, node);
+
+    // T? Ð?NG GHI FILE SAU KHI THÊM DK
+    ltc_save_to_file("loptinchi.txt");
+
+    return true;
 }
 
 DangKy* ltc_find_registration(int maLopTC, const string& masv) {
@@ -634,10 +972,13 @@ DangKy* ltc_find_registration(int maLopTC, const string& masv) {
 }
 
 bool ltc_set_score(int maLopTC, const string& masv, float diem) {
-	DangKy* dk = ltc_find_registration(maLopTC, masv);
-	if (!dk) return false;
-	dk->DIEM = diem;
-	return true;
+    DangKy* dk = ltc_find_registration(maLopTC, masv);
+    if (!dk) return false;
+    dk->DIEM = diem;
+
+    // T? Ð?NG GHI FILE
+    ltc_save_to_file("loptinchi.txt");
+    return true;
 }
 
 void ltc_print_filtered(const string& nk, int hk, int nhom, const string& mamh) {

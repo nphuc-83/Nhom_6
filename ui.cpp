@@ -17,7 +17,7 @@ int QuanLiChucNang() {
         cout << "1. Quan li lop tin chi\n";
         cout << "2. Quan li lop hoc\n";
         cout << "3. Quan li mon hoc\n";
-        cout << "4. Quan li dang ky lop tin chi (tam khoa)\n";
+        cout << "4. Quan li dang ky lop tin chi\n";
         cout << "5. Ghi du lieu mon hoc vao file\n";
         cout << "0. Thoat chuong trinh\n";
         cout << "-------------------------------------\n";

@@ -127,7 +127,6 @@ int QuanLiLopTinChi() {
 				system("cls");
 				QuanLyDiem::ltc_load_from_file("loptinchi.txt");
 				QuanLyDiem::ltc_print_all();
-				
 				system("pause");
 				break;
 			}

@@ -831,17 +831,56 @@ void ltc_auto_load() {
     ltc_load_from_file("loptinchi.txt");
 }
 
+// HAM CAN GIUA (CENTER TEXT)
+string center(const string &text, int width) {
+    int len = text.length();
+    if (len >= width) return text; // n?u dài hon thì tr? l?i luôn
+
+    int left = (width - len) / 2;
+    int right = width - len - left;
+
+    return string(left, ' ') + text + string(right, ' ');
+}
+
+// HAM TEXT COLOR
+void textColor(int color) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
+
+// HAM CONSOLE COLOR
+void setBGColor(int bg, int text) {
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(h, bg * 16 + text);
+}
+
 void ltc_print_all() {
     cout << "\n";
-    cout << string(100, '=') << "\n";
-    cout << "                DANH SACH TAT CA LOP TIN CHI\n";
-    cout << string(100, '=') << "\n";
+    cout << setw(31) << "";
+	setBGColor(14, 4);  // yellow console, red text
+	cout << "DANH SACH TAT CA LOP TIN CHI\n";
+    setBGColor(0, 7);  // black console, white text
+    cout << endl;
 
     if (!dsLopTC) {
         cout << "       (Chua co lop tin chi nao)\n";
         cout << string(100, '=') << "\n\n";
         return;
     }
+    	textColor(14); // vàng
+        cout << "+" << string(91, '-') << "+" << "\n";
+	    cout << "|" << center("STT", 5)
+	         << "|" << center("MA LOP", 8)
+	         << "|" << center("MA MON", 10)
+	         << "|" << center("NHOM", 6)
+	         << "|" << center("NIEN KHOA", 13)
+	         << "|" << center("HOC KI", 8)
+	         << "|" << center("SI SO", 9)
+	         << "|" << center("SL MIN", 8)
+	         << "|" << center("SL MAX", 8)
+	         << "|" << center("HUY", 7)
+	         << "|\n";
+		if (!dsLopTC) { cout << "(Chua co lop tin chi)\n"; return; }
+		cout << "|" << string(91, '-') << "|" << "\n";
 
     int sttLop = 0;
     for (LopTinChi* p = dsLopTC; p; p = p->next) {
@@ -856,17 +895,20 @@ void ltc_print_all() {
         }
 
         // In thông tin l?p
-        cout << left
-             << setw(5)  << sttLop
-             << setw(8)  << p->MALOPTC
-             << setw(10) << p->MAMH
-             << setw(28) << tenMon.substr(0, 27)
-             << setw(6)  << p->NHOM
-             << setw(8)  << p->NIENKHOA
-             << setw(4)  << p->HOCKY
-             << setw(6)  << siSo << "/" << p->SOSVMAX
-             << setw(8)  << (p->HUYLOP ? "DA HUY" : "MO")
-             << "\n";
+        cout << "|"; textColor(12); // red
+		cout << center(to_string(sttLop), 5);
+		textColor(14); // vàng						
+        cout << "|"  << center(to_string(p->MALOPTC), 8)					
+             << "|"  << center(p->MAMH,10)					
+             << "|"  << center(to_string(p->NHOM), 6)						
+             << "|"  << center(p->NIENKHOA, 13)						
+             << "|"  << center(to_string(p->HOCKY), 8)					
+             << "|"  << center(to_string(siSo) +  "/" + to_string(p->SOSVMAX), 9)	
+             << "|"  << center(to_string(p->SOSVMIN), 8)                   
+			 << "|"  << center(to_string(p->SOSVMAX), 8)                  
+             << "|"  << center((p->HUYLOP ? string("DA HUY"): string("MO")), 7)
+             << "|\n";
+        
 
         // In danh sách dang ký
         if (p->DSDK) {
@@ -905,11 +947,13 @@ void ltc_print_all() {
                      << "| " << (dk->HUYDK ? "Huy" : "OK") << "\n";
             }
         } else {
-            cout << "        +-- Chua co sinh vien dang ky.\n";
+            cout << "";
         }
-        cout << "\n";
+        cout << "";
     }
+    cout << "+" << string(91, '-') << "+" << "\n\n";
     cout << string(100, '=') << "\n\n";
+    textColor(7); // reset white color
 }
 
 bool ltc_add_registration(int maLopTC, const string& masv) {

@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <windows.h>
 
 namespace QuanLyDiem {
 
@@ -70,7 +71,7 @@ struct LopTinChi {
 	std::string MAMH, NIENKHOA;
 	int HOCKY, NHOM, SOSVMIN, SOSVMAX;
 	bool HUYLOP;
-	DangKy* DSDK; // danh sách dang ký (liên k?t don)
+	DangKy* DSDK; // danh sách sv dang ký (liên k?t don)
 	LopTinChi* next;
 };
 
@@ -163,6 +164,9 @@ void ltc_clear_all();
 
 void ltc_load_from_file(const std::string& filename = "loptinchi.txt");
 void ltc_save_to_file(const std::string& filename = "loptinchi.txt");
+std::string center(const std::string &text, int width); // ham can giua
+void textColor(int color); // ham text color
+void setBGColor(int bg, int text);  // ham console color
 
 
 } // namespace QuanLyDiem

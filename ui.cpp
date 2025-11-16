@@ -3,53 +3,351 @@
 #include <limits>
 #include <fstream>
 #include <sstream>
+#include <conio.h>
 
 using namespace QuanLyDiem;
 // ===== MENU CHÍNH =====
-int QuanLiChucNang() {
-    int choice;
-    do {
-        system("cls");
-        cout << "=====================================\n";
-        cout << "  QUAN LI SINH VIEN THEO HE TIN CHI\n";
-        cout << "=====================================\n";
+void SetColor(int text, int bg) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, (bg << 4) | text);
+}
 
-        cout << "1. Quan li lop tin chi\n";
-        cout << "2. Quan li lop hoc\n";
-        cout << "3. Quan li mon hoc\n";
-        cout << "4. Quan li dang ky lop tin chi\n";
-        cout << "5. Ghi du lieu mon hoc vao file\n";
-        cout << "0. Thoat chuong trinh\n";
-        cout << "-------------------------------------\n";
-        cout << "Nhap lua chon: ";
-        cin >> choice;
+void gotoxy(int x, int y) {
+    COORD coord;
+    coord.X = x;
+    coord.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
 
-        switch (choice) {
-        	case 1:
-        		QuanLiLopTinChi();
-        		break;
-        	case 2:
-        		QuanliLopSinhVien();
-        		break;
-            case 3:
-                QuanLiMonHoc();
-                break;
-            case 4:
-                QuanliDangKySinhVien();
-                break;
-            case 5:
-                QuanLyDiem::mh_save_to_file("monhoc.txt");
-                system("pause");
-                break;
-            case 0:
-                cout << "Dang thoat...\n";
-                break;
-            default:
-                cout << "Tuy chon nay tam thoi khong kha dung.\n";
-                system("pause");
+void hideCursor() {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO cursorInfo;
+    GetConsoleCursorInfo(hConsole, &cursorInfo);
+    cursorInfo.bVisible = false;
+    SetConsoleCursorInfo(hConsole, &cursorInfo);
+}
+
+struct Menu {
+    string title;
+    vector<string> options;
+};
+
+void clearLine(int y, int startX, int width) {
+    gotoxy(startX, y);
+    for(int i = 0; i < width; i++) cout << " ";
+}
+
+void drawHeader() {
+    SetColor(12, 14); // Text do, background vang
+    int len1 = 13; // Do dai text "DO AN - DE 2"
+    int startX1 = 33;// Vi tri bat dau (can giua)
+    gotoxy(startX1, 0);
+    for(int i = 0; i < len1 + 7; i++) cout << " ";// +7 de co khoang trong 2 ben
+    gotoxy(startX1 + 4, 0);
+    cout << "DO AN - DE 2";
+    
+    int len2 = 44;
+    int startX2 = 18;// Vi tri bat dau (can giua)
+    gotoxy(startX2, 1);
+    for(int i = 0; i < len2 + 10; i++) cout << " ";
+    gotoxy(startX2 + 4, 1);
+    cout << "CHUONG TRINH QUAN LY SINH VIEN THEO HE TIN CHI";
+    
+    SetColor(7, 0);
+}
+
+// Ve mot item menu chinh rieng le 
+void drawMainMenuItem(const Menu& menu, int index, bool isSelected) {
+    int startY = 4;
+    int itemWidth = 28;
+    int itemHeight = 3;
+    int spacing = 1;
+    int leftMargin = 2;
+    
+    int y = startY + index * (itemHeight + spacing);
+    
+    if (isSelected) {
+        SetColor(12, 14);
+    } else {
+        SetColor(0, 15);
+    }
+    
+    for(int row = 0; row < itemHeight; row++) {
+        gotoxy(leftMargin, y + row);
+        for(int col = 0; col < itemWidth; col++) {
+            cout << " ";
         }
-    } while (choice != 0);
-    return choice;
+    }
+    
+    gotoxy(leftMargin + 1, y + 1);
+    cout << index + 1 << "." << menu.title;
+    
+    SetColor(7, 0);
+}
+
+// Ve mot submenu item rieng le 
+void drawSubMenuItem(const string& option, int index, bool isSelected) {
+    int startX = 38;
+    int startY = 4;
+    int itemWidth = 45;
+    int itemHeight = 3;
+    int spacing = 1;
+    
+    int y = startY + index * (itemHeight + spacing);
+    
+    if (isSelected) {
+        SetColor(12, 14);
+    } else {
+        SetColor(12, 15);
+    }
+    
+    for(int row = 0; row < itemHeight; row++) {
+        gotoxy(startX, y + row);
+        for(int col = 0; col < itemWidth; col++) {
+            cout << " ";
+        }
+    }
+    
+    gotoxy(startX + 2, y + 1);
+    cout << index + 1 << ". " << option;
+    
+    SetColor(7, 0);
+}
+
+void drawMainMenu(const vector<Menu>& menus, int current) {
+    int startY = 4;
+    int itemWidth = 28; // Chieu rong moi o 
+    int itemHeight = 3; // Chieu cao moi o 
+    int spacing = 1;    // Khoang cach giua cac o
+    int leftMargin = 2; // Margin ben trai
+    
+// Ve nen den cho toan bo vung menu
+    SetColor(7, 0);
+    for(int y = startY; y < startY + menus.size() * (itemHeight + spacing) + 2; y++) {
+        gotoxy(0, y);
+        for(int x = 0; x < 32; x++) cout << " ";
+    }
+// Ve tung menu item   
+    for (int i = 0; i < (int)menus.size(); i++) {
+        int y = startY + i * (itemHeight + spacing);
+        
+        if (i == current) {
+          // Item duoc chon: background vang, text do 
+            SetColor(12, 14);
+        } else {
+          // Item khong chon: background trang, text de
+            SetColor(0, 15);
+        }
+        
+          // Ve o chu nhat cho item nay
+        for(int row = 0; row < itemHeight; row++) {
+            gotoxy(leftMargin, y + row);
+            for(int col = 0; col < itemWidth; col++) {
+                cout << " ";
+            }
+        }
+        
+          // Ve text o giua o 
+        gotoxy(leftMargin + 1, y + 1);
+        cout << i + 1 << "." << menus[i].title;
+    }
+    
+    SetColor(7, 0);
+}
+
+void drawSubMenu(const Menu& m, int current) {
+    if (m.options.empty()) return;
+    
+    int startX = 38;
+    int startY = 4;
+    int itemWidth = 45;
+    int itemHeight = 3;
+    int spacing = 1;
+    
+    SetColor(7, 0);
+    for(int y = startY; y < startY + m.options.size() * (itemHeight + spacing) + 2; y++) {
+        gotoxy(35, y);
+        for(int x = 0; x < 50; x++) cout << " ";
+    }
+    
+    for (int i = 0; i < (int)m.options.size(); i++) {
+    drawSubMenuItem(m.options[i], i, i == current);
+    }  
+    
+    SetColor(7, 0);
+}
+
+void clearSubMenuArea() {
+    int startX = 35;
+    int startY = 4;
+    int menuWidth = 50;
+    
+    SetColor(7, 0);
+    for(int y = startY; y < 30; y++) {
+        clearLine(y, startX, menuWidth);
+    }
+}
+
+void drawEscHint(bool show) {
+    gotoxy(35, 25);
+    if (show) {
+        SetColor(8, 0);
+        cout << "(Nhan ESC de quay lai menu chinh)";
+    } else {
+        for(int i = 0; i < 40; i++) cout << " ";
+    }
+    SetColor(7, 0);
+}
+
+// ============== MENU TONG===============
+int QuanLiChucNang() {
+    system("color 0F");
+    hideCursor(); // AN CON TRO
+    
+    vector<Menu> menus = {
+        {"Quan Ly Lop Tin Chi", {
+            "Nhap Danh Sach Lop Tin Chi",
+            "Xem Danh Sach Lop Tin Chi",
+            "Xem Diem Lop Tin Chi",
+            "Nhap Diem"
+        }},
+        {"Quan Ly Mon Hoc", {
+            "Them Mon Hoc",
+            "Xoa Mon Hoc",
+            "Dieu Chinh Mon Hoc",
+            "In Danh Sach Mon Hoc"
+        }},
+        {"Quan Ly Sinh Vien", {
+            "Them Lop Hoc",
+            "Xoa Lop Hoc",
+            "Dieu Chinh Lop Hoc",
+            "Cap Nhat Danh Sach"
+        }},
+        {"Quan Ly Dang Ki", {
+            "Dang Ki Mon Hoc",
+            "Huy Dang Ki"
+        }},
+        {"Ghi Du Lieu", {}},
+        {"Thoat", {}}
+    };
+    
+    int currentMain = 0;
+    int oldMain = -1;              // THEM BIEN LUU TRANG THAI CU 
+    bool inSubMenu = false;
+    bool wasInSubMenu = false;     // THEM BIEN LUU TRANG THAI CU 
+    int currentSub = 0;
+    int oldSub = -1;               // THEM BIEN LUU TRANG THAI CU
+
+// VE BAN DAU MOT LAN - NGOAI VONG LAP
+    system("cls");
+    drawHeader();
+    drawMainMenu(menus, currentMain);
+    oldMain = currentMain;
+
+    while (true) {
+      // CHI VE LAI KHI CO THAY DOI
+
+      // Cap nhat main menu neu thay doi
+      if (oldMain != currentMain) {
+      drawMainMenuItem(menus[oldMain], oldMain, false);
+      drawMainMenuItem(menus[currentMain], currentMain, true);
+      oldMain = currentMain;
+}
+
+      // Xu ly submenu
+      if (inSubMenu && !wasInSubMenu) {
+      drawSubMenu(menus[currentMain], currentSub);
+      drawEscHint(true);
+      oldSub = currentSub;
+      } else if (inSubMenu && oldSub != currentSub) {
+         drawSubMenuItem(menus[currentMain].options[oldSub], oldSub, false);
+         drawSubMenuItem(menus[currentMain].options[currentSub], currentSub, true);
+         oldSub = currentSub;
+      } else if (!inSubMenu && wasInSubMenu) {
+         clearSubMenuArea();
+         drawEscHint(false);
+}
+
+       wasInSubMenu = inSubMenu;
+    // Xu ly phim 
+        int key = _getch();
+        if (key == 224) {
+            key = _getch();
+            if (!inSubMenu) {
+                if (key == 72) { // Up
+                    currentMain = (currentMain - 1 + menus.size()) % menus.size();
+                } else if (key == 80) { // Down
+                    currentMain = (currentMain + 1) % menus.size();
+                }
+            } else {
+                int optSize = menus[currentMain].options.size();
+                if (key == 72) { // Up
+                    currentSub = (currentSub - 1 + optSize) % optSize;
+                } else if (key == 80) { // Down
+                    currentSub = (currentSub + 1) % optSize;
+                }
+            }
+        } else if (key == 13) { // Enter
+            if (!inSubMenu) {
+                // Xu ly menu chinh
+                if (currentMain == 0) { // Quan Ly Lop Tin Chi
+                    inSubMenu = true;
+                    currentSub = 0;
+                } else if (currentMain == 1) { // Quan Ly Mon Hoc
+                    inSubMenu = true;
+                    currentSub = 0;
+                } else if (currentMain == 2) { // Quan Ly Sinh Vien
+                    inSubMenu = true;
+                    currentSub = 0;
+                } else if (currentMain == 3) { // Quan Ly Dang Ki
+                    inSubMenu = true;
+                    currentSub = 0;
+                } else if (currentMain == 4) { // Ghi Du Lieu
+                    system("cls");
+                    gotoxy(30, 10);
+                    SetColor(10, 0);
+                    cout << "Dang ghi du lieu...";
+                    QuanLyDiem::mh_save_to_file("monhoc.txt");
+                    QuanLyDiem::ltc_save_to_file("loptinchi.txt");
+                    QuanLyDiem::dssv_save_to_file("lopSV.txt");
+                    gotoxy(30, 12);
+                    cout << "Da ghi du lieu vao file!";
+                    SetColor(7, 0);
+                    gotoxy(30, 14);
+                    system("pause");
+                } else if (currentMain == 5) { // Thoat
+                    system("cls");
+                    gotoxy(35, 10);
+                    SetColor(14, 0);
+                    cout << "Thoat chuong trinh...";
+                    SetColor(7, 0);
+                    Sleep(1000);
+                    return 0;
+                }
+            } else {
+                // Xu ly submenu
+                if (currentMain == 0) { // Lop Tin Chi
+                    QuanLiLopTinChi();
+                } else if (currentMain == 1) { // Mon Hoc
+                    QuanLiMonHoc();
+                } else if (currentMain == 2) { // Sinh Vien
+                    QuanliLopSinhVien();
+                } else if (currentMain == 3) { // Dang Ki
+                    QuanliDangKySinhVien();
+                }
+                // Ve lai sau khi thoat chuc nang
+                system("cls");
+                drawHeader();
+                drawMainMenu(menus, currentMain);
+                oldMain = currentMain;
+                inSubMenu = false; // Quay lai menu chinh sau khi chon
+            }
+        } else if (key == 27 && inSubMenu) { // ESC
+            inSubMenu = false;
+        }
+    }
+    
+    return 0;
 }
 // ===== MENU QUAN LI LOP TIN CHI =====
 int QuanLiLopTinChi() {

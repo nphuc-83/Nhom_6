@@ -758,7 +758,7 @@ void ltc_save_to_file(const string& filename) {
     }
     fout.close();
 }
-// === Ð?C FILE ===
+// === ÐOC FILE ===
 void ltc_load_from_file(const string& filename) {
     // Xóa danh sách cu
     while (dsLopTC) {
@@ -826,6 +826,28 @@ void ltc_load_from_file(const string& filename) {
     cout << "Da tai " << filename << " thanh cong (co DSDK)!\n";
 }
 
+// SORT TANG DAN THEO MÃ LOPTC
+void ltc_sort_asc() {
+    if (!dsLopTC || !dsLopTC->next) return;
+
+    for (LopTinChi* i = dsLopTC; i->next != nullptr; i = i->next) {
+        for (LopTinChi* j = i->next; j != nullptr; j = j->next) {
+            if (i->MALOPTC > j->MALOPTC) {
+                // Ð?i d? li?u 2 node
+                std::swap(i->MALOPTC, j->MALOPTC);
+                std::swap(i->MAMH, j->MAMH);
+                std::swap(i->NIENKHOA, j->NIENKHOA);
+                std::swap(i->HOCKY, j->HOCKY);
+                std::swap(i->NHOM, j->NHOM);
+                std::swap(i->SOSVMIN, j->SOSVMIN);
+                std::swap(i->SOSVMAX, j->SOSVMAX);
+                std::swap(i->HUYLOP, j->HUYLOP);
+                std::swap(i->DSDK, j->DSDK);
+            }
+        }
+    }
+}
+
 // === T? Ð?NG LOAD KHI KH?I Ð?NG ===
 void ltc_auto_load() {
     ltc_load_from_file("loptinchi.txt");
@@ -854,6 +876,7 @@ void setBGColor(int bg, int text) {
 }
 
 void ltc_print_all() {
+	ltc_sort_asc();  // <<< S?P X?P TANG D?N
     cout << "\n";
     cout << setw(31) << "";
 	setBGColor(14, 4);  // yellow console, red text

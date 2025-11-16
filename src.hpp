@@ -164,6 +164,7 @@ void ltc_clear_all();
 
 void ltc_load_from_file(const std::string& filename = "loptinchi.txt");
 void ltc_save_to_file(const std::string& filename = "loptinchi.txt");
+void ltc_sort_asc();  // SORT TANG DAN THEO MÃ LOPTC
 std::string center(const std::string &text, int width); // ham can giua
 void textColor(int color); // ham text color
 void setBGColor(int bg, int text);  // ham console color

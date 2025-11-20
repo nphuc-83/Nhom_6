@@ -168,6 +168,9 @@ void ltc_sort_asc();  // SORT TANG DAN THEO MÃ LOPTC
 std::string center(const std::string &text, int width); // ham can giua
 void textColor(int color); // ham text color
 void setBGColor(int bg, int text);  // ham console color
+std::string normalizeMaMH(std::string s); // HÀM CHU THUONG -> CHU HOA
+bool isValidMaMH(const std::string& s); // KIEM TRA SAU KHI VIET HOA VÀ GIOI HAN KI TU
+std::string inputMaMH();  // HÀM NHAP MÃ MÔN HOC
 
 
 } // namespace QuanLyDiem

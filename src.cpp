@@ -688,6 +688,7 @@ void dk_registration_table(const string& masv, int hocky, const string& nienkhoa
 
 int next_MALOPTC() { return current_id++; } //thay the
 
+// HÀM THÊM LOPTC
 LopTinChi* ltc_add(const string& mamh, const string& nk, int hk, int nhom, int minsv, int maxsv, bool huy) {
 	LopTinChi* node = new LopTinChi;
 	node->MALOPTC = next_MALOPTC();
@@ -705,6 +706,7 @@ LopTinChi* ltc_add(const string& mamh, const string& nk, int hk, int nhom, int m
 	return node;
 }
 
+// HAM TÌM LOPTC
 LopTinChi* ltc_find_by_id(int id) {
 	for (LopTinChi* p = dsLopTC; p; p = p->next) {
 		if (p->MALOPTC == id) return p;
@@ -712,7 +714,8 @@ LopTinChi* ltc_find_by_id(int id) {
 	return nullptr;
 }
 
-bool ltc_remove_by_id(int id) {
+// HAM XÓA LOPTC
+bool ltc_remove_by_id(int id) {   
 	LopTinChi* p = dsLopTC;
 	LopTinChi* prev = nullptr;
 	while (p) {
@@ -728,6 +731,8 @@ bool ltc_remove_by_id(int id) {
 	}
 	return false;
 }
+
+// HÀM LUU FILE
 void ltc_save_to_file(const string& filename) {
     ofstream fout(filename);
     if (!fout.is_open()) {
@@ -758,7 +763,7 @@ void ltc_save_to_file(const string& filename) {
     }
     fout.close();
 }
-// === ÐOC FILE ===
+// HÀM ÐOC FILE
 void ltc_load_from_file(const string& filename) {
     // Xóa danh sách cu
     while (dsLopTC) {
@@ -875,6 +880,43 @@ void setBGColor(int bg, int text) {
     SetConsoleTextAttribute(h, bg * 16 + text);
 }
 
+// HÀM CHU THUONG -> CHU HOA
+string normalizeMaMH(string s) {
+    for (char &c : s) {
+        if (islower(c))
+            c = toupper(c);   // t? d?ng d?i sang ch? hoa
+    }
+    return s;
+}
+
+// KIEM TRA SAU KHI VIET HOA VÀ GIOI HAN KI TU
+bool isValidMaMH(const string& s) {
+    if (s.length() == 0 || s.length() > 10) return false;
+
+    for (char c : s) {
+        if (!isalnum(c)) return false; // ph?i là A-Z ho?c 0-9
+    }
+    return true;
+}
+
+// HÀM NHAP MÃ MÔN HOC
+string inputMaMH() {
+    string mamh;
+    while (true) {
+        cout << "Nhap ma mon hoc: ";
+        getline(cin, mamh);
+
+        mamh = normalizeMaMH(mamh);
+
+        if (isValidMaMH(mamh))
+            return mamh;
+
+        cout << "Ma mon hoc chi duoc A-Z, 0-9, toi da 10 ky tu!\n";
+    }
+}
+
+
+// HAM IN DS LOPTC
 void ltc_print_all() {
 	ltc_sort_asc();  // <<< S?P X?P TANG D?N
     cout << "\n";

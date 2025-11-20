@@ -354,6 +354,8 @@ int QuanLiLopTinChi() {
 	int chon;
 	do {
 		system("cls");
+		QuanLyDiem::ltc_load_from_file("loptinchi.txt");
+		QuanLyDiem::ltc_print_all();
 		cout << "======= QUAN LI LOP TIN CHI =======\n";
 		cout << "1. Nhap danh sach lop Tin Chi (Them/Xoa/Sua)\n";
 		cout << "2. Xem danh sach lop Tin Chi\n";
@@ -370,6 +372,8 @@ int QuanLiLopTinChi() {
 				int sub;
 				do {
 					system("cls");
+					QuanLyDiem::ltc_load_from_file("loptinchi.txt");
+					QuanLyDiem::ltc_print_all();
 					cout << "--- Nhap danh sach lop Tin Chi ---\n";
 					cout << "1. Them lop moi\n";
 					cout << "2. Xoa lop theo ma\n";
@@ -379,13 +383,14 @@ int QuanLiLopTinChi() {
 					cin >> sub;
 					cin.ignore(numeric_limits<streamsize>::max(), '\n');
 					if (sub == 1) {
-						string mamh, nk; int hk, nhom, minsv, maxsv;
-						cout << "Nhap ma mon hoc: "; getline(cin, mamh);
+						string nk; int hk, nhom, minsv, maxsv;
+						string mamh = inputMaMH();
 						cout << "Nhap nien khoa: "; getline(cin, nk);
 						cout << "Nhap hoc ky: "; cin >> hk;
 						cout << "Nhap nhom: "; cin >> nhom;
 						cout << "Nhap soSV min: "; cin >> minsv;
-						cout << "Nhap soSV max: "; cin >> maxsv; cin.ignore(numeric_limits<streamsize>::max(), '\n');
+						cout << "Nhap soSV max: "; cin >> maxsv; 
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
 						
 						QuanLyDiem::LopTinChi* node = QuanLyDiem::ltc_add(mamh, nk, hk, nhom, minsv, maxsv);
 						cout << "Da them lop tin chi. Ma lop: " << node->MALOPTC << "\n";

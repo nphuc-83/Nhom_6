@@ -388,8 +388,7 @@ int QuanLiLopTinChi() {
 						cout << "Nhap nien khoa: "; getline(cin, nk);
 						cout << "Nhap hoc ky: "; cin >> hk;
 						cout << "Nhap nhom: "; cin >> nhom;
-						cout << "Nhap soSV min: "; cin >> minsv;
-						cout << "Nhap soSV max: "; cin >> maxsv; 
+						nhapSoLuongSV(minsv, maxsv);
 						cin.ignore(numeric_limits<streamsize>::max(), '\n');
 						
 						QuanLyDiem::LopTinChi* node = QuanLyDiem::ltc_add(mamh, nk, hk, nhom, minsv, maxsv);

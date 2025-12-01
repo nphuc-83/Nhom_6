@@ -171,6 +171,12 @@ void setBGColor(int bg, int text);  // ham console color
 std::string normalizeMaMH(std::string s); // HÀM CHU THUONG -> CHU HOA
 bool isValidMaMH(const std::string& s); // KIEM TRA SAU KHI VIET HOA VÀ GIOI HAN KI TU
 std::string inputMaMH();  // HÀM NHAP MÃ MÔN HOC
+void nhapSoLuongSV(int &minsv, int &maxsv);  // HÀM KIEM TRA BAT BUOC SV MIN < SV MAX
+void clearLastLines(int lines);  // HAM XOA DONG CUOI
+int split_fields(const std::string& s, std::string out[], int max_fields); // Hàm tách chuoi bang '|' không dùng vector
+void mh_print_MAMH_from_file(const std::string& filename);  // read file monhoc.txt in ra mã MH
+void waitForEnter(); // HAM DOI PHIM ENTER
+std::string pad2(int n); //// HAM DINH DANG 2 CHU SO KHI N < 10
 
 
 } // namespace QuanLyDiem

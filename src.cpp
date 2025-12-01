@@ -5,6 +5,8 @@
 #include <fstream>
 #include "src.hpp"
 #include <sstream>
+#include <conio.h>
+
 
 using namespace std;
 
@@ -213,6 +215,7 @@ void mh_load_from_file(const string& filename) {
         size_t pos1 = line.find('|');
         if (pos1 == string::npos) continue;
         string mamh = line.substr(0, pos1);
+        mamh = normalizeMaMH(mamh);
         size_t pos2 = line.find('|', pos1 + 1);
         if (pos2 == string::npos) continue;
         string tenmh = line.substr(pos1 + 1, pos2 - pos1 - 1);
@@ -732,6 +735,29 @@ bool ltc_remove_by_id(int id) {
 	return false;
 }
 
+// read file monhoc.txt in ra mã MH
+void mh_print_MAMH_from_file(const std::string& filename) {
+    ifstream fin(filename);
+    if (!fin) {
+        cout << "Khong tim thay file!\n";
+        return;
+    }
+
+    string line;
+    while (getline(fin, line)) {
+        if (line.empty()) continue;
+
+        size_t pos1 = line.find('|');
+        if (pos1 == string::npos) continue;
+
+        string mamh = line.substr(0, pos1);  // L?y MAMH
+
+        cout << mamh << endl;  // In ra mã môn h?c
+    }
+
+    fin.close();
+}
+
 // HÀM LUU FILE
 void ltc_save_to_file(const string& filename) {
     ofstream fout(filename);
@@ -764,7 +790,27 @@ void ltc_save_to_file(const string& filename) {
     fout.close();
 }
 // HÀM ÐOC FILE
+// Hàm tách chuoi bang '|' không dùng vector
+int split_fields(const string& s, string out[], int max_fields) {
+    int count = 0;
+    size_t start = 0, pos;
+
+    while (count < max_fields && (pos = s.find('|', start)) != string::npos) {
+        out[count++] = s.substr(start, pos - start);
+        start = pos + 1;
+    }
+
+    // l?y tru?ng cu?i
+    if (count < max_fields && start < s.length()) {
+        out[count++] = s.substr(start);
+    }
+
+    return count;
+}
+
+
 void ltc_load_from_file(const string& filename) {
+
     // Xóa danh sách cu
     while (dsLopTC) {
         LopTinChi* temp = dsLopTC;
@@ -783,6 +829,8 @@ void ltc_load_from_file(const string& filename) {
     LopTinChi* currentLop = nullptr;
     int max_id = 999;
 
+    string fields[10];   // M?ng t?m d? ch?a các tru?ng sau khi tách
+
     while (getline(fin, line)) {
         if (line.empty()) continue;
         if (line == "---") {
@@ -790,15 +838,11 @@ void ltc_load_from_file(const string& filename) {
             continue;
         }
 
-        stringstream ss(line);
-        vector<string> fields;
-        string token;
-        while (getline(ss, token, '|')) {
-            fields.push_back(token);
-        }
+        int count = split_fields(line, fields, 10);
 
-        // Dòng l?p tín ch? (8 tru?ng)
-        if (fields.size() == 8 && currentLop == nullptr) {
+        // ----- DÒNG L?P TÍN CH?: 8 TRU?NG -----
+        if (count == 8 && currentLop == nullptr) {
+
             currentLop = new LopTinChi;
             currentLop->MALOPTC  = stoi(fields[0]);
             currentLop->MAMH     = fields[1];
@@ -809,26 +853,31 @@ void ltc_load_from_file(const string& filename) {
             currentLop->SOSVMAX  = stoi(fields[6]);
             currentLop->HUYLOP   = (stoi(fields[7]) != 0);
             currentLop->DSDK     = nullptr;
-            currentLop->next     = dsLopTC;
-            dsLopTC              = currentLop;
 
-            if (currentLop->MALOPTC > max_id) max_id = currentLop->MALOPTC;
+            // thêm vào d?u danh sách
+            currentLop->next = dsLopTC;
+            dsLopTC = currentLop;
 
+            if (currentLop->MALOPTC > max_id)
+                max_id = currentLop->MALOPTC;
         }
-        // Dòng dang ký (3 tru?ng)
-        else if (fields.size() == 3 && currentLop != nullptr) {
+
+        // ----- DÒNG ÐANG KÝ: 3 TRU?NG -----
+        else if (count == 3 && currentLop != nullptr) {
             DangKy* dk = new DangKy;
             dk->MASV  = fields[0];
             dk->DIEM  = stof(fields[1]);
             dk->HUYDK = (stoi(fields[2]) != 0);
-            dk->next  = currentLop->DSDK;
+
+            dk->next = currentLop->DSDK;
             currentLop->DSDK = dk;
         }
     }
 
     fin.close();
     current_id = max_id + 1;
-    cout << "Da tai " << filename << " thanh cong (co DSDK)!\n";
+
+    cout << "Da tai " << filename << " thanh cong (khong dung vector, co DSDK)!\n";
 }
 
 // SORT TANG DAN THEO MÃ LOPTC
@@ -880,6 +929,12 @@ void setBGColor(int bg, int text) {
     SetConsoleTextAttribute(h, bg * 16 + text);
 }
 
+// HAM DOI PHIM ENTER
+void waitForEnter() {
+    while (getch() != 13);
+}
+
+
 // HÀM CHU THUONG -> CHU HOA
 string normalizeMaMH(string s) {
     for (char &c : s) {
@@ -908,11 +963,69 @@ string inputMaMH() {
 
         mamh = normalizeMaMH(mamh);
 
-        if (isValidMaMH(mamh))
-            return mamh;
+        if (!isValidMaMH(mamh)) {
+            cout << "Ma mon hoc chi duoc A-Z, 0-9, toi da 10 ky tu!\n";
+            cin.get(); cin.get();
+            clearLastLines(3);
+            continue;
+        }
 
-        cout << "Ma mon hoc chi duoc A-Z, 0-9, toi da 10 ky tu!\n";
+        // Ki?m tra t?n t?i b?ng mh_find
+        if (mh_find(rootMonHoc, mamh) == nullptr) {
+            cout << "Khong ton tai ma mon hoc trong file! Hay nhap lai!\n";
+            cin.get();
+            clearLastLines(3);
+            continue;
+        }
+
+        return mamh;
     }
+}
+
+// HAM XOA DONG CUOI
+void clearLastLines(int lines)
+{
+    for (int i = 0; i < lines; i++) {
+        cout << "\033[F";  // move cursor up 1 line
+        cout << "\033[2K"; // clear the entire line
+    }
+}
+
+// HÀM KIEM TRA BAT BUOC SV MIN < SV MAX
+void nhapSoLuongSV(int &minsv, int &maxsv) {
+    while (true) {
+        cout << "Nhap soSV min: ";
+        cin >> minsv;
+        cout << "Nhap soSV max: ";
+        cin >> maxsv;
+
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+            cout << "Gia tri khong hop le! Nhan 1 phim bat ky de nhap lai.";
+            waitForEnter();	
+            clearLastLines(3);   // xoá: l?i + max + min
+            continue;
+        }
+
+        if (minsv < maxsv) {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return;
+        }
+
+        // L?i sai min/max
+        cout << "ERROR: soSV min phai NHO HON soSV max! Vui long nhap lai.\n";
+		waitForEnter();
+
+        clearLastLines(3);  // xoá: dòng l?i + max + min
+    }
+}
+
+// HAM DINH DANG 2 CHU SO KHI N < 10
+string pad2(int n) {
+    if (n < 10) return "0" + to_string(n);
+    return to_string(n);
 }
 
 
@@ -932,7 +1045,7 @@ void ltc_print_all() {
         return;
     }
     	textColor(14); // vàng
-        cout << "+" << string(91, '-') << "+" << "\n";
+        cout << "+" << string(96, '-') << "+" << "\n";
 	    cout << "|" << center("STT", 5)
 	         << "|" << center("MA LOP", 8)
 	         << "|" << center("MA MON", 10)
@@ -942,10 +1055,10 @@ void ltc_print_all() {
 	         << "|" << center("SI SO", 9)
 	         << "|" << center("SL MIN", 8)
 	         << "|" << center("SL MAX", 8)
-	         << "|" << center("HUY", 7)
+	         << "|" << center("TRANG THAI", 12)
 	         << "|\n";
 		if (!dsLopTC) { cout << "(Chua co lop tin chi)\n"; return; }
-		cout << "|" << string(91, '-') << "|" << "\n";
+		cout << "|" << string(96, '-') << "|" << "\n";
 
     int sttLop = 0;
     for (LopTinChi* p = dsLopTC; p; p = p->next) {
@@ -968,10 +1081,10 @@ void ltc_print_all() {
              << "|"  << center(to_string(p->NHOM), 6)						
              << "|"  << center(p->NIENKHOA, 13)						
              << "|"  << center(to_string(p->HOCKY), 8)					
-             << "|"  << center(to_string(siSo) +  "/" + to_string(p->SOSVMAX), 9)	
-             << "|"  << center(to_string(p->SOSVMIN), 8)                   
-			 << "|"  << center(to_string(p->SOSVMAX), 8)                  
-             << "|"  << center((p->HUYLOP ? string("DA HUY"): string("MO")), 7)
+             << "|"  << center(to_string(siSo) +  "/" + pad2(p->SOSVMAX), 9)	
+             << "|"  << center(pad2(p->SOSVMIN), 8)                   
+			 << "|"  << center(pad2(p->SOSVMAX), 8)                  
+             << "|"  << center((p->HUYLOP ? string("DA HUY"): string("MO")), 12)
              << "|\n";
         
 
@@ -1016,7 +1129,7 @@ void ltc_print_all() {
         }
         cout << "";
     }
-    cout << "+" << string(91, '-') << "+" << "\n\n";
+    cout << "+" << string(96, '-') << "+" << "\n\n";
     cout << string(100, '=') << "\n\n";
     textColor(7); // reset white color
 }

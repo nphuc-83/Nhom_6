@@ -174,9 +174,9 @@ std::string inputMaMH();  // HÀM NHAP MÃ MÔN HOC
 void nhapSoLuongSV(int &minsv, int &maxsv);  // HÀM KIEM TRA BAT BUOC SV MIN < SV MAX
 void clearLastLines(int lines);  // HAM XOA DONG CUOI
 int split_fields(const std::string& s, std::string out[], int max_fields); // Hàm tách chuoi bang '|' không dùng vector
-void mh_print_MAMH_from_file(const std::string& filename);  // read file monhoc.txt in ra mã MH
 void waitForEnter(); // HAM DOI PHIM ENTER
 std::string pad2(int n); //// HAM DINH DANG 2 CHU SO KHI N < 10
+void dsdk_ltc_print(LopTinChi* p, DS_LOPSV* dsLopSV);  // IN DSSV DANG KI LOP TIN CHI
 
 
 } // namespace QuanLyDiem

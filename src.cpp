@@ -735,29 +735,6 @@ bool ltc_remove_by_id(int id) {
 	return false;
 }
 
-// read file monhoc.txt in ra mã MH
-void mh_print_MAMH_from_file(const std::string& filename) {
-    ifstream fin(filename);
-    if (!fin) {
-        cout << "Khong tim thay file!\n";
-        return;
-    }
-
-    string line;
-    while (getline(fin, line)) {
-        if (line.empty()) continue;
-
-        size_t pos1 = line.find('|');
-        if (pos1 == string::npos) continue;
-
-        string mamh = line.substr(0, pos1);  // L?y MAMH
-
-        cout << mamh << endl;  // In ra mã môn h?c
-    }
-
-    fin.close();
-}
-
 // HÀM LUU FILE
 void ltc_save_to_file(const string& filename) {
     ofstream fout(filename);
@@ -1087,52 +1064,60 @@ void ltc_print_all() {
              << "|"  << center((p->HUYLOP ? string("DA HUY"): string("MO")), 12)
              << "|\n";
         
-
-        // In danh sách dang ký
-        if (p->DSDK) {
-            cout << "        +-- Danh sach dang ky (" << siSo << " sinh vien):\n";
-            cout << "        | STT | MASV       | HO TEN                  | DIEM  | TT     \n";
-            cout << "        |-----|------------|-------------------------|-------|--------\n";
-
-            int sttSV = 0;
-            for (DangKy* dk = p->DSDK; dk; dk = dk->next) {
-                if (dk->HUYDK) continue;  // B? qua dã h?y
-                sttSV++;
-
-                // Tìm h? tên sinh viên t? dsLopSV
-                string ho = "", ten = "";
-                for (int i = 0; i < dsLopSV->n; ++i) {
-                    PTRSV sv = dsLopSV->nodes[i]->FirstSV;
-                    while (sv) {
-                        if (sv->sv.MASV == dk->MASV) {
-                            ho = sv->sv.HO;
-                            ten = sv->sv.TEN;
-                            break;
-                        }
-                        sv = sv->next;
-                    }
-                    if (!ho.empty()) break;
-                }
-
-                string hoTen = ho + " " + ten;
-                if (hoTen.length() > 23) hoTen = hoTen.substr(0, 20) + "...";
-
-                cout << "        | " << left
-                     << setw(3)  << sttSV
-                     << "| " << setw(10) << dk->MASV
-                     << "| " << setw(23) << hoTen
-                     << "| " << setw(5)  << (dk->DIEM < 0 ? "Chua" : to_string((int)dk->DIEM))
-                     << "| " << (dk->HUYDK ? "Huy" : "OK") << "\n";
-            }
-        } else {
-            cout << "";
-        }
         cout << "";
     }
     cout << "+" << string(96, '-') << "+" << "\n\n";
     cout << string(100, '=') << "\n\n";
     textColor(7); // reset white color
 }
+
+
+ // IN DSSV DANG KI LOP TIN CHI
+void dsdk_ltc_print(LopTinChi* p, DS_LOPSV* dsLopSV) {
+    if (!p || !p->DSDK) {
+        cout << "\nLop nay hien khong co sinh vien dang ky!\n";
+        return;
+    }
+
+    cout << "\n===== DANH SACH SINH VIEN DANG KY LOP " << p->MALOPTC << " =====\n";
+    cout << "        | STT | MASV       | HO TEN                  | DIEM  | TT     \n";
+    cout << "        |-----|------------|-------------------------|-------|--------\n";
+
+    int stt = 0;
+
+    for (DangKy* dk = p->DSDK; dk; dk = dk->next) {
+        if (dk->HUYDK) continue;
+        stt++;
+
+        string ho = "", ten = "";
+
+        // ----- Tìm h? tên t? dsLopSV -----
+        for (int i = 0; i < dsLopSV->n; ++i) {
+            PTRSV sv = dsLopSV->nodes[i]->FirstSV;
+            while (sv) {
+                if (sv->sv.MASV == dk->MASV) {
+                    ho = sv->sv.HO;
+                    ten = sv->sv.TEN;
+                    break;
+                }
+                sv = sv->next;
+            }
+            if (!ho.empty()) break;
+        }
+
+        string hoten = ho + " " + ten;
+        if (hoten.length() > 23) hoten = hoten.substr(0, 20) + "...";
+
+        cout << "        | "
+             << setw(3)  << left << stt
+             << "| " << setw(10) << dk->MASV
+             << "| " << setw(23) << hoten
+             << "| " << setw(5)  << (dk->DIEM < 0 ? "Chua" : to_string((int)dk->DIEM))
+             << "| " << (dk->HUYDK ? "Huy" : "OK")
+             << "\n";
+    }
+}
+
 
 bool ltc_add_registration(int maLopTC, const string& masv) {
     LopTinChi* ltc = ltc_find_by_id(maLopTC);

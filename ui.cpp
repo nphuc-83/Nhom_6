@@ -429,6 +429,18 @@ int QuanLiLopTinChi() {
 				system("cls");
 				QuanLyDiem::ltc_load_from_file("loptinchi.txt");
 				QuanLyDiem::ltc_print_all();
+				cout << "Nhap ma lop: ";
+				int ma;
+				cin >> ma;
+				
+				system("cls");
+				LopTinChi* lop = ltc_find_by_id(ma);
+				
+				if (!lop) {
+				    cout << "Khong tim thay lop!\n";
+				} else {
+				    dsdk_ltc_print(lop, dsLopSV);
+				}
 				system("pause");
 				break;
 			}

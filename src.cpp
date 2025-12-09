@@ -256,90 +256,7 @@ void mh_print_all() {
 }
 // ==================== SINH VIÊN ====================
 
-//void sv_add_head(SinhVien*& head, SinhVien* node) {
-//    node->next = head;
-//    head = node;
-//}
-//
-//SinhVien* sv_find(SinhVien* head, const string& masv) {
-//    for (SinhVien* p = head; p; p = p->next)
-//        if (p->MASV == masv) return p;
-//    return nullptr;
-//}
-//
-//bool sv_remove(SinhVien*& head, const string& masv) {
-//    SinhVien* cur = head;
-//    SinhVien* prev = nullptr;
-//    while (cur) {
-//        if (cur->MASV == masv) {
-//            if (!prev) head = cur->next;
-//            else prev->next = cur->next;
-//            delete cur;
-//            return true;
-//        }
-//        prev = cur;
-//        cur = cur->next;
-//    }
-//    return false;
-//}
-//
-//bool sv_edit(SinhVien* head, const string& masv, const string& ho,
-//             const string& ten, char phai, const string& sodt) {
-//    SinhVien* p = sv_find(head, masv);
-//    if (!p) return false;
-//    p->HO = ho;
-//    p->TEN = ten;
-//    p->PHAI = phai;
-//    p->SODT = sodt;
-//    return true;
-//}
-//
-//void sv_print(SinhVien* head) {
-//    cout << left << setw(16) << "MASV"
-//         << setw(20) << "HO"
-//         << setw(12) << "TEN"
-//         << setw(8) << "PHAI"
-//         << setw(15) << "SODT"
-//         << "\n";
-//
-//    for (SinhVien* p = head; p; p = p->next)
-//        cout << left << setw(16) << p->MASV
-//             << setw(20) << p->HO
-//             << setw(12) << p->TEN
-//             << setw(8) << p->PHAI
-//             << setw(15) << p->SODT
-//             << "\n";
-//}
-//
-//vector<SinhVien*> sv_to_vector(SinhVien* head) {
-//    vector<SinhVien*> v;
-//    for (SinhVien* p = head; p; p = p->next)
-//        v.push_back(p);
-//    return v;
-//}
-//
-//void sv_print_sorted_by_name(SinhVien* head) {
-//    auto v = sv_to_vector(head);
-//    sort(v.begin(), v.end(), [](SinhVien* a, SinhVien* b) {
-//        if (a->TEN != b->TEN) return a->TEN < b->TEN;
-//        return a->HO < b->HO;
-//    });
-//    cout << "Danh sach SV sap xep theo TEN + HO:\n";
-//    cout << left << setw(16) << "MASV"
-//         << setw(20) << "HO"
-//         << setw(12) << "TEN"
-//         << setw(8) << "PHAI"
-//         << setw(15) << "SODT"
-//         << "\n";
-//    for (auto p : v)
-//        cout << left << setw(16) << p->MASV
-//             << setw(20) << p->HO
-//             << setw(12) << p->TEN
-//             << setw(8) << p->PHAI
-//             << setw(15) << p->SODT
-//             << "\n";
-//}
-//
+
 bool sv_insert(LopSV* lop, const SinhVien& sv) {
     if (!lop) return false;
     PTRSV p = lop->FirstSV;
@@ -396,6 +313,44 @@ void sv_print_all_in_class(LopSV* lop) {
 
 // ==================== L?P SINH VIÊN ====================
 
+bool validate_MALOP(const string& malop) {
+    if (malop.empty()) {
+        cout << "Loi: Ma lop khong duoc de trong!\n";
+        return false;
+    }
+    if (malop.length() > 15) {
+        cout << " Loi: Ma lop khong duoc qua 15 ky tu! (Hien tai: " 
+             << malop.length() << " ky tu)\n";
+        return false;
+    }
+    for (char ch : malop) {
+        if (!isalnum((unsigned char)ch)) {
+            cout << " Loi: Ma lop chi duoc chua chu cai va so!\n";
+            return false;
+        }
+    }
+    return true;
+}
+
+bool validate_TENLOP(const string& tenlop) {
+    if (tenlop.empty()) {
+        cout << " Loi: Ten lop khong duoc de trong!\n";
+        return false;
+    }
+    if (tenlop.length() > 50) {
+        cout << " Loi: Ten lop khong duoc qua 50 ky tu! (Hien tai: " 
+             << tenlop.length() << " ky tu)\n";
+        return false;
+    }
+    for (char ch : tenlop) {
+        if (!isalnum((unsigned char)ch) && !isspace((unsigned char)ch) && ch != '-') {
+            cout << " Loi: Ten lop chi duoc chua chu, so, khoang trang va dau gach ngang!\n";
+            return false;
+        }
+    }
+    return true;
+}
+
 int dssv_find_index_lop(const string& malop) {
     for (int i = 0; i < QuanLyDiem::dsLopSV->n; ++i)
         if (QuanLyDiem::dsLopSV->nodes[i] && QuanLyDiem::dsLopSV->nodes[i]->MALOP == malop)
@@ -404,25 +359,44 @@ int dssv_find_index_lop(const string& malop) {
 }
 
 bool dssv_insert(const string& malop, const string& tenlop) {
-    if (dsLopSV->n >= MAX_LOPSV) return false;
-    if (dssv_find_index_lop(malop) != -1) return false;
+	if (!validate_MALOP(malop)) {
+        return false;}
+    if (!validate_TENLOP(tenlop)) {
+        return false;}
+    if (dsLopSV->n >= MAX_LOPSV) {
+        cout << " Loi: Da dat gioi han toi da " << MAX_LOPSV << " lop!\n";
+        return false;}
+    if (dssv_find_index_lop(malop) != -1){
+        cout << " Loi: Ma lop '" << malop << "' da ton tai!\n";
+        return false;}
     dsLopSV->nodes[dsLopSV->n++] = new LopSV(malop, tenlop);
+    cout << " Them lop '" << malop << "' thanh cong!\n";
     return true;
 }
 
 bool dssv_remove(const string& malop) {
     int idx = dssv_find_index_lop(malop);
-    if (idx == -1) return false;
+    if (idx == -1){
+        cout << " Loi: Khong tim thay lop co ma '" << malop << "'!\n";
+        return false;
+    }
     sv_clear(dsLopSV->nodes[idx]->FirstSV);
     delete dsLopSV->nodes[idx];
     dsLopSV->nodes[idx] = nullptr;
     dsLopSV->n--;
+    cout << " Da xoa lop '" << malop << "' thanh cong!\n";
     return true;
 }
 
 bool dssv_edit(const string& malop, const string& newTen) {
     int idx = dssv_find_index_lop(malop);
-    if (idx == -1) return false;
+    if (idx == -1){
+        cout << " Loi: Khong tim thay lop co ma '" << malop << "'!\n";
+        return false;
+    }
+    if (!validate_TENLOP(newTen)) {
+        return false;
+    }
     dsLopSV->nodes[idx]->TENLOP = newTen;
     return true;
 }

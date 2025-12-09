@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sstream>
 #include <conio.h>
+#include <iomanip>
+
 
 using namespace QuanLyDiem;
 // ===== MENU CHÍNH =====
@@ -207,19 +209,14 @@ int QuanLiChucNang() {
     vector<Menu> menus = {
         {"Quan Ly Lop Tin Chi", {
             "Nhap Danh Sach Lop Tin Chi",
-            "Xem Danh Sach Lop Tin Chi",
             "Xem Diem Lop Tin Chi",
             "Nhap Diem"
         }},
         {"Quan Ly Mon Hoc", {
-            "Them Mon Hoc",
-            "Xoa Mon Hoc",
             "Dieu Chinh Mon Hoc",
             "In Danh Sach Mon Hoc"
         }},
         {"Quan Ly Sinh Vien", {
-            "Them Lop Hoc",
-            "Xoa Lop Hoc",
             "Dieu Chinh Lop Hoc",
             "Cap Nhat Danh Sach"
         }},
@@ -444,50 +441,17 @@ int QuanLiLopTinChi() {
 				system("pause");
 				break;
 			}
-			case 3: {
-				system("cls");
-				cout << "Xem diem theo: 1) Ma lop | 2) Bo loc (MAMH,NK,HK,NHOM)\n";
-				int t; cin >> t; cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				if (t == 1) {
-					int id; cout << "Nhap ma lop: "; cin >> id; cin.ignore(numeric_limits<streamsize>::max(), '\n');
-					QuanLyDiem::LopTinChi* ltc = QuanLyDiem::ltc_find_by_id(id);
-					if (!ltc) cout << "Khong tim thay lop.\n";
-					else dk_print(ltc->DSDK);
-				} else if (t == 2) {
-					string mamh, nk; int hk, nhom;
-					cout << "Nhap maMH: "; getline(cin, mamh);
-					cout << "Nhap nien khoa: "; getline(cin, nk);
-					cout << "Nhap hoc ky: "; cin >> hk;
-					cout << "Nhap nhom: "; cin >> nhom; cin.ignore(numeric_limits<streamsize>::max(), '\n');
-					QuanLyDiem::ltc_print_filtered(nk, hk, nhom, mamh);
-				}
-				system("pause");
-				break;
-			}
 			case 4: {
-				system("cls");
-				cout << "Nhap diem cho mot lop\n";
-				int id; cout << "Nhap ma lop: "; cin >> id; cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				QuanLyDiem::LopTinChi* ltc = QuanLyDiem::ltc_find_by_id(id);
-				if (!ltc) { cout << "Khong tim thay lop.\n"; system("pause"); break; }
-				// hien thi danh sach dang ky
-				cout << "Danh sach dang ky:\n"; dk_print(ltc->DSDK);
-				cout << "Nhap MASV de cap nhat diem (nhap EOF hoac rong de thoat):\n";
-				while (true) {
-					string masv; cout << "MASV: "; getline(cin, masv);
-					if (masv.empty()) break;
-					QuanLyDiem::DangKy* dk = dk_find(ltc->DSDK, masv);
-					if (!dk) {
-						cout << "Sinh vien chua dang ky. Co muon them? (1: co / 0: khong): "; int x; cin >> x; cin.ignore(numeric_limits<streamsize>::max(), '\n');
-						if (x == 1) { QuanLyDiem::ltc_add_registration(id, masv); cout << "Da them dang ky.\n"; }
-						else continue;
-					} // co the bi trung NHOM
-					float diem; cout << "Nhap diem: "; cin >> diem; cin.ignore(numeric_limits<streamsize>::max(), '\n');
-					QuanLyDiem::ltc_set_score(id, masv, diem);
-					cout << "Da cap nhat diem cho " << masv << "\n";
-				}
-				system("pause");
-				break;
+			    score_nhap_diem();	//cau i
+			    break;
+			}
+			case 5: {
+			    score_inBangDiemTBLopThuong(); //cau k
+			    break;
+			}
+			case 6: {
+			   score_inBangDiemMonCaoNhatLopThuong(); //cau l
+			    break;
 			}
 			case 0: cout << "Quay lai menu chinh...\n"; break;
 			default: cout << "Lua chon khong hop le!\n"; system("pause"); break;

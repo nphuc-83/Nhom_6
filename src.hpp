@@ -91,19 +91,17 @@ extern DS_LOPSV* dsLopSV;
 // =================== NGUYÊN M?U HÀM ===================
 
 // --- Sinh viên ---
-//void sv_add_head(SinhVien*& head, SinhVien* node);
 SinhVien* sv_find(SinhVien* head, const std::string& masv);
 bool sv_remove(SinhVien*& head, const std::string& masv);
-bool sv_edit(SinhVien* head, const std::string& masv, const std::string& ho,
-             const std::string& ten, char phai, const std::string& sodt);
+bool sv_edit(SinhVien* head, const std::string& masv, const std::string& ho, const std::string& ten, char phai, const std::string& sodt);
 void sv_print(SinhVien* head);
 std::vector<SinhVien*> sv_to_vector(SinhVien* head);
 void sv_print_sorted_by_name(SinhVien* head);
 void sv_clear(SinhVien*& head);
-
-
 bool sv_insert(LopSV* lop, const SinhVien& sv);
 void sv_print_all_in_class(LopSV* lop);
+
+
 // --- L?p sinh viên ---
 int dssv_find_index_lop(const std::string& malop);
 bool dssv_insert(const std::string& malop, const std::string& tenlop);
@@ -124,6 +122,8 @@ treeMH mh_left_rotate(treeMH x);
 treeMH mh_insert(treeMH root, treeMH node);
 treeMH mh_remove(treeMH root, const std::string& mamh);
 treeMH mh_find(treeMH root, const std::string& mamh);
+treeMH mh_find_by_name(treeMH root, const std::string& tenmh);
+
 void mh_inorder_print(treeMH root);
 void mh_clear(treeMH root);
 bool mh_edit(const std::string& mamh, const std::string& tenmh, int stclt, int stcth);
@@ -158,13 +158,19 @@ bool ltc_set_score(int maLopTC, const std::string& masv, float diem);
 
 // in danh sách theo b? l?c (niên khóa, hoc ky, nhom, mamh)
 void ltc_print_filtered(const std::string& nk, int hk, int nhom, const std::string& mamh);
-
 // gi?i phóng toàn b? ds
 void ltc_clear_all();
-
+LopTinChi* ltc_find(const std::string& nk, int hk, int nhom, const std::string& mamh);
+void print_score_table(LopTinChi* ltc, DS_LOPSV* ds);
 void ltc_load_from_file(const std::string& filename = "loptinchi.txt");
 void ltc_save_to_file(const std::string& filename = "loptinchi.txt");
 void ltc_sort_asc();  // SORT TANG DAN THEO MÃ LOPTC
+
+void score_nhap_diem();//case 4
+void score_inBangDiemTBLopThuong();	//case 6
+void score_inBangDiemMonCaoNhatLopThuong(); //case 7
+
+
 std::string center(const std::string &text, int width); // ham can giua
 void textColor(int color); // ham text color
 void setBGColor(int bg, int text);  // ham console color

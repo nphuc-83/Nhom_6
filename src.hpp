@@ -184,6 +184,26 @@ void waitForEnter(); // HAM DOI PHIM ENTER
 std::string pad2(int n); //// HAM DINH DANG 2 CHU SO KHI N < 10
 void dsdk_ltc_print(LopTinChi* p, DS_LOPSV* dsLopSV);  // IN DSSV DANG KI LOP TIN CHI
 
+// Ham Menu
+void ltc_1_1();
+void ltc_1_2();
+void ltc_1_3();
+void ltc_2();
+
+void mh_1();
+void mh_2();
+void mh_3();
+void mh_4();
+
+void dssv_1();
+void dssv_2();
+void dssv_3();
+void dssv_4_1(LopSV* lop);
+void dssv_4_2(LopSV* lop);
+void dssv_4_3(LopSV* lop);
+
+void dk_1(const std::string& masv, int hocky, const std::string& nienkhoa);
+void dk_2(const std::string& masv, int hocky, const std::string& nienkhoa);
 
 } // namespace QuanLyDiem
 

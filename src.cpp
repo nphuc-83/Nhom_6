@@ -1582,6 +1582,394 @@ void ltc_clear_all() {
 	}
 }
 
+
+
+
+
+// Ham Menu
+void ltc_1_1() {
+    string nk; int hk, nhom, minsv, maxsv;
+    string mamh = inputMaMH();
+
+    cout << "Nhap nien khoa: "; getline(cin, nk);
+    cout << "Nhap hoc ky: "; cin >> hk;
+    cout << "Nhap nhom: "; cin >> nhom;
+
+    nhapSoLuongSV(minsv, maxsv);
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    QuanLyDiem::LopTinChi* node = QuanLyDiem::ltc_add(mamh, nk, hk, nhom, minsv, maxsv);
+
+    cout << "Da them lop tin chi. Ma lop: " << node->MALOPTC << "\n";
+
+    QuanLyDiem::ltc_save_to_file("loptinchi.txt");
+
+    system("pause");
+}
+
+void ltc_1_2() {
+    int id;
+    cout << "Nhap ma lop can xoa: ";
+    cin >> id; 
+    cin.ignore();
+
+    if (QuanLyDiem::ltc_remove_by_id(id)) {
+        cout << "Da xoa.\n";
+        QuanLyDiem::ltc_save_to_file("loptinchi.txt");
+    } else {
+        cout << "Khong tim thay hoac lop co dang ky.\n";
+    }
+
+    system("pause");
+}
+
+void ltc_1_3() {
+    int id;
+    cout << "Nhap ma lop can sua: ";
+    cin >> id;
+    cin.ignore();
+
+    LopTinChi* ltc = QuanLyDiem::ltc_find_by_id(id);
+
+    if (!ltc) {
+        cout << "Khong tim thay lop.\n";
+        system("pause");
+        return;
+    }
+
+    cout << "Nhap soSV min moi: ";
+    cin >> ltc->SOSVMIN;
+
+    cout << "Nhap soSV max moi: ";
+    cin >> ltc->SOSVMAX;
+
+    cout << "Huy lop? (0: khong, 1: co): ";
+    cin >> ltc->HUYLOP;
+    cin.ignore();
+
+    cout << "Da cap nhat.\n";
+
+    QuanLyDiem::ltc_save_to_file("loptinchi.txt");
+
+    system("pause");
+}
+
+void ltc_2() {
+    system("cls");
+
+    QuanLyDiem::ltc_load_from_file("loptinchi.txt");
+    QuanLyDiem::ltc_print_all();
+
+    cout << "Nhap ma lop: ";
+    int ma;
+    cin >> ma;
+    cin.ignore();
+
+    system("cls");
+
+    LopTinChi* lop = ltc_find_by_id(ma);
+
+    if (!lop) {
+        cout << "Khong tim thay lop!\n";
+    } else {
+        dsdk_ltc_print(lop, dsLopSV);
+    }
+
+    system("pause");
+}
+
+void mh_1() {
+    system("cls");
+    cout << "======= QUAN LI MON HOC =======\n";
+
+    string MAMH, TENMH;
+    int STCLT, STCTH;
+
+    QuanLyDiem::mh_print_all();
+
+    MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc: ");
+    TENMH = checkTen("Vui long nhap ten Mon Hoc: ");
+    STCLT = nhapSTC("so tin chi ly thuyet");
+    STCTH = nhapSTC("so tin chi thuc hanh");
+
+    QuanLyDiem::treeMH node = new QuanLyDiem::nodeMH;
+
+    node->mh.MAMH = MAMH;
+    node->mh.TENMH = TENMH;
+    node->mh.STCLT = STCLT;
+    node->mh.STCTH = STCTH;
+    node->mh.height = 1;
+
+    node->left = nullptr;
+    node->right = nullptr;
+
+    // Chèn vào cây AVL
+    QuanLyDiem::rootMonHoc = QuanLyDiem::mh_insert(QuanLyDiem::rootMonHoc, node);
+
+    system("cls");
+    QuanLyDiem::mh_print_all();
+    cout << ">> Da them mon hoc thanh cong!\n";
+
+    system("pause");
+}
+
+void mh_2() {
+    string MAMH;
+    MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc can xoa: ");
+
+    QuanLyDiem::rootMonHoc = QuanLyDiem::mh_remove(QuanLyDiem::rootMonHoc, MAMH);
+
+    cout << ">> Da xoa mon hoc (neu ton tai)!\n";
+
+    QuanLyDiem::mh_print_all();
+    system("pause");
+}
+
+void mh_3() {
+    string MAMH, TENMH;
+    int STCLT, STCTH;
+
+    cout << "Vui long nhap ma mon hoc can chinh sua: ";
+    MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc: ");
+
+    cout << "Vui long nhap ten mon hoc moi: ";
+    cin.ignore();
+    TENMH = checkTen("Vui long nhap ten Mon Hoc moi: ");
+
+    STCLT = nhapSTC("Vui long nhap lai so tin chi ly thuyet");
+    STCTH = nhapSTC("Vui long nhap lai so tin chi thuc hanh");
+
+    if (QuanLyDiem::mh_edit(MAMH, TENMH, STCLT, STCTH)) {
+        cout << ">> Da chinh sua mon hoc thanh cong!\n";
+    } else {
+        cout << ">> Khong tim thay mon hoc!\n";
+    }
+
+    QuanLyDiem::mh_print_all();
+    system("pause");
+}
+
+void mh_4() {
+    QuanLyDiem::mh_print_all();
+    system("pause");
+}
+
+void dssv_1() {
+    system("cls");
+    cout << "======= QUAN LI DANH SACH SINH VIEN =======\n";
+
+    QuanLyDiem::dssv_print_all();
+
+    string MALOP, TENLOP;
+
+    MALOP = checkMa(15, "Vui long nhap Ma Lop Hoc: ");
+    TENLOP = checkTen("Vui long nhap ten Lop Hoc: ");
+
+    if (QuanLyDiem::dssv_insert(MALOP, TENLOP)) {
+        cout << "Them thanh cong\n";
+        QuanLyDiem::dssv_save_to_file("lopSV.txt");
+    } else {
+        cout << "Danh sach lop da day!\n";
+    }
+
+    system("pause");
+}
+
+void dssv_2() {
+    system("cls");
+    cout << "======= QUAN LI DANH SACH SINH VIEN =======\n";
+
+    QuanLyDiem::dssv_print_all();
+
+    string MALOP = checkMa(15, "Vui long nhap Ma Lop Hoc can xoa: ");
+
+    if (QuanLyDiem::dssv_remove(MALOP)) {
+        cout << "Xoa thanh cong\n";
+        QuanLyDiem::dssv_save_to_file("lopSV.txt");
+    } else {
+        cout << "Danh sach lop khong ton tai!\n";
+    }
+
+    system("pause");
+}
+
+void dssv_3() {
+    system("cls");
+    cout << "======= QUAN LI DANH SACH SINH VIEN =======\n";
+
+    QuanLyDiem::dssv_print_all();
+
+    string MALOP = checkMa(15, "Vui long nhap Ma Lop Hoc can dieu chinh: ");
+    string newTen = checkTen("Vui long nhap ten Lop Hoc moi: ");
+
+    if (QuanLyDiem::dssv_edit(MALOP, newTen)) {
+        cout << "Dieu chinh thanh cong\n";
+        QuanLyDiem::dssv_save_to_file("lopSV.txt");
+    } else {
+        cout << "Danh sach lop khong ton tai!\n";
+    }
+
+    system("pause");
+}
+
+void dssv_4_1(LopSV* lop) {
+    QuanLyDiem::SinhVien sv;
+
+    cout << "\n=== THEM SINH VIEN MOI ===\n";
+    cout << "Ma SV: "; getline(cin, sv.MASV);
+    cout << "Ho: "; getline(cin, sv.HO);
+    cout << "Ten: "; getline(cin, sv.TEN);
+    cout << "Phai (Nam/Nu): "; getline(cin, sv.PHAI);
+    cout << "So dien thoai: "; getline(cin, sv.SODT);
+    cout << "Email: "; getline(cin, sv.Email);
+
+    if (QuanLyDiem::sv_insert(lop, sv)) {
+        cout << ">> Them thanh cong!\n";
+        QuanLyDiem::dssv_save_to_file("lopSV.txt");
+    } else {
+        cout << ">> Loi: Trung ma sinh vien hoac loi khac!\n";
+    }
+
+    system("pause");
+}
+
+void dssv_4_2(LopSV* lop) {
+    string masv;
+    cout << "\nNhap ma sinh vien can xoa: ";
+    getline(cin, masv);
+
+    QuanLyDiem::nodeSV*& head = lop->FirstSV;
+    QuanLyDiem::nodeSV* cur = head;
+    QuanLyDiem::nodeSV* prev = nullptr;
+    bool found = false;
+
+    while (cur) {
+        if (cur->sv.MASV == masv) {
+            if (!prev) head = cur->next;
+            else prev->next = cur->next;
+            delete cur;
+            found = true;
+            break;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+
+    cout << (found ? ">> Da xoa thanh cong!\n" : ">> Khong tim thay sinh vien!\n");
+    QuanLyDiem::dssv_save_to_file("lopSV.txt");
+    system("pause");
+}
+
+void dssv_4_3(LopSV* lop) {
+    string masv;
+    cout << "\nNhap ma sinh vien can sua: ";
+    getline(cin, masv);
+
+    QuanLyDiem::nodeSV* p = lop->FirstSV;
+    while (p && p->sv.MASV != masv) p = p->next;
+
+    if (!p) {
+        cout << ">> Khong tim thay sinh vien!\n";
+        system("pause");
+        return;
+    }
+
+    cout << "=== SUA THONG TIN SINH VIEN ===\n";
+    cout << "Ho (" << p->sv.HO << "): "; getline(cin, p->sv.HO);
+    cout << "Ten (" << p->sv.TEN << "): "; getline(cin, p->sv.TEN);
+    cout << "Phai (" << p->sv.PHAI << "): "; getline(cin, p->sv.PHAI);
+    cout << "So dien thoai (" << p->sv.SODT << "): "; getline(cin, p->sv.SODT);
+    cout << "Email (" << p->sv.Email << "): "; getline(cin, p->sv.Email);
+
+    cout << ">> Cap nhat thanh cong!\n";
+    QuanLyDiem::dssv_save_to_file("lopSV.txt");
+    system("pause");
+}
+
+void dk_1(const string& masv, int hocky, const string& nienkhoa) {
+    int maLopTC;
+    cout << "Nhap MALOPTC can dang ky (0 de thoat): ";
+    cin >> maLopTC;
+
+    if (maLopTC == 0) return;
+
+    LopTinChi* lop = QuanLyDiem::ltc_find_by_id(maLopTC);
+    if (!lop) {
+        cout << "Lop khong ton tai!\n";
+    }
+    else if (lop->HUYLOP) {
+        cout << "Lop da bi huy!\n";
+    }
+    else if (dk_find(lop->DSDK, masv)) {
+        cout << "Ban da dang ky lop nay roi!\n";
+    }
+    else {
+        int siSo = 0;
+        for (DangKy* dk = lop->DSDK; dk; dk = dk->next)
+            if (!dk->HUYDK) siSo++;
+
+        if (siSo >= lop->SOSVMAX) {
+            cout << "Lop da day!\n";
+        } else {
+            QuanLyDiem::ltc_add_registration(maLopTC, masv);
+            cout << "DANG KY THANH CONG!\n";
+        }
+    }
+
+    system("pause");
+}
+
+void dk_2(const string& masv, int hocky, const string& nienkhoa) {
+    int maLopTC;
+    cout << "Nhap MALOPTC can HUY dang ky (0 de thoat): ";
+    cin >> maLopTC;
+
+    if (maLopTC == 0) {
+        system("pause");
+        return;
+    }
+
+    LopTinChi* lop = QuanLyDiem::ltc_find_by_id(maLopTC);
+    if (!lop) {
+        cout << "Loi: Khong tim thay lop tin chi co ma " << maLopTC << "!\n";
+        system("pause");
+        return;
+    }
+
+    DangKy* dk = QuanLyDiem::dk_find(lop->DSDK, masv);
+    if (!dk) {
+        cout << "Ban chua dang ky lop nay!\n";
+        system("pause");
+        return;
+    }
+
+    int xacNhan;
+    cout << "Ban co chac chan muon HUY dang ky lop nay khong?\n";
+    cout << "   -> Ma lop: " << maLopTC 
+         << " | Mon: " << lop->MAMH 
+         << " | Nhom: " << lop->NHOM << "\n";
+    cout << "   (1: Co / 0: Khong): ";
+    cin >> xacNhan;
+
+    if (xacNhan != 1) {
+        cout << "Da huy thao tac.\n";
+        system("pause");
+        return;
+    }
+
+    if (QuanLyDiem::dk_remove(lop->DSDK, masv)) {
+        cout << "HUY DANG KY THANH CONG!\n";
+        cout << "   Da xoa dang ky cua sinh vien " << masv 
+             << " khoi lop " << maLopTC << "\n";
+
+        QuanLyDiem::ltc_save_to_file("loptinchi.txt");
+    } else {
+        cout << "LOI: Khong the huy dang ky!\n";
+    }
+
+    system("pause");
+}
+
 } // namespace QuanLyDiem
 
 //===== check thong tin can nhap vao ===

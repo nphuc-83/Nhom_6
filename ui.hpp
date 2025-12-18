@@ -17,4 +17,8 @@ int QuanliLopSinhVien();
 int QuanliDangKySinhVien();
 
 #endif
-
+//    cout << "Nhap soSV min moi: ";
+//    cin >> ltc->SOSVMIN;
+//
+//    cout << "Nhap soSV max moi: ";
+////    cin >> ltc->SOSVMAX;

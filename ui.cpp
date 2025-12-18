@@ -364,31 +364,32 @@ int QuanLiLopTinChi() {
 		switch (chon) {
 			case 1: {
 				int sub;
-				system("cls");
-		        QuanLyDiem::ltc_load_from_file("loptinchi.txt");
-		        QuanLyDiem::ltc_print_all();
-		
-		        cout << "--- Nhap danh sach lop Tin Chi ---\n";
-		        cout << "1. Them lop moi\n";
-		        cout << "2. Xoa lop theo ma\n";
-		        cout << "3. Sua lop (soSVmin/max, huy)\n";
-		        cout << "0. Quay lai\n";
-		        cout << "Chon: ";
-		        
-		        cin >> sub;
-		        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				switch (sub) {
-					
-					
-		            case 1: ltc_1_1(); break;
-		            case 2: ltc_1_2(); break;
-		            case 3: ltc_1_3(); break;
-		            case 0: break;
-		            
-		            default:
-		                cout << "Lua chon khong hop le!\n";
-		                system("pause");
-		                
+				do{
+					system("cls");
+			        QuanLyDiem::ltc_load_from_file("loptinchi.txt");
+			        QuanLyDiem::ltc_print_all();
+			
+			        cout << "--- Nhap danh sach lop Tin Chi ---\n";
+			        cout << "1. Them lop moi\n";
+			        cout << "2. Xoa lop theo ma\n";
+			        cout << "3. Sua lop (soSVmin/max, huy)\n";
+			        cout << "0. Quay lai\n";
+			        cout << "Chon: ";
+			        
+			        cin >> sub;
+			        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+					switch (sub) {
+						
+						
+			            case 1: ltc_1_1(); break;
+			            case 2: ltc_1_2(); break;
+			            case 3: ltc_1_3(); break;
+			            case 0: break;
+			            
+			            default:
+			                cout << "Lua chon khong hop le!\n";
+			                system("pause");
+			            }
         		} while (sub != 0);
 				break;
 			}

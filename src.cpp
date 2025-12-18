@@ -1624,7 +1624,7 @@ void ltc_1_2() {
 }
 
 void ltc_1_3() {
-    int id;
+    int id, minsv, maxsv;
     cout << "Nhap ma lop can sua: ";
     cin >> id;
     cin.ignore();

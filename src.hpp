@@ -6,6 +6,7 @@
 #include <vector>
 #include <windows.h>
 
+using namespace std;
 namespace QuanLyDiem {
 
 // =================== C?U HÌNH CHU?I & GI?I H?N ===================
@@ -104,14 +105,13 @@ void sv_print_all_in_class(LopSV* lop);
 
 // --- L?p sinh viên ---
 int dssv_find_index_lop(const std::string& malop);
-bool dssv_insert(const std::string& malop, const std::string& tenlop);
-bool dssv_remove(const std::string& malop);
-bool dssv_edit(const std::string& malop, const std::string& newTen);
+bool dssv_insert(const string& malop, const std::string& tenlop);
+bool dssv_remove(const string& malop);
+bool dssv_edit(const string& malop, const string& newTen);
 LopSV* dssv_find(std::string &malop);
 void dssv_print_all();
 
-void dssv_save_to_file(const std::string& filename);
-void dssv_load_from_file(const std::string& filename);
+void dssv_save_to_file(const ing& filename);
 
 // --- Môn h?c (AVL Tree) ---
 int mh_height(treeMH n);
@@ -120,31 +120,31 @@ void mh_update_height(treeMH n);
 treeMH mh_right_rotate(treeMH y);
 treeMH mh_left_rotate(treeMH x);
 treeMH mh_insert(treeMH root, treeMH node);
-treeMH mh_remove(treeMH root, const std::string& mamh);
-treeMH mh_find(treeMH root, const std::string& mamh);
+treeMH mh_remove(treeMH root, const string& mamh);
+treeMH mh_find(treeMH root, const string& mamh);
 treeMH mh_find_by_name(treeMH root, const std::string& tenmh);
 
 void mh_inorder_print(treeMH root);
 void mh_clear(treeMH root);
-bool mh_edit(const std::string& mamh, const std::string& tenmh, int stclt, int stcth);
-void mh_save_to_file(const std::string& filename);
-void mh_load_from_file(const std::string& filename);
+bool mh_edit(const string& mamh, const string& tenmh, int stclt, int stcth);
+void mh_save_to_file(const string& filename);
+void mh_load_from_file(const string& filename);
 void mh_print_all();  		// CHECK XEM MÔN H?C NH?P ?N CHUA
 
 // --- Ðang ký ---
 void dk_add_head(DangKy*& head, DangKy* node);
-DangKy* dk_find(DangKy* head, const std::string& masv);
-bool dk_remove(DangKy*& head, const std::string& masv);
+DangKy* dk_find(DangKy* head, const string& masv);
+bool dk_remove(DangKy*& head, const string& masv);
 void dk_clear(DangKy*& head);
 void dk_print(DangKy* head);
 
-bool dk_check_in4_sv(DS_LOPSV& dsLopSV, std::string& masv, int hocky, std::string& nienkhoa);
+bool dk_check_in4_sv(DS_LOPSV& dsLopSV, const std::string& masv, int hocky, const std::string& nienkhoa);
 
-void dk_registration_table(const std::string& masv, int hocky, const std::string& nienkhoa);
+void dk_registration_table(const string& masv, int hocky, const string& nienkhoa);
 // --- L?p tín ch? ---
 int nextMaLopTC();
 int next_MALOPTC();
-LopTinChi* ltc_add(const std::string& mamh, const std::string& nk, int hk, int nhom, int minsv, int maxsv, bool huy = false);
+LopTinChi* ltc_add(const string& mamh, const string& nk, int hk, int nhom, int minsv, int maxsv, bool huy = false);
 LopTinChi* ltc_find_by_id(int id);
 bool ltc_remove_by_id(int id);
 void ltc_print_all();
@@ -171,7 +171,7 @@ void score_inBangDiemTBLopThuong();	//case 6
 void score_inBangDiemMonCaoNhatLopThuong(); //case 7
 
 
-std::string center(const std::string &text, int width); // ham can giua
+string center(const string &text, int width); // ham can giua
 void textColor(int color); // ham text color
 void setBGColor(int bg, int text);  // ham console color
 std::string normalizeMaMH(std::string s); // HÀM CHU THUONG -> CHU HOA
@@ -183,6 +183,9 @@ int split_fields(const std::string& s, std::string out[], int max_fields); // Hà
 void waitForEnter(); // HAM DOI PHIM ENTER
 std::string pad2(int n); //// HAM DINH DANG 2 CHU SO KHI N < 10
 void dsdk_ltc_print(LopTinChi* p, DS_LOPSV* dsLopSV);  // IN DSSV DANG KI LOP TIN CHI
+
+
+
 
 // Ham Menu
 void ltc_1_1();
@@ -206,9 +209,33 @@ void dk_1(const std::string& masv, int hocky, const std::string& nienkhoa);
 void dk_2(const std::string& masv, int hocky, const std::string& nienkhoa);
 
 } // namespace QuanLyDiem
+namespace UIPopup {
 
+    // ===== Console utils =====
+    void gotoxy(int x, int y);
+    void setColor(int color);
+
+    // ===== Popup frame =====
+    void drawPopupBox(
+        int x,
+        int y,
+        int w,
+        int h,
+        const string& title
+    );
+
+    // ===== Popup nh?p thông tin sinh viên =====
+    // title: tiêu d? popup (VD: "NHAP THONG TIN SINH VIEN")
+    bool inputSinhVien(
+        const string& title,
+        string& masv,
+        int& hocky,
+        string& nienkhoa
+    );
+
+}
 #endif // QUANLY_DIEM_HPP
 
-std::string checkMa(int limit, std::string info);
-std::string checkTen(std::string info);
-int nhapSTC(const std::string &tenBien = "s? tín ch?");
+string checkMa(int limit, string info);
+string checkTen(string info);
+int nhapSTC(const string &tenBien = "s? tín ch?");

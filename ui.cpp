@@ -560,24 +560,12 @@ int QuanliDangKySinhVien() {
 
     string masv, nienkhoa;
     int hocky;
-
+	
     // Nh?p + ki?m tra thông tin SV
-    while (true) {
-        system("cls");
-        cout << "======= NHAP THONG TIN SINH VIEN =======\n";
-        cout << "Nhap Ma Sinh Vien: "; cin >> masv;
-        cout << "Hoc Ky (1/2/3): "; cin >> hocky;
-        cout << "Nien Khoa (vd: 2024-2025): "; cin >> nienkhoa;
-
-        if (QuanLyDiem::dk_check_in4_sv(*QuanLyDiem::dsLopSV, masv, hocky, nienkhoa)) {
-            cout << "SINH VIEN HOP LE!\n";
-            system("pause");
-            break;
-        } else {
-            cout << "Thong tin khong hop le. Vui long nhap lai.\n";
-            system("pause");
-        }
-    }
+    UIPopup::inputSinhVien(
+	    "NHAP THONG TIN SINH VIEN",
+	    masv, hocky, nienkhoa
+	);
 
     int choice;
     do {

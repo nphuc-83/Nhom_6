@@ -1,6 +1,6 @@
-CNTT|CNTT|23|3
-GT|GT|14|3
-TA|TA|14|2
-TOANS|toasn|12|32
-VAN|VAN|4|5
-VATLY|vatly|6|4
+CNTT|Cntt|23|3
+GT|Gt|14|3
+TA|Ta|14|2
+TOAN|Toan|12|32
+VAN|Van|4|5
+VATLY|Vatly|6|4

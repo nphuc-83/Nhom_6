@@ -179,6 +179,49 @@ void drawSubMenu(const Menu& m, int current) {
     SetColor(7, 0);
 }
 
+void drawButton(int x, int y, const string& key, const string& text) {
+    SetColor(12, 15);
+    gotoxy(x, y);
+    cout << " " << key << " ";
+
+    SetColor(7, 0);
+    cout << ": " << text << " ";
+}
+
+void drawFunctionButtons() {
+    int x = 5;
+    int y = 22;
+    int gap = 18;
+
+    // A - ADD
+    SetColor(12, 15);
+    gotoxy(x, y);
+    cout << " A ";
+    SetColor(7, 0);
+    cout << ": ADD  ";
+
+    // D - DELETE
+    SetColor(12, 15);
+    gotoxy(x + gap, y);
+    cout << " D ";
+    SetColor(7, 0);
+    cout << ": DELETE  ";
+
+    // E - EDIT
+    SetColor(12, 15);
+    gotoxy(x + 2*gap, y);
+    cout << " E ";
+    SetColor(7, 0);
+    cout << ": EDIT  ";
+
+    // ESC - EXIT
+    SetColor(12, 15);
+    gotoxy(x + 3*gap, y);
+    cout << " ESC ";
+    SetColor(7, 0);
+    cout << ": EXIT";
+}
+
 void clearSubMenuArea() {
     int startX = 35;
     int startY = 4;
@@ -307,8 +350,9 @@ int QuanLiChucNang() {
                 } else if (currentMain == 3) { // Quan Ly Dang Ki
                     inSubMenu = true;
                     currentSub = 0;
-                } else if (currentMain == 4) { // Ghi Du Lieu
-                    
+                } else if (currentMain == 4) { // Score Board
+                    inSubMenu = true;
+                    currentSub = 0;
                 } else if (currentMain == 5) { // Thoat
                     system("cls");
                     gotoxy(35, 10);
@@ -318,17 +362,155 @@ int QuanLiChucNang() {
                     Sleep(1000);
                     return 0;
                 }
+            
             } else {
                 // Xu ly submenu
                 if (currentMain == 0) { // Lop Tin Chi
-                    QuanLiLopTinChi();
+                      if (currentSub == 0) {
+                        // Ði?u ch?nh danh sách l?p tín ch? (Thêm/Xóa/S?a)
+                        int sub;
+                        do {
+                            system("cls");
+                            QuanLyDiem::ltc_load_from_file("loptinchi.txt");
+                            QuanLyDiem::ltc_print_all();
+                            
+                            cout << "\n--- Nhap danh sach lop Tin Chi ---\n";
+                            cout << "1. Them lop moi\n";
+                            cout << "2. Xoa lop theo ma\n";
+                            cout << "3. Sua lop (soSVmin/max, huy)\n";
+                            cout << "0. Quay lai\n";
+                            cout << "Chon: ";
+                            
+                            cin >> sub;
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                            
+                            switch (sub) {
+                                case 1: ltc_1_1(); break;
+                                case 2: ltc_1_2(); break;
+                                case 3: ltc_1_3(); break;
+                                case 0: break;
+                                default:
+                                    cout << "Lua chon khong hop le!\n";
+                                    system("pause");
+                            }
+                        } while (sub != 0);
+                        
+                    } else if (currentSub == 1) {
+                        // Xem danh sách l?p tín ch?
+                        ltc_2();
+                    }
+                    
                 } else if (currentMain == 1) { // Mon Hoc
-                    QuanLiMonHoc();
+                      if (currentSub == 0) {
+                        QuanLiMonHoc();
+                        
+                    } else if (currentSub == 1) {
+                        // In danh sách môn h?c
+                        mh_4();
+                        
+                        gotoxy(5, 22);
+                        SetColor(11, 0);
+                        cout << "Nhan phim bat ky de quay lai...";
+                        SetColor(7, 0);
+                        _getch();
+                    }
+                    
                 } else if (currentMain == 2) { // Sinh Vien
-                    QuanliLopSinhVien();
-                } else if (currentMain == 3) { // Dang Ki
-                    QuanliDangKySinhVien();
+                    if (currentSub == 0) {
+                        // Ði?u ch?nh l?p h?c
+                        int sub;
+                        do {
+                            system("cls");
+                            QuanLyDiem::dssv_load_from_file("lopSV.txt");
+                            cout << "======= DIEU CHINH LOP HOC =======\n";
+                            QuanLyDiem::dssv_print_all();
+                            
+                            cout << "\n1. Them lop hoc\n";
+                            cout << "2. Xoa lop hoc\n";
+                            cout << "3. Sua lop hoc\n";
+                            cout << "0. Quay lai\n";
+                            cout << "Chon: ";
+                            cin >> sub;
+                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                            
+                            switch (sub) {
+                                case 1: dssv_1(); break;
+                                case 2: dssv_2(); break;
+                                case 3: dssv_3(); break;
+                                case 0: break;
+                                default:
+                                    cout << "Lua chon khong hop le!\n";
+                                    system("pause");
+                            }
+                        } while (sub != 0);
+                        
+                      } else if (currentSub == 1) {
+                        // C?p nh?t danh sách sinh viên
+                        system("cls");
+                        cout << "======= QUAN LY SINH VIEN TRONG LOP =======\n";
+                        QuanLyDiem::dssv_print_all();
+                        
+                        string MALOP = checkMa(15, "Nhap ma lop can quan ly: ");
+                        QuanLyDiem::LopSV* lop = QuanLyDiem::dssv_find(MALOP);
+                        
+                        if (!lop) {
+                            cout << "Lop khong ton tai!\n";
+                            system("pause");
+                        } else {
+                            int subChoice;
+                            do {
+                                system("cls");
+                                QuanLyDiem::sv_print_all_in_class(lop);
+                                
+                                cout << "\n--- CHUC NANG ---\n";
+                                cout << "1. Them sinh vien\n";
+                                cout << "2. Xoa sinh vien\n";
+                                cout << "3. Sua thong tin sinh vien\n";
+                                cout << "0. Quay lai menu lop\n";
+                                cout << "Chon: ";
+                                cin >> subChoice;
+                                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                                
+                                switch (subChoice) {
+                                    case 1: dssv_4_1(lop); break;
+                                    case 2: dssv_4_2(lop); break;
+                                    case 3: dssv_4_3(lop); break;
+                                    case 0: break;
+                               default:
+                                        cout << "Lua chon khong hop le!\n";
+                                        system("pause");
+                                }
+                            } while (subChoice != 0);
+                        }
+                    }
+                    
+                   } else if (currentMain == 3) { // Dang Ki
+                      QuanliDangKySinhVien();
+                      
+                      
+                    // Ve lai sau khi thoat chuc nang
+                      system("cls");
+                      drawHeader();
+                      drawMainMenu(menus, currentMain);
+                      oldMain = currentMain;
+                      inSubMenu = false; // Quay lai menu chinh sau khi chon
+                
+                } else if (currentMain == 4) { // Score Board
+                    if (currentSub == 0) {
+                        // Nh?p ði?m
+                        score_nhap_diem();
+                    } else if (currentSub == 1) {
+                        // In b?ng ði?m l?p tín ch?
+                        ltc_2();
+                    } else if (currentSub == 2) {
+                        // In ði?m trung b?nh l?p thý?ng
+                        score_inBangDiemTBLopThuong();
+                    } else if (currentSub == 3) {
+                        // In full b?ng ði?m l?p thý?ng
+                        score_inBangDiemMonCaoNhatLopThuong();
+                    }
                 }
+                
                 // Ve lai sau khi thoat chuc nang
                 system("cls");
                 drawHeader();
@@ -417,44 +599,66 @@ int QuanLiLopTinChi() {
 }
 // ===== MENU QU?N LÃ MÃ”N H?C =====
 int QuanLiMonHoc() {
-    int choice;
-    do {
-    	system("cls");
+    while (true) {
+        system("cls");
+
+        QuanLyDiem::mh_load_from_file("monhoc.txt");
+
         cout << "======= QUAN LI MON HOC =======\n";
-        QuanLyDiem::mh_print_all(); // Display the table of courses
-        cout << "1. Them mon hoc\n";
-        cout << "2. Xoa mon hoc\n";
-        cout << "3. Dieu chinh mon hoc\n";
-        cout << "4. In danh sach mon hoc\n";
-        cout << "0. Quay lai menu chinh\n";
-        cout << "-------------------------------\n";
-        cout << "Nhap lua chon: ";
-        cin >> choice;
+        QuanLyDiem::mh_print_all();
 
-        switch (choice) {
-            case 1: {
-			    mh_1();
-			    break;
-			}
+        gotoxy(5, 24);
+        SetColor(11, 0);
+        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
+        SetColor(7, 0);
 
-            case 2: {
-			    mh_2();
-			    break;
-			}
-			case 3: {
-			    mh_3();
-			    break;
-			}
-			case 4: {
-			    mh_4();
-			    break;
-			}
+        // VE NUT A D E ESC
+        drawFunctionButtons();
 
-            case 0: cout << "Quay lai menu chinh...\n"; break;
-            default: cout << "Lua chon khong hop le!\n"; break;
+        int key = _getch();
+
+        // ESC ? thoát
+        if (key == 27) {
+            break;
         }
-    } while (choice != 0);
-    return choice;
+        // chuyen chu thuong thanh chu hoa 
+        if (key >= 'a' && key <= 'z') {
+            key = key - 32;
+        }      
+		
+		bool validKey = false;  // Bien kiem tra phim hop le
+		  
+           switch (key) {
+                case 'A': // Phím A - ADD
+                    validKey = true;
+                    system("cls");
+                    mh_1(); // Them mon hoc
+                    break;
+                case 'D': // Phím D - DELETE
+				    validKey = true;
+					system("cls");
+                    mh_2(); // Xoa môn hoc                    
+                    break;
+                case 'E': // Phím E - EDIT
+                    validKey = true;
+					system("cls");
+					mh_3(); // Sua mon hoc
+                    break;
+                default:  //    phim không hop le - kh lam gi - menu ve lai 
+                    validKey = false;
+                    break;
+            // N?u phím không h?p l?, hi?n th? thông báo ng?n
+            if(!validKey && key != 27) {
+            gotoxy(5, 26);
+            SetColor(12, 0);  // Màu ð?
+            cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
+            SetColor(7, 0);   // Reset màu
+            Sleep(1000);      // Hi?n th? 1 giây
+            // Sau khi Sleep, v?ng l?p s? t? cls và v? l?i menu s?ch s? 
+        }
+    }
+    return 0;
+ }
 }
 
 int QuanliLopSinhVien() {
@@ -571,7 +775,7 @@ int QuanliDangKySinhVien() {
     do {
         system("cls");
         cout << "======= QUAN LI DANG KY LOP TIN CHI =======\n";
-        QuanLyDiem::dk_registration_table(masv, hocky, nienkhoa);  // ÐÃ S?A
+        QuanLyDiem::dk_registration_table(masv, hocky, nienkhoa);  // ?? S?A
 
         cout << "\n1. Dang ky lop tin chi\n";
         cout << "2. Huy dang ky\n";

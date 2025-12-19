@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <conio.h>
 #include <bits/stdc++.h>
+#include <limits>
 
 using namespace std;
 
@@ -1689,6 +1690,7 @@ void ltc_2() {
 
 void mh_1() {
     system("cls");
+    QuanLyDiem::mh_load_from_file("monhoc.txt");
     cout << "======= QUAN LI MON HOC =======\n";
 
     string MAMH, TENMH;
@@ -1697,6 +1699,7 @@ void mh_1() {
     QuanLyDiem::mh_print_all();
 
     MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc: ");
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     TENMH = checkTen("Vui long nhap ten Mon Hoc: ");
     STCLT = nhapSTC("so tin chi ly thuyet");
     STCTH = nhapSTC("so tin chi thuc hanh");
@@ -1713,8 +1716,8 @@ void mh_1() {
     node->right = nullptr;
 
     // Chèn vào cây AVL
-    QuanLyDiem::rootMonHoc = QuanLyDiem::mh_insert(QuanLyDiem::rootMonHoc, node);
-
+    QuanLyDiem::rootMonHoc = QuanLyDiem::mh_insert(QuanLyDiem::rootMonHoc, node);    
+    QuanLyDiem::mh_save_to_file("monhoc.txt");
     system("cls");
     QuanLyDiem::mh_print_all();
     cout << ">> Da them mon hoc thanh cong!\n";
@@ -1723,11 +1726,16 @@ void mh_1() {
 }
 
 void mh_2() {
+	system("cls");
+	QuanLyDiem::mh_load_from_file("monhoc.txt");
     string MAMH;
+    QuanLyDiem::mh_print_all();
     MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc can xoa: ");
-
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
     QuanLyDiem::rootMonHoc = QuanLyDiem::mh_remove(QuanLyDiem::rootMonHoc, MAMH);
-
+    
+    QuanLyDiem::mh_save_to_file("monhoc.txt");
     cout << ">> Da xoa mon hoc (neu ton tai)!\n";
 
     QuanLyDiem::mh_print_all();
@@ -1735,20 +1743,22 @@ void mh_2() {
 }
 
 void mh_3() {
+	system("cls");
+	QuanLyDiem::mh_load_from_file("monhoc.txt");
     string MAMH, TENMH;
     int STCLT, STCTH;
-
+    QuanLyDiem::mh_print_all();
     cout << "Vui long nhap ma mon hoc can chinh sua: ";
     MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc: ");
-
     cout << "Vui long nhap ten mon hoc moi: ";
-    cin.ignore();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     TENMH = checkTen("Vui long nhap ten Mon Hoc moi: ");
 
     STCLT = nhapSTC("Vui long nhap lai so tin chi ly thuyet");
     STCTH = nhapSTC("Vui long nhap lai so tin chi thuc hanh");
 
     if (QuanLyDiem::mh_edit(MAMH, TENMH, STCLT, STCTH)) {
+    	QuanLyDiem::mh_save_to_file("monhoc.txt");
         cout << ">> Da chinh sua mon hoc thanh cong!\n";
     } else {
         cout << ">> Khong tim thay mon hoc!\n";
@@ -1758,7 +1768,11 @@ void mh_3() {
     system("pause");
 }
 
+
 void mh_4() {
+	system("cls");
+	QuanLyDiem::mh_load_from_file("monhoc.txt");
+    cout << "======= DANH SACH MON HOC =======\n";
     QuanLyDiem::mh_print_all();
     system("pause");
 }
@@ -2095,7 +2109,7 @@ bool inputSinhVien(
 }
 //===== check thong tin can nhap vao ===
 
-string checkMa(int limit, string info) {
+string checkMa(int limit, std::string info) {
     string MAMH;
 
     while (true) {

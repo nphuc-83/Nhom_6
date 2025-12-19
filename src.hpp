@@ -111,7 +111,8 @@ bool dssv_edit(const string& malop, const string& newTen);
 LopSV* dssv_find(std::string &malop);
 void dssv_print_all();
 
-void dssv_save_to_file(const ing& filename);
+void dssv_save_to_file(const std::string& filename);
+void dssv_load_from_file(const std::string& filename);
 
 // --- Môn h?c (AVL Tree) ---
 int mh_height(treeMH n);

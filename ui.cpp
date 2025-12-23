@@ -1,23 +1,26 @@
 #include "ui.hpp"
 #include "src.hpp"
-#include <limits>
-#include <fstream>
-#include <sstream>
-#include <conio.h>
-#include <iomanip>
-
+#include <windows.h>   
+#include <conio.h>     // cho _getch()
+#include <limits>      // cho numeric_limits
+#include <fstream>     // cho ifstream/ofstream 
+#include <sstream>     // cho stringstream 
+#include <iomanip>     // cho setw, setprecision,...
+#include <vector>      // cho vector<Menu>
+#include <string>      
+#include <algorithm>   
 
 using namespace QuanLyDiem;
-// ===== MENU CH√çNH =====
+
+// ==================== C¡C H¿M V? GIAO DI?N ====================
+
 void SetColor(int text, int bg) {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(hConsole, (bg << 4) | text);
 }
 
 void gotoxy(int x, int y) {
-    COORD coord;
-    coord.X = x;
-    coord.Y = y;
+    COORD coord = { (SHORT)x, (SHORT)y };
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
@@ -29,153 +32,113 @@ void hideCursor() {
     SetConsoleCursorInfo(hConsole, &cursorInfo);
 }
 
-struct Menu {
-    string title;
-    vector<string> options;
-};
-
 void clearLine(int y, int startX, int width) {
     gotoxy(startX, y);
     for(int i = 0; i < width; i++) cout << " ";
 }
 
-void drawHeader() {
-    SetColor(12, 14); // Text do, background vang
-    int len1 = 13; // Do dai text "DO AN - DE 2"
-    int startX1 = 33;// Vi tri bat dau (can giua)
+void drawHeader(string& tieude) {
+    SetColor(12, 14);
+    int len1 = 13;
+    int startX1 = 33;
     gotoxy(startX1, 0);
-    for(int i = 0; i < len1 + 7; i++) cout << " ";// +7 de co khoang trong 2 ben
+    for(int i = 0; i < len1 + 7; i++) cout << " ";
     gotoxy(startX1 + 4, 0);
     cout << "DO AN - DE 2";
-    
+
     int len2 = 44;
-    int startX2 = 18;// Vi tri bat dau (can giua)
+    int startX2 = 18;
     gotoxy(startX2, 1);
     for(int i = 0; i < len2 + 10; i++) cout << " ";
     gotoxy(startX2 + 4, 1);
-    cout << "CHUONG TRINH QUAN LY SINH VIEN THEO HE TIN CHI";
-    
+    cout << tieude;
+
     SetColor(7, 0);
 }
 
-// Ve mot item menu chinh rieng le 
 void drawMainMenuItem(const Menu& menu, int index, bool isSelected) {
     int startY = 4;
     int itemWidth = 28;
     int itemHeight = 3;
     int spacing = 1;
     int leftMargin = 2;
-    
+
     int y = startY + index * (itemHeight + spacing);
-    
-    if (isSelected) {
-        SetColor(12, 14);
-    } else {
-        SetColor(0, 15);
-    }
-    
+
+    if (isSelected) SetColor(12, 14);
+    else SetColor(0, 15);
+
     for(int row = 0; row < itemHeight; row++) {
         gotoxy(leftMargin, y + row);
-        for(int col = 0; col < itemWidth; col++) {
-            cout << " ";
-        }
+        for(int col = 0; col < itemWidth; col++) cout << " ";
     }
-    
+
     gotoxy(leftMargin + 1, y + 1);
     cout << index + 1 << "." << menu.title;
-    
+
     SetColor(7, 0);
 }
 
-// Ve mot submenu item rieng le 
 void drawSubMenuItem(const string& option, int index, bool isSelected) {
     int startX = 38;
     int startY = 4;
     int itemWidth = 45;
     int itemHeight = 3;
     int spacing = 1;
-    
+
     int y = startY + index * (itemHeight + spacing);
-    
-    if (isSelected) {
-        SetColor(12, 14);
-    } else {
-        SetColor(12, 15);
-    }
-    
+
+    if (isSelected) SetColor(12, 14);
+    else SetColor(12, 15);
+
     for(int row = 0; row < itemHeight; row++) {
         gotoxy(startX, y + row);
-        for(int col = 0; col < itemWidth; col++) {
-            cout << " ";
-        }
+        for(int col = 0; col < itemWidth; col++) cout << " ";
     }
-    
+
     gotoxy(startX + 2, y + 1);
     cout << index + 1 << ". " << option;
-    
+
     SetColor(7, 0);
 }
 
 void drawMainMenu(const vector<Menu>& menus, int current) {
     int startY = 4;
-    int itemWidth = 28; // Chieu rong moi o 
-    int itemHeight = 3; // Chieu cao moi o 
-    int spacing = 1;    // Khoang cach giua cac o
-    int leftMargin = 2; // Margin ben trai
-    
-// Ve nen den cho toan bo vung menu
+    int itemWidth = 28;
+    int itemHeight = 3;
+    int spacing = 1;
+    int leftMargin = 2;
+
     SetColor(7, 0);
-    for(int y = startY; y < startY + menus.size() * (itemHeight + spacing) + 2; y++) {
+    for(int y = startY; y < startY + (int)menus.size() * (itemHeight + spacing) + 2; y++) {
         gotoxy(0, y);
         for(int x = 0; x < 32; x++) cout << " ";
     }
-// Ve tung menu item   
+
     for (int i = 0; i < (int)menus.size(); i++) {
-        int y = startY + i * (itemHeight + spacing);
-        
-        if (i == current) {
-          // Item duoc chon: background vang, text do 
-            SetColor(12, 14);
-        } else {
-          // Item khong chon: background trang, text de
-            SetColor(0, 15);
-        }
-        
-          // Ve o chu nhat cho item nay
-        for(int row = 0; row < itemHeight; row++) {
-            gotoxy(leftMargin, y + row);
-            for(int col = 0; col < itemWidth; col++) {
-                cout << " ";
-            }
-        }
-        
-          // Ve text o giua o 
-        gotoxy(leftMargin + 1, y + 1);
-        cout << i + 1 << "." << menus[i].title;
+        drawMainMenuItem(menus[i], i, i == current);
     }
-    
-    SetColor(7, 0);
 }
 
 void drawSubMenu(const Menu& m, int current) {
     if (m.options.empty()) return;
-    
+
     int startX = 38;
     int startY = 4;
     int itemWidth = 45;
     int itemHeight = 3;
     int spacing = 1;
-    
+
     SetColor(7, 0);
-    for(int y = startY; y < startY + m.options.size() * (itemHeight + spacing) + 2; y++) {
+    for(int y = startY; y < startY + (int)m.options.size() * (itemHeight + spacing) + 2; y++) {
         gotoxy(35, y);
         for(int x = 0; x < 50; x++) cout << " ";
     }
-    
+
     for (int i = 0; i < (int)m.options.size(); i++) {
-    drawSubMenuItem(m.options[i], i, i == current);
-    }  
-    
+        drawSubMenuItem(m.options[i], i, i == current);
+    }
+
     SetColor(7, 0);
 }
 
@@ -189,10 +152,9 @@ void drawButton(int x, int y, const string& key, const string& text) {
 }
 
 void drawFunctionButtons() {
-    int x = 5;
-    int y = 22;
-    int gap = 18;
-
+	int gap = 18;
+	int x = 5;
+	int y = 22;
     // A - ADD
     SetColor(12, 15);
     gotoxy(x, y);
@@ -223,13 +185,8 @@ void drawFunctionButtons() {
 }
 
 void clearSubMenuArea() {
-    int startX = 35;
-    int startY = 4;
-    int menuWidth = 50;
-    
-    SetColor(7, 0);
-    for(int y = startY; y < 30; y++) {
-        clearLine(y, startX, menuWidth);
+    for(int y = 4; y < 30; y++) {
+        clearLine(y, 35, 50);
     }
 }
 
@@ -244,558 +201,483 @@ void drawEscHint(bool show) {
     SetColor(7, 0);
 }
 
-// ============== MENU TONG===============
+// ==================== MENU CHÕNH ====================
+
 int QuanLiChucNang() {
     system("color 0F");
-    hideCursor(); // AN CON TRO
-    
+    hideCursor();
+
     vector<Menu> menus = {
-        {"Quan Ly Lop Tin Chi", {
-            "Dieu Chinh Danh Sach Lop Tin Chi",
-        }},
-        
-        {"Quan Ly Mon Hoc", {
-            "Dieu Chinh Mon Hoc",
-            "In Danh Sach Mon Hoc"
-        }},
-        
-        {"Quan Ly Sinh Vien", {
-            "Dieu Chinh Lop Hoc",
-            "Cap Nhat Danh Sach Sinh Vien"
-        }},
-        
-        {"Quan Ly Dang Ki", {
-            "Dang Ki Mon Hoc",
-            "Huy Dang Ki"
-        }},
-        
+        {"Quan Ly Lop Tin Chi", {"Dieu Chinh Danh Sach Lop Tin Chi"}},
+        {"Quan Ly Mon Hoc", {"Dieu Chinh Mon Hoc", "In Danh Sach Mon Hoc"}},
+        {"Quan Ly Sinh Vien", {"Dieu Chinh Lop Hoc", "Cap Nhat Danh Sach Sinh Vien"}},
+        {"Quan Ly Dang Ki", {"Dang Ki Mon Hoc", "Huy Dang Ki"}},
         {"Score board", {
-	        "Nhap Diem",
-	        "In Bang Diem Lop Tin Chi",
-	        "In Diem Trung Binh Cua 1 Lop Thuong",
-	        "In Full Bang Diem Cua 1 Lop Thuong",
-		}},
-		
+            "Nhap Diem",
+            "In Bang Diem Lop Tin Chi",
+            "In Diem Trung Binh Cua 1 Lop Thuong",
+            "In Full Bang Diem Cua 1 Lop Thuong"
+        }},
         {"Thoat", {}}
     };
-    
-    int currentMain = 0;
-    int oldMain = -1;              // THEM BIEN LUU TRANG THAI CU 
-    bool inSubMenu = false;
-    bool wasInSubMenu = false;     // THEM BIEN LUU TRANG THAI CU 
-    int currentSub = 0;
-    int oldSub = -1;               // THEM BIEN LUU TRANG THAI CU
 
-// VE BAN DAU MOT LAN - NGOAI VONG LAP
+    int currentMain = 0;
+    int oldMain = -1;
+    bool inSubMenu = false;
+    bool wasInSubMenu = false;
+    int currentSub = 0;
+    int oldSub = -1;
+
     system("cls");
-    drawHeader();
+    string temp = "CHUONG TRINH QUAN LY SINH VIEN THEO HE TIN CHI";
+    drawHeader(temp);
     drawMainMenu(menus, currentMain);
     oldMain = currentMain;
 
     while (true) {
-      // CHI VE LAI KHI CO THAY DOI
+        // C?p nh?t ch? khi cÛ thay d?i
+        if (oldMain != currentMain) {
+            drawMainMenuItem(menus[oldMain], oldMain, false);
+            drawMainMenuItem(menus[currentMain], currentMain, true);
+            oldMain = currentMain;
+        }
+		
+		// Xu ly submenu
+        if (inSubMenu && !wasInSubMenu) {
+            drawSubMenu(menus[currentMain], currentSub);
+            drawEscHint(true);
+            oldSub = currentSub;
+        } else if (inSubMenu && oldSub != currentSub) {
+            drawSubMenuItem(menus[currentMain].options[oldSub], oldSub, false);
+            drawSubMenuItem(menus[currentMain].options[currentSub], currentSub, true);
+            oldSub = currentSub;
+        } else if (!inSubMenu && wasInSubMenu) {
+            clearSubMenuArea();
+            drawEscHint(false);
+        }
 
-      // Cap nhat main menu neu thay doi
-      if (oldMain != currentMain) {
-      drawMainMenuItem(menus[oldMain], oldMain, false);
-      drawMainMenuItem(menus[currentMain], currentMain, true);
-      oldMain = currentMain;
-}
-
-      // Xu ly submenu
-      if (inSubMenu && !wasInSubMenu) {
-      drawSubMenu(menus[currentMain], currentSub);
-      drawEscHint(true);
-      oldSub = currentSub;
-      } else if (inSubMenu && oldSub != currentSub) {
-         drawSubMenuItem(menus[currentMain].options[oldSub], oldSub, false);
-         drawSubMenuItem(menus[currentMain].options[currentSub], currentSub, true);
-         oldSub = currentSub;
-      } else if (!inSubMenu && wasInSubMenu) {
-         clearSubMenuArea();
-         drawEscHint(false);
-}
-
-       wasInSubMenu = inSubMenu;
-    // Xu ly phim 
+        wasInSubMenu = inSubMenu;
+		
+		// Xu ly phim 
+		/*
+		72 = key up
+		80 = key down
+		13 = key enter
+		*/
         int key = _getch();
         if (key == 224) {
             key = _getch();
             if (!inSubMenu) {
-                if (key == 72) { // Up
-                    currentMain = (currentMain - 1 + menus.size()) % menus.size();
-                } else if (key == 80) { // Down
-                    currentMain = (currentMain + 1) % menus.size();
-                }
+                if (key == 72) currentMain = (currentMain - 1 + menus.size()) % menus.size();
+                else if (key == 80) currentMain = (currentMain + 1) % menus.size();	
             } else {
                 int optSize = menus[currentMain].options.size();
-                if (key == 72) { // Up
-                    currentSub = (currentSub - 1 + optSize) % optSize;
-                } else if (key == 80) { // Down
-                    currentSub = (currentSub + 1) % optSize;
-                }
+                if (key == 72) currentSub = (currentSub - 1 + optSize) % optSize;	
+                else if (key == 80) currentSub = (currentSub + 1) % optSize;
             }
-        } else if (key == 13) { // Enter
-            if (!inSubMenu) {
-                // Xu ly menu chinh
-                if (currentMain == 0) { // Quan Ly Lop Tin Chi
-                    inSubMenu = true;
-                    currentSub = 0;
-                } else if (currentMain == 1) { // Quan Ly Mon Hoc
-                    inSubMenu = true;
-                    currentSub = 0;
-                } else if (currentMain == 2) { // Quan Ly Sinh Vien
-                    inSubMenu = true;
-                    currentSub = 0;
-                } else if (currentMain == 3) { // Quan Ly Dang Ki
-                    inSubMenu = true;
-                    currentSub = 0;
-                } else if (currentMain == 4) { // Score Board
-                    inSubMenu = true;
-                    currentSub = 0;
-                } else if (currentMain == 5) { // Thoat
-                    system("cls");
-                    gotoxy(35, 10);
-                    SetColor(14, 0);
-                    cout << "Thoat chuong trinh...";
-                    SetColor(7, 0);
-                    Sleep(1000);
-                    return 0;
-                }
-            
-            } else {
-                // Xu ly submenu
-                if (currentMain == 0) { // Lop Tin Chi
-                      if (currentSub == 0) {
-                        // –i?u ch?nh danh s·ch l?p tÌn ch? (ThÍm/XÛa/S?a)
-                        int sub;
-                        do {
-                            system("cls");
-                            QuanLyDiem::ltc_load_from_file("loptinchi.txt");
-                            QuanLyDiem::ltc_print_all();
-                            
-                            cout << "\n--- Nhap danh sach lop Tin Chi ---\n";
-                            cout << "1. Them lop moi\n";
-                            cout << "2. Xoa lop theo ma\n";
-                            cout << "3. Sua lop (soSVmin/max, huy)\n";
-                            cout << "0. Quay lai\n";
-                            cout << "Chon: ";
-                            
-                            cin >> sub;
-                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                            
-                            switch (sub) {
-                                case 1: ltc_1_1(); break;
-                                case 2: ltc_1_2(); break;
-                                case 3: ltc_1_3(); break;
-                                case 0: break;
-                                default:
-                                    cout << "Lua chon khong hop le!\n";
-                                    system("pause");
-                            }
-                        } while (sub != 0);
-                        
-                    } else if (currentSub == 1) {
-                        // Xem danh s·ch l?p tÌn ch?
-                        ltc_2();
-                    }
-                    
-                } else if (currentMain == 1) { // Mon Hoc
-                      if (currentSub == 0) {
-                        QuanLiMonHoc();
-                        
-                    } else if (currentSub == 1) {
-                        // In danh s·ch mÙn h?c
-                        mh_4();
-                        
-                        gotoxy(5, 22);
-                        SetColor(11, 0);
-                        cout << "Nhan phim bat ky de quay lai...";
-                        SetColor(7, 0);
-                        _getch();
-                    }
-                    
-                } else if (currentMain == 2) { // Sinh Vien
-                    if (currentSub == 0) {
-                        // –i?u ch?nh l?p h?c
-                        int sub;
-                        do {
-                            system("cls");
-                            QuanLyDiem::dssv_load_from_file("lopSV.txt");
-                            cout << "======= DIEU CHINH LOP HOC =======\n";
-                            QuanLyDiem::dssv_print_all();
-                            
-                            cout << "\n1. Them lop hoc\n";
-                            cout << "2. Xoa lop hoc\n";
-                            cout << "3. Sua lop hoc\n";
-                            cout << "0. Quay lai\n";
-                            cout << "Chon: ";
-                            cin >> sub;
-                            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                            
-                            switch (sub) {
-                                case 1: dssv_1(); break;
-                                case 2: dssv_2(); break;
-                                case 3: dssv_3(); break;
-                                case 0: break;
-                                default:
-                                    cout << "Lua chon khong hop le!\n";
-                                    system("pause");
-                            }
-                        } while (sub != 0);
-                        
-                      } else if (currentSub == 1) {
-                        // C?p nh?t danh s·ch sinh viÍn
-                        system("cls");
-                        cout << "======= QUAN LY SINH VIEN TRONG LOP =======\n";
-                        QuanLyDiem::dssv_print_all();
-                        
-                        string MALOP = checkMa(15, "Nhap ma lop can quan ly: ");
-                        QuanLyDiem::LopSV* lop = QuanLyDiem::dssv_find(MALOP);
-                        
-                        if (!lop) {
-                            cout << "Lop khong ton tai!\n";
-                            system("pause");
-                        } else {
-                            int subChoice;
-                            do {
-                                system("cls");
-                                QuanLyDiem::sv_print_all_in_class(lop);
-                                
-                                cout << "\n--- CHUC NANG ---\n";
-                                cout << "1. Them sinh vien\n";
-                                cout << "2. Xoa sinh vien\n";
-                                cout << "3. Sua thong tin sinh vien\n";
-                                cout << "0. Quay lai menu lop\n";
-                                cout << "Chon: ";
-                                cin >> subChoice;
-                                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                                
-                                switch (subChoice) {
-                                    case 1: dssv_4_1(lop); break;
-                                    case 2: dssv_4_2(lop); break;
-                                    case 3: dssv_4_3(lop); break;
-                                    case 0: break;
-                               default:
-                                        cout << "Lua chon khong hop le!\n";
-                                        system("pause");
-                                }
-                            } while (subChoice != 0);
-                        }
-                    }
-                    
-                   } else if (currentMain == 3) { // Dang Ki
-                      QuanliDangKySinhVien();
-                      
-                      
-                    // Ve lai sau khi thoat chuc nang
-                      system("cls");
-                      drawHeader();
-                      drawMainMenu(menus, currentMain);
-                      oldMain = currentMain;
-                      inSubMenu = false; // Quay lai menu chinh sau khi chon
-                
-                } else if (currentMain == 4) { // Score Board
-                    if (currentSub == 0) {
-                        // Nh?p i?m
-                        score_nhap_diem();
-                    } else if (currentSub == 1) {
-                        // In b?ng i?m l?p tÌn ch?
-                        ltc_2();
-                    } else if (currentSub == 2) {
-                        // In i?m trung b?nh l?p th˝?ng
-                        score_inBangDiemTBLopThuong();
-                    } else if (currentSub == 3) {
-                        // In full b?ng i?m l?p th˝?ng
-                        score_inBangDiemMonCaoNhatLopThuong();
-                    }
-                }
-                
-                // Ve lai sau khi thoat chuc nang
-                system("cls");
-                drawHeader();
-                drawMainMenu(menus, currentMain);
-                oldMain = currentMain;
-                inSubMenu = false; // Quay lai menu chinh sau khi chon
-            }
-        } else if (key == 27 && inSubMenu) { // ESC
-            inSubMenu = false;
-        }
-    }
-    
+        } else if (key == 13) { 
+		    if (!inSubMenu) {
+		        if (currentMain == 5) { // Tho·t
+		            system("cls");
+		            gotoxy(35, 10);
+		            SetColor(14, 0);
+		            cout << "Thoat chuong trinh...";
+		            SetColor(7, 0);
+		            Sleep(1000);
+		            return 0;
+		        }
+		
+		        // N?u menu chÌnh cÛ submenu thÏ v‡o submenu, khÙng return ngay
+		        if (!menus[currentMain].options.empty()) {
+		            inSubMenu = true;
+		            currentSub = 0; // m?c d?nh ch?n m?c d?u
+		        } else {
+		            // Menu chÌnh khÙng cÛ submenu ? return luÙn
+		            return (currentMain + 1) * 10;
+		        }
+		    } else {
+		        // –ang ? submenu ? return gi· tr? submenu
+		        return (currentMain + 1) * 10 + (currentSub + 1);
+		    }
+		}
+		else if (key == 27 && inSubMenu) {
+		        inSubMenu = false;
+		    }
+		}
+
     return 0;
 }
-// ===== MENU QUAN LI LOP TIN CHI =====
-int QuanLiLopTinChi() {
-	int chon;
-	do {
-		system("cls");
-		QuanLyDiem::ltc_load_from_file("loptinchi.txt");
-		QuanLyDiem::ltc_print_all();
-		cout << "======= QUAN LI LOP TIN CHI =======\n";
-		cout << "1. Nhap danh sach lop Tin Chi (Them/Xoa/Sua)\n";
-		cout << "2. Xem danh sach lop Tin Chi\n";
-		cout << "3. Xem Diem lop Tin Chi\n";
-		cout << "4. Nhap Diem\n";
-		cout << "0. Quay lai menu chinh\n";
-		cout << "-------------------------------\n";
-		cout << "Nhap lua chon: ";
-		cin >> chon;
-		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		
-		switch (chon) {
-			case 1: {
-				int sub;
-				do{
-					system("cls");
-			        QuanLyDiem::ltc_load_from_file("loptinchi.txt");
-			        QuanLyDiem::ltc_print_all();
-			
-			        cout << "--- Nhap danh sach lop Tin Chi ---\n";
-			        cout << "1. Them lop moi\n";
-			        cout << "2. Xoa lop theo ma\n";
-			        cout << "3. Sua lop (soSVmin/max, huy)\n";
-			        cout << "0. Quay lai\n";
-			        cout << "Chon: ";
-			        
-			        cin >> sub;
-			        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-					switch (sub) {
-						
-						
-			            case 1: ltc_1_1(); break;
-			            case 2: ltc_1_2(); break;
-			            case 3: ltc_1_3(); break;
-			            case 0: break;
-			            
-			            default:
-			                cout << "Lua chon khong hop le!\n";
-			                system("pause");
-			            }
-        		} while (sub != 0);
-				break;
-			}
-			case 2: {
-			    ltc_2();
-			    break;
-			}
-			case 4: {
-			    score_nhap_diem();	//cau i
-			    break;
-			}
-			case 5: {
-			    score_inBangDiemTBLopThuong(); //cau k
-			    break;
-			}
-			case 6: {
-			   score_inBangDiemMonCaoNhatLopThuong(); //cau l
-			    break;
-			}
-			case 0: cout << "Quay lai menu chinh...\n"; break;
-			default: cout << "Lua chon khong hop le!\n"; system("pause"); break;
-		}
-	} while (chon != 0);
-	return chon;
-}
-// ===== MENU QU?N L√ç M√îN H?C =====
+
+// ==================== C¡C H¿M CH?C NANG KH¡C ====================
+
 int QuanLiMonHoc() {
+    // ... (gi? nguyÍn ho‡n to‡n code cu c?a b?n)
     while (true) {
         system("cls");
-
         QuanLyDiem::mh_load_from_file("monhoc.txt");
-
         cout << "======= QUAN LI MON HOC =======\n";
         QuanLyDiem::mh_print_all();
-
+        
         gotoxy(5, 24);
         SetColor(11, 0);
         cout << "Su dung phim chuc nang hoac ESC de quay lai...";
+        
         SetColor(7, 0);
-
-        // VE NUT A D E ESC
         drawFunctionButtons();
 
         int key = _getch();
+        if (key == 27) break;
+        if (key >= 'a' && key <= 'z') key -= 32;
 
-        // ESC ? tho·t
-        if (key == 27) {
-            break;
+        bool validKey = false;
+        switch (key) {
+            case 'A': validKey = true; system("cls"); mh_1(); break;
+            case 'D': validKey = true; system("cls"); mh_2(); break;
+            case 'E': validKey = true; system("cls"); mh_3(); break;
         }
-        // chuyen chu thuong thanh chu hoa 
-        if (key >= 'a' && key <= 'z') {
-            key = key - 32;
-        }      
-		
-		bool validKey = false;  // Bien kiem tra phim hop le
-		  
-           switch (key) {
-                case 'A': // PhÌm A - ADD
-                    validKey = true;
-                    system("cls");
-                    mh_1(); // Them mon hoc
-                    break;
-                case 'D': // PhÌm D - DELETE
-				    validKey = true;
-					system("cls");
-                    mh_2(); // Xoa mÙn hoc                    
-                    break;
-                case 'E': // PhÌm E - EDIT
-                    validKey = true;
-					system("cls");
-					mh_3(); // Sua mon hoc
-                    break;
-                default:  //    phim khÙng hop le - kh lam gi - menu ve lai 
-                    validKey = false;
-                    break;
-            // N?u phÌm khÙng h?p l?, hi?n th? thÙng b·o ng?n
-            if(!validKey && key != 27) {
+        if (!validKey && key != 27) {
             gotoxy(5, 26);
-            SetColor(12, 0);  // M‡u ?
+            SetColor(12, 0);
             cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
-            SetColor(7, 0);   // Reset m‡u
-            Sleep(1000);      // Hi?n th? 1 gi‚y
-            // Sau khi Sleep, v?ng l?p s? t? cls v‡ v? l?i menu s?ch s? 
+            SetColor(7, 0);
+            Sleep(1000);
         }
     }
     return 0;
- }
 }
 
-int QuanliLopSinhVien() {
-	int choice;
-    do {
-    	system("cls");
-        cout << "======= QUAN LI DANH SACH SINH VIEN =======\n";
-        QuanLyDiem::dssv_print_all();
-        cout << "1. Them lop hoc\n";
-        cout << "2. Xoa lop hoc\n";
-        cout << "3. Dieu chinh lop hoc\n";
-        cout << "4. Cap nhat danh sach lop hoc\n";
-        cout << "0. Quay lai menu chinh\n";
-        cout << "-------------------------------\n";
-        cout << "Nhap lua chon: ";
-        cin >> choice;
+namespace UIPopup {
 
-        switch (choice) {
-            case 1: {
-			    dssv_1();
-			    break;
-			}
-			case 2: {
-			    dssv_2();
-			    break;
-			}
-			case 3: {
-			    dssv_3();
-			    break;
-			}
+// ================= CURSOR =================
+void gotoxy(int x, int y) {
+    COORD c = { (SHORT)x, (SHORT)y };
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
+}
 
-            case 4: {
-			    system("cls");
-			    cout << "======= QUAN LY SINH VIEN TRONG LOP =======\n";
-			    QuanLyDiem::dssv_print_all();
-			
-			    string MALOP = checkMa(15, "Nhap ma lop can quan ly: ");
-			    QuanLyDiem::LopSV* lop = QuanLyDiem::dssv_find(MALOP);
-			
-			    if (!lop) {
-			        cout << "Lop khong ton tai!\n";
-			        system("pause");
-			        break;
-			    }
-			
-			    int subChoice;
-			
-			    do {
-			        system("cls");
-			        QuanLyDiem::sv_print_all_in_class(lop);
-			
-			        cout << "\n--- CHUC NANG ---\n";
-			        cout << "1. Them sinh vien\n";
-			        cout << "2. Xoa sinh vien\n";
-			        cout << "3. Sua thong tin sinh vien\n";
-			        cout << "0. Quay lai menu lop\n";
-			        cout << "Chon: ";
-			        cin >> subChoice;
-			        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			
-			        switch (subChoice) {
-			            case 1:
-			                dssv_4_1(lop);
-			                break;
-			
-			            case 2:
-			                dssv_4_2(lop);
-			                break;
-			
-			            case 3:
-			                dssv_4_3(lop);
-			                break;
-			
-			            case 0:
-			                break;
-			
-			            default:
-			                cout << "Lua chon khong hop le!\n";
-			                system("pause");
-			                break;
-			        }
-			
-			    } while (subChoice != 0);
-			
-			    break;
-			}
+// ================= COLOR =================
+void setColor(int color) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
 
+// ================= DRAW WINDOW POPUP =================
+void drawPopupBox(int x, int y, int w, int h, const string& title) {
+    setColor(14); // Yellow border
 
-            case 0: cout << "Quay lai menu chinh...\n"; break;
-            default: cout << "Lua chon khong hop le!\n"; break;
-        }
-    } while (choice != 0);
-    return choice;
-};
+    // ===== Top border =====
+    gotoxy(x, y);
+    cout << "+" << string(w - 2, '=') << "+";
 
-int QuanliDangKySinhVien() {
-    system("cls");
+    // ===== Title bar =====
+    gotoxy(x, y + 1);
+    cout << "|";
 
-    // T?I D? LI?U TRU?C KHI DŸNG
-    QuanLyDiem::dssv_load_from_file("lopSV.txt");
-    QuanLyDiem::mh_load_from_file("monhoc.txt");
-    QuanLyDiem::ltc_load_from_file("loptinchi.txt");  // B?T BU?C!
+    int titlePos = (w - title.size()) / 2;
+    if (titlePos < 1) titlePos = 1;
 
-    string masv, nienkhoa;
-    int hocky;
-	
-    // Nh?p + ki?m tra thÙng tin SV
-    UIPopup::inputSinhVien(
-	    "NHAP THONG TIN SINH VIEN",
-	    masv, hocky, nienkhoa
-	);
+    cout << string(titlePos - 1, ' ')
+         << title
+         << string(w - titlePos - title.size() - 1, ' ')
+         << "|";
 
-    int choice;
-    do {
+    // ===== Separator =====
+    gotoxy(x, y + 2);
+    cout << "+" << string(w - 2, '-') << "+";
+
+    // ===== Content =====
+    for (int i = 3; i < h - 1; i++) {
+        gotoxy(x, y + i);
+        cout << "¶" << string(w - 2, ' ') << "¶";
+    }
+
+    // ===== Bottom =====
+    gotoxy(x, y + h - 1);
+    cout << "+" << string(w - 2, '-') << "+";
+
+    setColor(7);
+}
+
+// ================= DRAW INPUT FIELD =================
+void drawInputField(int x, int y, const string& label, int width) {
+    gotoxy(x, y);
+    cout << label << " : [";
+    cout << string(width, ' ');
+    cout << "]";
+}
+
+// ================= SHOW INPUT CURSOR =================
+void showCursor(int x, int y) {
+    gotoxy(x, y);
+    cout << "|";
+}
+
+// ================= POPUP INPUT SINH VIEN =================
+bool inputSinhVien(
+    const string& title,
+    string& masv,
+    int& hocky,
+    string& nienkhoa
+) {
+    const int W = 60;
+    const int H = 12;
+
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+
+    int consoleWidth  = csbi.srWindow.Right  - csbi.srWindow.Left + 1;
+    int consoleHeight = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
+
+    int X = (consoleWidth  - W) / 2;
+    int Y = (consoleHeight - H) / 2;
+
+    while (true) {
         system("cls");
-        cout << "======= QUAN LI DANG KY LOP TIN CHI =======\n";
-        QuanLyDiem::dk_registration_table(masv, hocky, nienkhoa);  // ?? S?A
+        drawPopupBox(X, Y, W, H, title);
 
-        cout << "\n1. Dang ky lop tin chi\n";
-        cout << "2. Huy dang ky\n";
-        cout << "0. Quay lai menu chinh\n";
-        cout << "------------------------------------\n";
-        cout << "Nhap lua chon: ";
-        cin >> choice;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        // ===== Ma SV =====
+        drawInputField(X + 3, Y + 4, "Ma sinh vien", 20);
+        gotoxy(X + 20, Y + 4);
+        cin >> masv;
 
-        switch (choice) {
-            case 1: dk_1(masv, hocky, nienkhoa); break;
-    		case 2: dk_2(masv, hocky, nienkhoa); break;
-            case 0:
-                cout << "Quay lai menu chinh...\n";
-                break;
-            default:
-                cout << "Lua chon khong hop le!\n";
-                system("pause");
+        // ===== Hoc ky =====
+        drawInputField(X + 3, Y + 6, "Hoc ky (1-3)", 5);
+        gotoxy(X + 20, Y + 6);
+
+        if (!(cin >> hocky) || hocky < 1 || hocky > 3) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+
+            setColor(12);
+            gotoxy(X + 3, Y + H - 2);
+            cout << "Hoc ky phai la so tu 1 den 3! Nhan phim bat ky...";
+            setColor(7);
+            getch();
+            continue;
         }
-    } while (choice != 0);
+        cin.ignore(1000, '\n');
 
-    return 0;
+        // ===== Nien khoa =====
+        drawInputField(X + 3, Y + 8, "Nien khoa", 20);
+        gotoxy(X + 20, Y + 8);
+        getline(cin, nienkhoa);
+
+        // ===== Validate =====
+        if (QuanLyDiem::dk_check_in4_sv(
+                *QuanLyDiem::dsLopSV,
+                masv,
+                hocky,
+                nienkhoa)) {
+
+            setColor(10);
+            gotoxy(X + 3, Y + H - 2);
+            cout << "Thong tin hop le!";
+            setColor(7);
+
+            Sleep(1000);
+            system("cls");
+            return true;
+        } else {
+            setColor(12);
+            gotoxy(X + 3, Y + H - 2);
+            cout << "Thong tin KHONG hop le! Nhan phim bat ky de nhap lai.";
+            setColor(7);
+            getch();
+        }
+    }
 }
+
+} // namespace UIPopup
+
+namespace Border_Maker {
+
+    void textColor(int color) {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+    }
+
+    void gotoxy(int x, int y) {
+        COORD coord = { (SHORT)x, (SHORT)y };
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    }
+
+    string center(const string& s, int width) {
+        int len = s.length();
+        if (width <= len) return s.substr(0, width);
+        int left = (width - len) / 2;
+        int right = width - len - left;
+        return string(left, ' ') + s + string(right, ' ');
+    }
+
+    void drawFunctionButtons(int x, int y) {
+        gotoxy(x, y);
+        SetColor(12, 15); cout << " A "; SetColor(7, 0); cout << ": Regis   ";
+        
+        gotoxy(x + 18, y);
+        SetColor(12, 15); cout << " B "; SetColor(7, 0); cout << ": Unregis  ";
+        
+        gotoxy(x + 36, y);
+        SetColor(12, 15); cout << " C "; SetColor(7, 0); cout << ": Exit     ";
+    }
+
+    // H‡m ph?: v? thanh tr?ng th·i ph‚n trang
+    void drawPagination(int currentPage, int totalPages, int x, int y) {
+        gotoxy(x, y);
+        SetColor(11, 0);
+        cout << " Trang " << currentPage << " / " << totalPages 
+             << "   (Su dung phim len/xuong de chuyen trang)";
+        SetColor(7, 0);
+    }
+	void dk_registration_table(const string& masv, int hocky, const string& nienkhoa) {
+        string temp = "QUAN LI THONG TIN DANG KY LOP TIN CHI SINH VIEN";
+        drawHeader(temp);
+
+        // TÏm thÙng tin sinh viÍn
+        string ho, ten;
+        bool foundSV = false;
+        for (int i = 0; i < dsLopSV->n; ++i) {
+            PTRSV p = dsLopSV->nodes[i]->FirstSV;
+            while (p) {
+                if (p->sv.MASV == masv) {
+                    ho = p->sv.HO;
+                    ten = p->sv.TEN;
+                    foundSV = true;
+                    break;
+                }
+                p = p->next;
+            }
+            if (foundSV) break;
+        }
+        if (!foundSV) {
+            cout << "\nKhong tim thay sinh vien co ma: " << masv << endl;
+            cout << "Nhan phim bat ky de quay lai...";
+            _getch();
+            return;
+        }
+
+        // L?c t?t c? l?p tin ch? ph˘ h?p
+        vector<LopTinChi*> filteredClasses;
+        for (LopTinChi* p = dsLopTC; p; p = p->next) {
+            if (p->HOCKY == hocky && p->NIENKHOA == nienkhoa) {
+                filteredClasses.push_back(p);
+            }
+        }
+
+        const int ROWS_PER_PAGE = 15;
+        int totalClasses = filteredClasses.size();
+        int totalPages = (totalClasses == 0) ? 1 : (totalClasses + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
+
+        int currentPage = 1;
+
+        while (true) {
+            system("cls");
+            drawHeader(temp);
+
+            // ThÙng tin sinh viÍn
+            cout << endl;
+            SetColor(10, 0);
+            cout << "  Sinh vien: " << ho << " " << ten << "   |   Ma SV: " << masv << endl;
+            cout << "  Hoc ky: " << hocky << "   |   Nien khoa: " << nienkhoa << endl;
+            SetColor(7, 0);
+
+            // === V? khung b?ng ===
+            const int khungW = 96;
+            textColor(14); // v‡ng
+            cout << "+" << string(khungW, '-') << "+\n";
+            SetColor(14, 0);  // to‡n b? dÚng header d˘ng m‡u v‡ng cho vi?n v‡ ch?
+			cout << "|"
+			     << center("STT",5) << "|"
+			     << center("MA LOP",8) << "|"
+			     << center("MA MON",10) << "|"
+			     << center("NHOM",6) << "|"
+			     << center("NIEN KHOA",13) << "|"
+			     << center("HOC KI",8) << "|"
+			     << center("SI SO",9) << "|"
+			     << center("SL MIN",8) << "|"
+			     << center("SL MAX",8) << "|"
+			     << center("TRANG THAI",12) << "|\n";
+            textColor(14);
+            cout << "|" << string(khungW, '-') << "|\n";
+
+            // TÌnh ch? s? b?t d?u v‡ k?t th˙c c?a trang hi?n t?i
+            int startIdx = (currentPage - 1) * ROWS_PER_PAGE;
+            int endIdx = min(startIdx + ROWS_PER_PAGE, totalClasses);
+
+            int stt = startIdx + 1;  // STT to‡n c?c
+
+            if (totalClasses == 0) {
+                textColor(12);
+                cout << "|" << center("1",5) << "|";
+                textColor(14);
+                for (int i = 0; i < 9; ++i)
+                    cout << center("Khong co du lieu", (i==0 ? 8 : (i==1 ? 10 : 8)));
+                cout << "|\n";
+            } else {
+                for (int i = startIdx; i < endIdx; ++i) {
+                    LopTinChi* p = filteredClasses[i];
+                    treeMH mon = mh_find(rootMonHoc, p->MAMH);
+                    string tenMon = mon ? mon->mh.TENMH : "(Khong tim thay)";
+
+                    int siSo = 0;
+                    for (DangKy* dk = p->DSDK; dk; dk = dk->next)
+                        if (!dk->HUYDK) siSo++;
+
+                    cout << "|";
+                    textColor(12); cout << center(to_string(stt++), 5); textColor(14);
+                    cout << "|" << center(to_string(p->MALOPTC),8)
+                         << "|" << center(p->MAMH,10)
+                         << "|" << center(to_string(p->NHOM),6)
+                         << "|" << center(p->NIENKHOA,13)
+                         << "|" << center(to_string(p->HOCKY),8)
+                         << "|" << center(to_string(siSo) + "/" + to_string(p->SOSVMAX),9)
+                         << "|" << center(to_string(p->SOSVMIN),8)
+                         << "|" << center(to_string(p->SOSVMAX),8)
+                         << "|" << center(p->HUYLOP ? "DA HUY" : "MO",12)
+                         << "|\n";
+                }
+            }
+
+            // === Quan tr?ng: In d?y d? c·c dÚng tr?ng v?i d?y d? d?u | ===
+            int printedRows = (totalClasses == 0) ? 1 : (endIdx - startIdx);
+            for (int i = printedRows; i < ROWS_PER_PAGE; ++i) {
+                textColor(14);
+                cout << "|" << string(khungW, ' ') << "|\n";
+            }
+
+            // –Ûng khung du?i
+            textColor(14);
+            cout << "+" << string(khungW, '-') << "+\n\n";
+            textColor(7);
+
+            // N˙t ch?c nang & ph‚n trang
+            drawFunctionButtons(8, 22);
+            drawPagination(currentPage, totalPages, 8, 24);
+
+            // X? l˝ phÌm
+            int key = _getch();
+            if (key == 224) { // phÌm mui tÍn
+                key = _getch();
+                if (key == 72 && currentPage > 1) {          // lÍn
+                    currentPage--;
+                }
+                else if (key == 80 && currentPage < totalPages) { // xu?ng
+                    currentPage++;
+                }
+            }
+            else if (key == 'c' || key == 'C' || key == 27) { // C ho?c ESC
+                return;
+            }
+            else if (key == 'a' || key == 'A') {
+                system("cls");
+                dk_1(masv, hocky, nienkhoa);
+                // Sau khi th?c hi?n dk_1 xong, cÛ th? quay l?i m‡n hÏnh n‡y
+                // (ho?c khÙng c?n, t˘y logic c?a b?n)
+            }
+            else if (key == 'b' || key == 'B') {
+                system("cls");
+                dk_2(masv, hocky, nienkhoa);
+            }
+        }
+    }
+
+}
+
+

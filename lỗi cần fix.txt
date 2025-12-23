@@ -1,0 +1,1 @@
+1. đăng ký lớp tín chỉ phần học kỳ, niên khóa miễn đúng là hiển thị dù không có lớp chứ không phải báo lỗi

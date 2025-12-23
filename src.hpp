@@ -141,7 +141,8 @@ void dk_print(DangKy* head);
 
 bool dk_check_in4_sv(DS_LOPSV& dsLopSV, const std::string& masv, int hocky, const std::string& nienkhoa);
 
-void dk_registration_table(const string& masv, int hocky, const string& nienkhoa);
+//void dk_registration_table(const string& masv, int hocky, const string& nienkhoa);
+
 // --- L?p tín ch? ---
 int nextMaLopTC();
 int next_MALOPTC();
@@ -200,7 +201,7 @@ void ltc_2();
 void mh_1();
 void mh_2();
 void mh_3();
-void mh_4();
+void mh_4();	// print dsmh
 
 void dssv_1();
 void dssv_2();
@@ -213,31 +214,7 @@ void dk_1(const std::string& masv, int hocky, const std::string& nienkhoa);
 void dk_2(const std::string& masv, int hocky, const std::string& nienkhoa);
 
 } // namespace QuanLyDiem
-namespace UIPopup {
 
-    // ===== Console utils =====
-    void gotoxy(int x, int y);
-    void setColor(int color);
-
-    // ===== Popup frame =====
-    void drawPopupBox(
-        int x,
-        int y,
-        int w,
-        int h,
-        const string& title
-    );
-
-    // ===== Popup nh?p thông tin sinh viên =====
-    // title: tiêu d? popup (VD: "NHAP THONG TIN SINH VIEN")
-    bool inputSinhVien(
-        const string& title,
-        string& masv,
-        int& hocky,
-        string& nienkhoa
-    );
-
-}
 #endif // QUANLY_DIEM_HPP
 
 string checkMa(int limit, string info);

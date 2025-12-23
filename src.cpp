@@ -621,83 +621,6 @@ void dk_print(DangKy* head) {
 		}
 }
 
-void dk_registration_table(const string& masv, int hocky, const string& nienkhoa) {
-    // 1. Tìm h? tên sinh viên
-    string ho, ten;
-    bool foundSV = false;
-    for (int i = 0; i < dsLopSV->n; ++i) {
-        PTRSV p = dsLopSV->nodes[i]->FirstSV;
-        while (p) {
-            if (p->sv.MASV == masv) {
-                ho = p->sv.HO;
-                ten = p->sv.TEN;
-                foundSV = true;
-                break;
-            }
-            p = p->next;
-        }
-        if (foundSV) break;
-    }
-
-    if (!foundSV) {
-        cout << "Khong tim thay sinh vien co ma: " << masv << endl;
-        return;
-    }
-
-    // 2. In tiêu d?
-    cout << "\n===== DANH SACH LOP TIN CHI MO (HK " << hocky << " - " << nienkhoa << ") =====\n";
-    cout << "Ho ten SV: " << ho << " " << ten << " | Ma SV: " << masv << endl;
-    cout << left
-         << setw(8)  << "MALOPTC"
-         << setw(10) << "MAMH"
-         << setw(30) << "TEN MON"
-         << setw(6)  << "NHOM"
-         << setw(6)  << "SI SO"
-         << setw(8)  << "TRANG THAI"
-         << setw(10) << "DANG KY" << "\n";
-    cout << string(88, '-') << "\n";
-
-    bool foundAny = false;
-    for (LopTinChi* p = dsLopTC; p; p = p->next) {
-        // L?c theo h?c k? + niên khóa
-        if (p->HOCKY != hocky || p->NIENKHOA != nienkhoa) continue;
-
-        foundAny = true;
-
-        // Tìm tên môn
-        treeMH mon = mh_find(rootMonHoc, p->MAMH);
-        string tenMon = mon ? mon->mh.TENMH : "(Khong tim thay)";
-
-        // Ð?m s? sinh viên dã dang ký
-        int siSo = 0;
-        for (DangKy* dk = p->DSDK; dk; dk = dk->next) {
-            if (!dk->HUYDK) siSo++;  // ch? tính chua h?y
-        }
-
-        // Ki?m tra sinh viên này dã dang ký chua
-        bool daDangKy = (dk_find(p->DSDK, masv) != nullptr);
-
-        // Tr?ng thái l?p
-        string trangThai = p->HUYLOP ? "DA HUY" : "MO";
-
-        cout << left
-             << setw(8)  << p->MALOPTC
-             << setw(10) << p->MAMH
-             << setw(30) << tenMon
-             << setw(6)  << p->NHOM
-             << setw(3)  << siSo << "/" << p->SOSVMAX
-             << setw(8)  << trangThai
-             << setw(10) << (daDangKy ? "DA DK" : "CHUA") << "\n";
-    }
-
-    if (!foundAny) {
-        cout << "Khong co lop tin chi nao mo trong hoc ky nay.\n";
-    } else {
-        cout << "\n>> Chon MALOPTC de dang ky. Nhap 0 de thoat.\n";
-    }
-    cout << "========================================================================\n";
-}
-
 // ==================== Lop TÍN CHi ====================
 
 int next_MALOPTC() { return current_id++; } //thay the
@@ -1382,8 +1305,6 @@ string inputMaMH() {
         return mamh;
     }
 }
-
-//HÀM NHAP NIEN KHOA
 string inputNienKhoa() {
     string nk;
 
@@ -1512,8 +1433,6 @@ int inputNhom() {
         return nhom;
     }
 }
-
-// HAM XOA DONG CUOI
 void clearLastLines(int lines) {
     for (int i = 0; i < lines; i++) {
         cout << "\033[F";  // move cursor up 1 line
@@ -1800,7 +1719,6 @@ void ltc_1_3() {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             break;
         }
-
         cout << "ERROR: soSV min phai NHO HON soSV max! Vui long nhap lai.\n";
         waitForEnter();
         clearLastLines(3);
@@ -1811,6 +1729,7 @@ void ltc_1_3() {
     cin.ignore();
 
     cout << "Da cap nhat.\n";
+
     QuanLyDiem::ltc_save_to_file("loptinchi.txt");
 
     system("pause");
@@ -2146,119 +2065,6 @@ void dk_2(const string& masv, int hocky, const string& nienkhoa) {
 }
 
 } // namespace QuanLyDiem
-namespace UIPopup {
-
-// ================= CURSOR =================
-void gotoxy(int x, int y) {
-    COORD c = {(SHORT)x, (SHORT)y};
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
-}
-
-// ================= COLOR =================
-void setColor(int color) {
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
-}
-
-// ================= DRAW POPUP =================
-void drawPopupBox(int x, int y, int w, int h, const string& title) {
-    setColor(14); // Yellow for the border (foreground bright yellow)
-    
-    // Draw top border (solid, uninterrupted)
-    gotoxy(x, y);
-    cout << "+" << string(w - 2, '-') << "+";
-    
-    // Draw sides and fill with spaces
-    for (int i = 1; i < h - 1; i++) {
-        gotoxy(x, y + i);
-        cout << "|" << string(w - 2, ' ') << "|";
-    }
-    
-    // Draw bottom border (solid)
-    gotoxy(x, y + h - 1);
-    cout << "+" << string(w - 2, '-') << "+";
-    
-    // Place title inside the popup, centered on the second line
-    int titlePos = (w - title.size()) / 2;
-    gotoxy(x + titlePos, y + 1);
-    cout << title;
-    
-    setColor(7); // Reset to default
-}
-
-// ================= POPUP INPUT SV =================
-bool inputSinhVien(
-    const string& title,
-    string& masv,
-    int& hocky,
-    string& nienkhoa
-    
-) {
-    const int W = 60;
-    const int H = 10;
-   
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    GetConsoleScreenBufferInfo(hConsole, &csbi);
-    int consoleWidth = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    int consoleHeight = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-   
-    int X = (consoleWidth - W) / 2;
-    int Y = (consoleHeight - H) / 2;
-   
-    while (true) {
-        system("cls");
-        drawPopupBox(X, Y, W, H, title);
-       
-        // Ma SV
-        gotoxy(X + 3, Y + 3);
-        cout << "Ma sinh vien : ";
-        gotoxy(X + 20, Y + 3);
-        cin >> masv;
-       
-        // Hoc ky
-        gotoxy(X + 3, Y + 5);
-        cout << "Hoc ky (1-3) : ";
-        gotoxy(X + 20, Y + 5);
-       
-        if (!(cin >> hocky) || hocky < 1 || hocky > 3) {  // Thêm ki?m tra giá tr? h?p l? luôn
-            cin.clear();
-            cin.ignore(1000, '\n');
-            setColor(12);
-            gotoxy(X + 3, Y + 8);
-            cout << "Hoc ky phai la so tu 1 den 3! Nhan phim bat ky...   ";
-            setColor(7);
-            getch();
-            continue;
-        }
-        cin.ignore(1000, '\n'); // Xóa newline còn l?i sau cin >> hocky
-       
-        // Nien khoa
-        gotoxy(X + 3, Y + 7);
-        cout << "Nien khoa : ";
-        gotoxy(X + 20, Y + 7);
-        getline(cin, nienkhoa);
-       
-        // Ki?m tra h?p l?
-        if (QuanLyDiem::dk_check_in4_sv(*QuanLyDiem::dsLopSV, masv, hocky, nienkhoa)) {
-            setColor(10);
-            gotoxy(X + 3, Y + 8);
-            cout << "Thong tin hop le!                           ";
-            setColor(7);
-            Sleep(1000);
-            
-            system("cls");  // Quan tr?ng: Xóa s?ch popup tru?c khi thoát
-            return true;
-        } else {
-            setColor(12);
-            gotoxy(X + 3, Y + 8);
-            cout << "Thong tin KHONG hop le! Nhan phim bat ky de nhap lai.";
-            setColor(7);
-            getch();
-        }
-    }
-}
-
-}
 //===== check thong tin can nhap vao ===
 
 string checkMa(int limit, std::string info) {

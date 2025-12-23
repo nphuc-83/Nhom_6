@@ -11,7 +11,5 @@
 +Đăng ký lớp cho sinh viên G
 +Hủy đăng ký lớp (loại sinh viên khỏi lớp) H
 
-
-CHỨC NĂNG HIỆN TẠI:
-+ A, B, E ,F
-+ Chưa thêm các điều kiện khi nhập dữ liệu
+Debug
+1. đăng ký lớp tín chỉ phần học kỳ, niên khóa miễn đúng là hiển thị dù không có lớp chứ không phải báo lỗi

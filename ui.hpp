@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include "src.hpp"
 using namespace std;
 
 struct Menu {
@@ -18,20 +18,8 @@ int QuanLiMonHoc();
 int QuanliLopSinhVien();
 int QuanliDangKySinhVien();
 
-// === KHAI BÁO THÊM CÁC HÀM V? GIAO DI?N ÐU?C DÙNG ? NHI?U NOI ===
-//void drawFunctionButtons();     
-//void SetColor(int text, int bg);
-//void gotoxy(int x, int y);
-//void hideCursor();
-//void clearLine(int y, int startX, int width);
-//void drawHeader(string& tieude);
-//void drawMainMenuItem(const Menu& menu, int index, bool isSelected);
-//void drawSubMenuItem(const string& option, int index, bool isSelected);
-//void drawMainMenu(const vector<Menu>& menus, int current);
-//void drawSubMenu(const Menu& m, int current);
-//void clearSubMenuArea();
-//void drawEscHint(bool show);
-namespace UIPopup {
+
+namespace dk_UIPopup {
 
     // ===== Console utils =====
     void gotoxy(int x, int y);
@@ -56,13 +44,55 @@ namespace UIPopup {
     );
 
 }
-namespace Border_Maker {
+namespace dk_Border_Maker {
     void textColor(int color);
     void gotoxy(int x, int y);
     string center(const string& s, int width);
 
-    // Hàm v? b?ng l?p tín ch? v?i t?i da 20 dòng
-    void dk_registration_table(const string& masv, int hocky, const string& nienkhoa);
+    // Hàm v? b?ng l?p tín ch? v?i t?i da 15 dòng
+    int dk_registration_table(const string& masv, int hocky, const string& nienkhoa);
 
 }
+namespace score_UIPopup{
+	void textColor(int color);
+	void gotoxy(int x, int y);
+	void popupError(int x, int y, const string& msg);
+	
+	
+    
+	bool popupNhapThongTin(
+        std::string& tenMH,
+        std::string Mamh,
+        std::string& nienKhoa,
+        int& hocKy,
+        int& nhom,
+        QuanLyDiem::LopTinChi*& ltc
+    );
+    
+    
+	
+	bool score_xuLyNhapDiemTinChi(
+		std::string& tenMH,
+        std::string& nienKhoa,
+        int& hocKy,
+        int& nhom,
+        QuanLyDiem::LopTinChi*& ltc
+	);
+}
+namespace score_Border_maker {
+	void textColor(int color);
+    void gotoxy(int x, int y);
+    string center(const string& s, int width);
+
+    // Hàm v? b?ng l?p tín ch? v?i t?i da 15 dòng   
+	int score_input_table(
+		std::string& tenMH,
+        std::string& nienkhoa,
+        int& hocky,
+        int& nhom,
+        
+        QuanLyDiem::LopTinChi*& ltc
+	);
+}
+
 #endif

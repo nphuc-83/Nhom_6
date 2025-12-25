@@ -139,7 +139,7 @@ bool dk_remove(DangKy*& head, const string& masv);
 void dk_clear(DangKy*& head);
 void dk_print(DangKy* head);
 
-bool dk_check_in4_sv(DS_LOPSV& dsLopSV, const std::string& masv, int hocky, const std::string& nienkhoa);
+bool dk_check_in4_sv(DS_LOPSV& dsLopSV, const string& masv, int hocky, const string& nienkhoa);
 
 //void dk_registration_table(const string& masv, int hocky, const string& nienkhoa);
 
@@ -152,27 +152,31 @@ bool ltc_remove_by_id(int id);
 void ltc_print_all();
 
 // thêm dang ký (MASV) vào l?p (n?u dã có thì không thêm duplicate)
-bool ltc_add_registration(int maLopTC, const std::string& masv);
+bool ltc_add_registration(int maLopTC, const string& masv);
 // tìm dang ký trong l?p
-DangKy* ltc_find_registration(int maLopTC, const std::string& masv);
+DangKy* ltc_find_registration(int maLopTC, const string& masv);
 // nh?p/ c?p nh?t di?m cho MASV trong l?p
-bool ltc_set_score(int maLopTC, const std::string& masv, float diem);
+bool ltc_set_score(int maLopTC, const string& masv, float diem);
 
 // in danh sách theo b? l?c (niên khóa, hoc ky, nhom, mamh)
 void ltc_print_filtered(const std::string& nk, int hk, int nhom, const std::string& mamh);
 // gi?i phóng toàn b? ds
 void ltc_clear_all();
-LopTinChi* ltc_find(const std::string& nk, int hk, int nhom, const std::string& mamh);
+LopTinChi* ltc_find(const string& nk, int hk, int nhom, const std::string& mamh);
 void print_score_table(LopTinChi* ltc, DS_LOPSV* ds);
-void ltc_load_from_file(const std::string& filename = "loptinchi.txt");
-void ltc_save_to_file(const std::string& filename = "loptinchi.txt");
+void ltc_load_from_file(const string& filename = "loptinchi.txt");
+void ltc_save_to_file(const string& filename = "loptinchi.txt");
 void ltc_sort_asc();  // SORT TANG DAN THEO MÃ LOPTC
 
-void score_nhap_diem();//case 4
+// --- Score board ---
+void score_1(LopTinChi*& ltc);//case 4
 void score_inBangDiemTBLopThuong();	//case 6
 void score_inBangDiemMonCaoNhatLopThuong(); //case 7
 
+bool score_kiemTraMonHoc(const std::string& tenMH, std::string& out_MAMH);   
+QuanLyDiem::LopTinChi* score_kiemTraLopTinChi(const std::string& mamh, const std::string& nienKhoa, int hocKy, int nhom);
 
+//// --- UI_Menu ---
 string center(const string &text, int width); // ham can giua
 void textColor(int color); // ham text color
 void setBGColor(int bg, int text);  // ham console color
@@ -188,8 +192,6 @@ int split_fields(const std::string& s, std::string out[], int max_fields); // Hà
 void waitForEnter(); // HAM DOI PHIM ENTER
 std::string pad2(int n); //// HAM DINH DANG 2 CHU SO KHI N < 10
 void dsdk_ltc_print(LopTinChi* p, DS_LOPSV* dsLopSV);  // IN DSSV DANG KI LOP TIN CHI
-
-
 
 
 // Ham Menu
@@ -210,8 +212,8 @@ void dssv_4_1(LopSV* lop);
 void dssv_4_2(LopSV* lop);
 void dssv_4_3(LopSV* lop);
 
-void dk_1(const std::string& masv, int hocky, const std::string& nienkhoa);
-void dk_2(const std::string& masv, int hocky, const std::string& nienkhoa);
+void dk_1(const string& masv, int hocky, const string& nienkhoa);
+void dk_2(const string& masv, int hocky, const string& nienkhoa);
 
 } // namespace QuanLyDiem
 
@@ -219,4 +221,4 @@ void dk_2(const std::string& masv, int hocky, const std::string& nienkhoa);
 
 string checkMa(int limit, string info);
 string checkTen(string info);
-int nhapSTC(const string &tenBien = "s? tín ch?");
+int nhapSTC(const string &tenBien);

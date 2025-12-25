@@ -95,45 +95,67 @@ int main() {
             }
         }
         else if (mainMenu == 4) { // Quan Ly Dang Ki
-            system("cls");
-            
-		    string masv, nienkhoa;
-		    int hocky;
-			
-		    // Nh?p + ki?m tra thông tin SV
-		    UIPopup::inputSinhVien(
-			    "NHAP THONG TIN SINH VIEN",
-			    masv, hocky, nienkhoa
-			);
-		
-		    int choice;
-		    
-		    do {
-		        system("cls");
-				Border_Maker::dk_registration_table(masv, hocky, nienkhoa);
+	        if (subMenu == 1){
+	            system("cls");
+	            
+			    string masv, nienkhoa;
+			    int hocky;
 				
-//		        cout << "\n1. Dang ky lop tin chi\n";
-//		        cout << "2. Huy dang ky\n";
-//		        cout << "0. Quay lai menu chinh\n";
-//		        cout << "------------------------------------\n";
-//		        cout << "Nhap lua chon: ";
-//		        cin >> choice;
-		        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		
-		        switch (choice) {
-		            case 1: dk_1(masv, hocky, nienkhoa); break;
-		    		case 2: dk_2(masv, hocky, nienkhoa); break;
-		            case 0:
-		                cout << "Quay lai menu chinh...\n";
-		                break;
-		            default:
-		                cout << "Lua chon khong hop le!\n";
-		                system("pause");
-		        }
-		    } while (choice != 0);
+			    // Nh?p + ki?m tra thông tin SV
+			    dk_UIPopup::inputSinhVien(
+				    "NHAP THONG TIN SINH VIEN",
+				    masv, hocky, nienkhoa
+				);
+			
+			    int choice;
+			    
+			    do {
+			        system("cls");
+					choice = dk_Border_Maker::dk_registration_table(masv, hocky, nienkhoa);
+			
+			        switch (choice) {
+			            case 1: system("cls"); dk_1(masv, hocky, nienkhoa); break;
+			    		case 2: system("cls"); dk_2(masv, hocky, nienkhoa); break;
+			            case 0:
+			                cout << "Quay lai menu chinh...\n";
+			                system("pause");
+			                subMenu = 0;
+			                break;
+			            default:
+			                cout << "Lua chon khong hop le!\n";
+			                system("pause");
+			        }
+			    } while (choice != 0);
+			} else if (subMenu == 2) {
+				system("pause");
+			}
         }
         else if (mainMenu == 5) { // Score board
-            if (subMenu == 1) score_nhap_diem();
+        	string tenMH, nienkhoa;
+	        int hocKy, nhom;	// Du lieu dê làm tiêu dè & tim ltc
+	        
+	        QuanLyDiem::LopTinChi* ltc = nullptr;		// Du lieu dê tao bang danh sach
+            if (subMenu == 1) {
+            	if(score_UIPopup::score_xuLyNhapDiemTinChi(tenMH, nienkhoa, hocKy, nhom, ltc)){
+            		int scoremenu;
+            		while(true) {
+            			scoremenu = score_Border_maker::score_input_table(tenMH, nienkhoa, hocKy, nhom, ltc);
+            			if(scoremenu == 1)	{
+            				score_1(ltc);
+            				system("pause");
+        					system("cls");
+        					continue;
+						}
+	            		if(scoremenu == 2)	{
+	            			QuanLyDiem::ltc_save_to_file("loptinchi.txt");
+	            			cout << endl << "Da luu file thanh cong";
+	            			system("pause");
+	            			continue;
+						}
+	            		if(scoremenu == 3) subMenu = 0; break;
+					}
+				}
+			}
             else if (subMenu == 2) ltc_2();
             else if (subMenu == 3) score_inBangDiemTBLopThuong();
             else if (subMenu == 4) score_inBangDiemMonCaoNhatLopThuong();

@@ -311,7 +311,6 @@ int QuanLiChucNang() {
 // ==================== CÁC HÀM CH?C NANG KHÁC ====================
 
 int QuanLiMonHoc() {
-    // ... (gi? nguyên hoàn toàn code cu c?a b?n)
     while (true) {
         system("cls");
         QuanLyDiem::mh_load_from_file("monhoc.txt");
@@ -346,7 +345,7 @@ int QuanLiMonHoc() {
     return 0;
 }
 
-namespace UIPopup {
+namespace dk_UIPopup {
 
 // ================= CURSOR =================
 void gotoxy(int x, int y) {
@@ -386,7 +385,7 @@ void drawPopupBox(int x, int y, int w, int h, const string& title) {
     // ===== Content =====
     for (int i = 3; i < h - 1; i++) {
         gotoxy(x, y + i);
-        cout << "¦" << string(w - 2, ' ') << "¦";
+        cout << "|" << string(w - 2, ' ') << "|";
     }
 
     // ===== Bottom =====
@@ -488,7 +487,7 @@ bool inputSinhVien(
 
 } // namespace UIPopup
 
-namespace Border_Maker {
+namespace dk_Border_Maker {
 
     void textColor(int color) {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
@@ -526,7 +525,7 @@ namespace Border_Maker {
              << "   (Su dung phim len/xuong de chuyen trang)";
         SetColor(7, 0);
     }
-	void dk_registration_table(const string& masv, int hocky, const string& nienkhoa) {
+	int dk_registration_table(const string& masv, int hocky, const string& nienkhoa) {
         string temp = "QUAN LI THONG TIN DANG KY LOP TIN CHI SINH VIEN";
         drawHeader(temp);
 
@@ -546,12 +545,6 @@ namespace Border_Maker {
             }
             if (foundSV) break;
         }
-        if (!foundSV) {
-            cout << "\nKhong tim thay sinh vien co ma: " << masv << endl;
-            cout << "Nhan phim bat ky de quay lai...";
-            _getch();
-            return;
-        }
 
         // L?c t?t c? l?p tin ch? phù h?p
         vector<LopTinChi*> filteredClasses;
@@ -559,7 +552,7 @@ namespace Border_Maker {
             if (p->HOCKY == hocky && p->NIENKHOA == nienkhoa) {
                 filteredClasses.push_back(p);
             }
-        }
+        }	// don't use vector here
 
         const int ROWS_PER_PAGE = 15;
         int totalClasses = filteredClasses.size();
@@ -638,9 +631,22 @@ namespace Border_Maker {
             // === Quan tr?ng: In d?y d? các dòng tr?ng v?i d?y d? d?u | ===
             int printedRows = (totalClasses == 0) ? 1 : (endIdx - startIdx);
             for (int i = printedRows; i < ROWS_PER_PAGE; ++i) {
-                textColor(14);
-                cout << "|" << string(khungW, ' ') << "|\n";
-            }
+			    textColor(14);
+			    cout << "|"
+			         << center("", 5)   << "|"   // STT
+			         << center("", 8)   << "|"   // MA LOP
+			         << center("", 10)  << "|"   // MA MON
+			         << center("", 6)   << "|"   // NHOM
+			         << center("", 13)  << "|"   // NIEN KHOA
+			         << center("", 8)   << "|"   // HOC KI
+			         << center("", 9)   << "|"   // SI SO
+			         << center("", 8)   << "|"   // SL MIN
+			         << center("", 8)   << "|"   // SL MAX
+			         << center("", 12)  << "|"   // TRANG THAI
+			         << "\n";
+			}
+
+
 
             // Ðóng khung du?i
             textColor(14);
@@ -662,22 +668,341 @@ namespace Border_Maker {
                     currentPage++;
                 }
             }
-            else if (key == 'c' || key == 'C' || key == 27) { // C ho?c ESC
-                return;
+            else if (key == 'c' || key == 'C' || key == 27) { 
+                return 0;
             }
             else if (key == 'a' || key == 'A') {
-                system("cls");
-                dk_1(masv, hocky, nienkhoa);
-                // Sau khi th?c hi?n dk_1 xong, có th? quay l?i màn hình này
-                // (ho?c không c?n, tùy logic c?a b?n)
+                return 1;
             }
             else if (key == 'b' || key == 'B') {
-                system("cls");
-                dk_2(masv, hocky, nienkhoa);
+                return 2;
             }
         }
     }
 
+}
+
+namespace score_UIPopup {
+
+    void textColor(int color) {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+    }
+
+    void gotoxy(int x, int y) {
+        COORD c = { (SHORT)x, (SHORT)y };
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
+    }
+
+    // ===== In loi trong popup =====
+    void popupError(int x, int y, const string& msg) {
+        textColor(12);
+        gotoxy(x + 2, y);
+        cout << msg;
+        textColor(7);
+        system("pause");
+
+        // xóa dòng l?i
+        gotoxy(x + 2, y);
+        cout << string(40, ' ');
+    }
+    		
+    bool popupNhapThongTin(
+	    string& tenMH,	//input
+	    string& nienKhoa,	//input
+	    int& hocKy,		//input
+	    int& nhom,		//input
+	    LopTinChi*& out_ltc
+	) {
+	    string Mamh = "";
+        int width = 44;
+        int height = 9; // +1 dòng báo l?i
+        
+
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+        int cw = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+        int ch = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+
+        int x = (cw - width) / 2;
+        int y = (ch - height) / 2;
+
+        textColor(14);
+
+        gotoxy(x, y);
+        cout << "+------------------------------------------+";
+        gotoxy(x, y + 1);
+        cout << "|        NHAP THONG TIN LOP TIN CHI        |";
+        gotoxy(x, y + 2);
+        cout << "+------------------------------------------+";
+        gotoxy(x, y + 3);
+        cout << "|  Ten mon hoc :                           |";
+        gotoxy(x, y + 4);
+        cout << "|  Nien khoa   :                           |";
+        gotoxy(x, y + 5);
+        cout << "|  Hoc ky      :                           |";
+        gotoxy(x, y + 6);
+        cout << "|  Nhom        :                           |";
+        gotoxy(x, y + 7);
+        cout << "|                                          |";
+        gotoxy(x, y + 8);
+        cout << "+------------------------------------------+";
+
+        // ===== Nh?p =====
+
+        // Ten mon hoc
+        gotoxy(x + 2, y + 3); cout << ">";
+        gotoxy(x + 20, y + 3);
+        getline(cin, tenMH);
+		
+		if (!QuanLyDiem::score_kiemTraMonHoc(tenMH, Mamh)) {
+	        popupError(x, y + 7, "LOI: Khong ton tai mon hoc!");
+	        return false;
+	    }
+	    
+        // Nien khoa
+        gotoxy(x + 2, y + 4); cout << ">";
+        gotoxy(x + 20, y + 4);
+        getline(cin, nienKhoa);
+
+        // Hoc ky
+        gotoxy(x + 2, y + 5); cout << ">";
+        gotoxy(x + 20, y + 5);
+        if (!(cin >> hocKy)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            popupError(x, y + 7, "LOI: Hoc ky khong hop le!");
+            return false;
+        }
+
+        // Nhom
+        gotoxy(x + 2, y + 6); cout << ">";
+        gotoxy(x + 20, y + 6);
+        if (!(cin >> nhom)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            popupError(x, y + 7, "LOI: Nhom khong hop le!");
+            return false;
+        }
+
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        
+        out_ltc = QuanLyDiem::score_kiemTraLopTinChi(Mamh, nienKhoa, hocKy, nhom);	// Duyet de lay ltc
+	    if (!out_ltc) {
+	        popupError(x, y + 7, "LOI: Khong ton tai lop tin chi!");
+	        return false;
+	    }
+	    
+        textColor(7);
+        return true;
+    }
+    
+    
+    bool score_xuLyNhapDiemTinChi(
+		std::string& tenMH,
+        std::string& nienKhoa,
+        int& hocKy,
+        int& nhom,		// Du lieu dê làm tiêu dè & tim ltc
+        
+        QuanLyDiem::LopTinChi*& ltc		// Du lieu dê tao bang danh sach
+	) {	
+		do {
+			system("cls");
+	
+		    // Popup nh?p + ki?m tra toàn b?
+		    if (!popupNhapThongTin(
+		            tenMH,
+		            nienKhoa,
+		            hocKy,
+		            nhom,
+		            ltc
+		        )) {
+		        // Có l?i: popup dã t? báo l?i
+		        continue;
+		    }
+		    
+			textColor(10);
+		    cout << "Dang nhap thanh cong!\n";
+		    textColor(7);
+	        
+	        system("pause");
+			return true;
+		} while (true);
+	}
+}
+
+namespace score_Border_maker {
+	 void textColor(int color) {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+    }
+
+    void gotoxy(int x, int y) {
+        COORD coord = { (SHORT)x, (SHORT)y };
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    }
+
+    string center(const string& s, int width) {
+        int len = s.length();
+        if (width <= len) return s.substr(0, width);
+        int left = (width - len) / 2;
+        int right = width - len - left;
+        return string(left, ' ') + s + string(right, ' ');
+    }
+
+    void drawFunctionButtons(int x, int y) {
+        gotoxy(x, y);
+        SetColor(12, 15); cout << " A "; SetColor(7, 0); cout << ": Insert   ";
+        
+        gotoxy(x + 18, y);
+        SetColor(12, 15); cout << " B "; SetColor(7, 0); cout << ": Save  ";
+        
+        gotoxy(x + 36, y);
+        SetColor(12, 15); cout << " C "; SetColor(7, 0); cout << ": Exit     ";
+    }
+
+    // Hàm ph?: v? thanh tr?ng thái phân trang
+    void drawPagination(int currentPage, int totalPages, int x, int y) {
+        gotoxy(x, y);
+        SetColor(11, 0);
+        cout << " Trang " << currentPage << " / " << totalPages 
+             << "   (Su dung phim len/xuong de chuyen trang)";
+        SetColor(7, 0);
+    }
+    
+    int score_input_table(
+		std::string& tenMH,
+        std::string& nienkhoa,
+        int& hocky,
+        int& nhom,		// tieu de
+        
+        QuanLyDiem::LopTinChi*& ltc		// duyet du lieu ltc
+	) {
+		string temp = "QUAN LI SCORE LOP TIN CHI SINH VIEN";
+        drawHeader(temp);	
+        
+        const int ROWS_PER_PAGE = 15;
+		int currentPage = 1;
+		
+		// ===== Ð?M T?NG S? DÒNG =====
+		int totalRecords = 0;
+		for (DangKy* p = ltc->DSDK; p; p = p->next)
+		    totalRecords++;
+		
+		int totalPages = (totalRecords + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
+		if (totalPages == 0) totalPages = 1;
+
+		
+		while (true) {
+		    system("cls");
+		    drawHeader(temp);
+			int printedRows = 0;
+			
+			int stt = (currentPage - 1) * ROWS_PER_PAGE + 1;
+			
+			// reset con tr? danh sách
+			DangKy* dk = ltc->DSDK;
+			
+			// skip d?n trang hi?n t?i
+			int skip = (currentPage - 1) * ROWS_PER_PAGE;
+			while (dk && skip--) dk = dk->next;
+
+			// Thông tin ltc
+            cout << endl;
+            SetColor(10, 0);
+            cout << "  Ten Lop: " << tenMH << "   |   Nien Khoa: " << nienkhoa << endl;
+            cout << "  Hoc ky: " << hocky << "   |   Nhom: " << nhom << endl;
+            SetColor(7, 0);
+		
+		    // ===== Khung b?ng =====
+		    const int khungW = 59;
+		    textColor(14);
+		
+		    // Vi?n trên
+		    cout << "+" << string(khungW, '-') << "+\n";
+		
+		    // Header c?t
+		    cout << "|"
+		         << center("STT",5)  << "|"
+		         << center("MASV",12)<< "|"
+		         << center("HO",20)  << "|"
+		         << center("TEN",12) << "|"
+		         << center("DIEM",6) << "|\n";
+		
+		    // G?ch ngang
+		    cout << "|" << string(khungW, '-') << "|\n";
+		
+		    // ===== In d? li?u th?t =====
+			while (dk && printedRows < ROWS_PER_PAGE) {
+			    string ho = "", ten = "";
+			
+			    // Tìm sinh viên theo MASV
+			    for (int i = 0; i < QuanLyDiem::dsLopSV->n; i++) {
+			        PTRSV sv = QuanLyDiem::dsLopSV->nodes[i]->FirstSV;
+			        while (sv) {
+			            if (sv->sv.MASV == dk->MASV) {
+			                ho  = sv->sv.HO;
+			                ten = sv->sv.TEN;
+			                break;
+			            }
+			            sv = sv->next;
+			        }
+			        if (!ho.empty()) break;
+			    }
+			
+			    // ===== In 1 dòng b?ng =====
+			    cout << "|"
+			         << center(to_string(stt++), 5)          << "|"
+			         << center(dk->MASV, 12)                 << "|"
+			         << center(ho, 20)                       << "|"
+			         << center(ten, 12)                      << "|"
+			         << center(dk->DIEM < 0 ? "-" : to_string(dk->DIEM), 6)
+			         << "|\n";
+			
+			    dk = dk->next;
+			    printedRows++;
+			}
+			
+			// ===== Bù dòng tr?ng cho d? b?ng =====
+			for (int i = printedRows; i < ROWS_PER_PAGE; ++i) {
+			    cout << "|"
+			         << center("",5)  << "|"
+			         << center("",12) << "|"
+			         << center("",20) << "|"
+			         << center("",12) << "|"
+			         << center("",6)  << "|\n";
+			}
+		
+		    // Vi?n du?i
+		    cout << "+" << string(khungW, '-') << "+\n\n";
+		    textColor(7);
+		
+		    // ===== Nút ch?c nang & phân trang =====
+		    drawFunctionButtons(8, 22);
+		    drawPagination(currentPage, totalPages, 8, 24);
+			
+			// X? lý phím
+            int key = _getch();
+            if (key == 224) { // phím mui tên
+                key = _getch();
+                if (key == 72 && currentPage > 1) {          // lên
+                    currentPage--;
+                }
+                else if (key == 80 && currentPage < totalPages) { // xu?ng
+                    currentPage++;
+                }
+            }
+            else if (key == 'c' || key == 'C' || key == 27) { // C ho?c ESC
+                return 0;
+            }
+            else if (key == 'a' || key == 'A') {
+                return 1;
+            }
+            else if (key == 'b' || key == 'B') {
+                return 2;
+            }
+		}
+
+	}
+    
 }
 
 

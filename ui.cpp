@@ -628,6 +628,7 @@ namespace dk_Border_Maker {
                 filteredClasses.push_back(p);
             }
         }	// don't use vector here
+        	// xai mang con tro
 
         const int ROWS_PER_PAGE = 15;
         int totalClasses = filteredClasses.size();
@@ -872,7 +873,7 @@ namespace score_UIPopup {
     }
     
     
-    bool score_xuLyNhapDiemTinChi(
+    bool score_popup_check_ltc(
 		std::string& tenMH,
         std::string& nienKhoa,
         int& hocKy,
@@ -931,7 +932,7 @@ namespace score_Border_maker {
         SetColor(12, 15); cout << " B "; SetColor(7, 0); cout << ": Save  ";
         
         gotoxy(x + 36, y);
-        SetColor(12, 15); cout << " C "; SetColor(7, 0); cout << ": Exit     ";
+        SetColor(12, 15); cout << " ESC "; SetColor(7, 0); cout << ": Exit     ";
     }
 
     // Hàm ph?: v? thanh tr?ng thái phân trang
@@ -1065,7 +1066,7 @@ namespace score_Border_maker {
                     currentPage++;
                 }
             }
-            else if (key == 'c' || key == 'C' || key == 27) { // C ho?c ESC
+            else if (key == 27) { //ESC
                 return 0;
             }
             else if (key == 'a' || key == 'A') {
@@ -1078,6 +1079,131 @@ namespace score_Border_maker {
 
 	}
     
+    void score_print_theo_monhoc(
+		std::string& tenMH,
+        std::string& nienkhoa,
+        int& hocky,
+        int& nhom,
+        
+        QuanLyDiem::LopTinChi*& ltc		// duyet du lieu ltc
+	) {
+		string temp = "BANG DIEM MON HOC THEO LOP TIN CHI ";
+        drawHeader(temp);
+        
+        const int ROWS_PER_PAGE = 15;
+		int currentPage = 1;
+		
+		// ===== Ð?M T?NG S? DÒNG =====
+		int totalRecords = 0;
+		for (DangKy* p = ltc->DSDK; p; p = p->next)
+		    totalRecords++;
+		
+		int totalPages = (totalRecords + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
+		if (totalPages == 0) totalPages = 1;
+
+		
+		while (true) {
+		    system("cls");
+		    drawHeader(temp);
+			int printedRows = 0;
+			
+			int stt = (currentPage - 1) * ROWS_PER_PAGE + 1;
+			
+			// reset con tr? danh sách
+			DangKy* dk = ltc->DSDK;
+			
+			// skip d?n trang hi?n t?i
+			int skip = (currentPage - 1) * ROWS_PER_PAGE;
+			while (dk && skip--) dk = dk->next;
+
+			// Thông tin ltc
+            cout << endl;
+            SetColor(10, 0);
+            cout << "Nien Khoa: " << nienkhoa << "  Hoc ky: " << hocky << "     Nhom: " << nhom << endl;
+            SetColor(7, 0);
+		
+		    // ===== Khung b?ng =====
+		    const int khungW = 59;
+		    textColor(14);
+		
+		    // Vi?n trên
+		    cout << "+" << string(khungW, '-') << "+\n";
+		
+		    // Header c?t
+		    cout << "|"
+		         << center("STT",5)  << "|"
+		         << center("MASV",12)<< "|"
+		         << center("HO",20)  << "|"
+		         << center("TEN",12) << "|"
+		         << center("DIEM",6) << "|\n";
+		
+		    // G?ch ngang
+		    cout << "|" << string(khungW, '-') << "|\n";
+		
+		    // ===== In d? li?u th?t =====
+			while (dk && printedRows < ROWS_PER_PAGE) {
+			    string ho = "", ten = "";
+			
+			    // Tìm sinh viên theo MASV
+			    for (int i = 0; i < QuanLyDiem::dsLopSV->n; i++) {
+			        PTRSV sv = QuanLyDiem::dsLopSV->nodes[i]->FirstSV;
+			        while (sv) {
+			            if (sv->sv.MASV == dk->MASV) {
+			                ho  = sv->sv.HO;
+			                ten = sv->sv.TEN;
+			                break;
+			            }
+			            sv = sv->next;
+			        }
+			        if (!ho.empty()) break;
+			    }
+			
+			    // ===== In 1 dòng b?ng =====
+			    cout << "|"
+			         << center(to_string(stt++), 5)          << "|"
+			         << center(dk->MASV, 12)                 << "|"
+			         << center(ho, 20)                       << "|"
+			         << center(ten, 12)                      << "|"
+			         << center(dk->DIEM < 0 ? "-" : to_string(dk->DIEM), 6)
+			         << "|\n";
+			
+			    dk = dk->next;
+			    printedRows++;
+			}
+			
+			// ===== Bù dòng tr?ng cho d? b?ng =====
+			for (int i = printedRows; i < ROWS_PER_PAGE; ++i) {
+			    cout << "|"
+			         << center("",5)  << "|"
+			         << center("",12) << "|"
+			         << center("",20) << "|"
+			         << center("",12) << "|"
+			         << center("",6)  << "|\n";
+			}
+		
+		    // Vi?n du?i
+		    cout << "+" << string(khungW, '-') << "+\n\n";
+		    textColor(7);
+		    
+		    // ===== Nút ch?c nang & phân trang =====
+		    drawPagination(currentPage, totalPages, 8, 24);
+			gotoxy(8, 22);
+        	SetColor(12, 15); cout << " ESC "; SetColor(7, 0); cout << ": Exit ";
+			// X? lý phím
+            int key = _getch();
+            if (key == 224) { // phím mui tên
+                key = _getch();
+                if (key == 72 && currentPage > 1) {          // lên
+                    currentPage--;
+                }
+                else if (key == 80 && currentPage < totalPages) { // xu?ng
+                    currentPage++;
+                }
+            }
+            cout << "\nNhan ESC de thoat...";
+		    if (key == 27) break; // ESC
+		}
+	}
 }
 
 

@@ -156,8 +156,6 @@ void ltc_print_all();
 bool ltc_add_registration(int maLopTC, const string& masv);
 // tìm dang ký trong l?p
 DangKy* ltc_find_registration(int maLopTC, const string& masv);
-// nh?p/ c?p nh?t di?m cho MASV trong l?p
-bool ltc_set_score(int maLopTC, const string& masv, float diem);
 
 // in danh sách theo b? l?c (niên khóa, hoc ky, nhom, mamh)
 void ltc_print_filtered(const std::string& nk, int hk, int nhom, const std::string& mamh);

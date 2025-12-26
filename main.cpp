@@ -98,12 +98,13 @@ int main() {
 			}
         }
         else if (mainMenu == 5) { // Score board
-        	string tenMH, nienkhoa;
-	        int hocKy, nhom;	// Du lieu dê làm tiêu dè & tim ltc
+        	string tenMH = "", nienkhoa = "";
+	        int hocKy = 0, nhom = 0;	// Du lieu dê làm tiêu dè & tim ltc
 	        
 	        QuanLyDiem::LopTinChi* ltc = nullptr;		// Du lieu dê tao bang danh sach
+	        
             if (subMenu == 1) {
-            	if(score_UIPopup::score_xuLyNhapDiemTinChi(tenMH, nienkhoa, hocKy, nhom, ltc)){
+            	if(score_UIPopup::score_popup_check_ltc(tenMH, nienkhoa, hocKy, nhom, ltc)){
             		int scoremenu;
             		while(true) {
             			scoremenu = score_Border_maker::score_input_table(tenMH, nienkhoa, hocKy, nhom, ltc);
@@ -123,7 +124,12 @@ int main() {
 					}
 				}
 			}
-            else if (subMenu == 2) ltc_2();
+            else if (subMenu == 2)  {
+            	if(score_UIPopup::score_popup_check_ltc(tenMH, nienkhoa, hocKy, nhom, ltc)){
+            		score_Border_maker::score_print_theo_monhoc(tenMH, nienkhoa, hocKy, nhom, ltc);
+		    	}
+			}
+			//ltc_2();
             else if (subMenu == 3) score_inBangDiemTBLopThuong();
             else if (subMenu == 4) score_inBangDiemMonCaoNhatLopThuong();
         }

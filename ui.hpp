@@ -72,7 +72,7 @@ namespace score_UIPopup{
     
     
 	
-	bool score_xuLyNhapDiemTinChi(
+	bool score_popup_check_ltc(
 		std::string& tenMH,
         std::string& nienKhoa,
         int& hocKy,
@@ -87,6 +87,15 @@ namespace score_Border_maker {
 
     // Hàm v? b?ng l?p tín ch? v?i t?i da 15 dòng   
 	int score_input_table(
+		std::string& tenMH,
+        std::string& nienkhoa,
+        int& hocky,
+        int& nhom,
+        
+        QuanLyDiem::LopTinChi*& ltc
+	);
+	
+	void score_print_theo_monhoc(
 		std::string& tenMH,
         std::string& nienkhoa,
         int& hocky,

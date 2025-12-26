@@ -914,141 +914,6 @@ void ltc_sort_asc() {
 }
 
 
-//void score_nhap_diem(){
-//	system("cls");
-//    std::cout << "=== NHAP DIEM LOP TIN CHI THEO TEN MON ===\n";
-//
-//    std::string nienKhoa, tenMH;
-//    int hocKy, nhom;
-//
-//    std::cout << "Nhap nien khoa (VD: 2023-2024): ";
-//    std::getline(std::cin, nienKhoa);
-//
-//    std::cout << "Nhap hoc ky: ";
-//    if (!(std::cin >> hocKy)) {
-//        std::cout << "Loi nhap lieu Hoc ky! Thao tac bi huy.\n";
-//        std::cin.clear();
-//        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//        system("pause");
-//        return;
-//    }
-//    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//
-//    std::cout << "Nhap nhom: ";
-//    if (!(std::cin >> nhom)) {
-//        std::cout << "Loi nhap lieu Nhom! Thao tac bi huy.\n";
-//        std::cin.clear();
-//        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//        system("pause");
-//        return;
-//    }
-//    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//
-//    std::cout << "Nhap TEN MON HOC: ";
-//    std::getline(std::cin, tenMH);
-//
-//    // Tìm MAMH
-//    treeMH mon = QuanLyDiem::mh_find_by_name(QuanLyDiem::rootMonHoc, tenMH);
-//    if (!mon) {
-//        std::cout << "Khong tim thay mon hoc!\n";
-//        system("pause");
-//        return; // Dùng return d? thoát hàm
-//    }
-//
-//    std::string mamh = mon->mh.MAMH;
-//
-//    // Tìm L?p tín ch?
-//    LopTinChi* ltc = nullptr;
-//    for (LopTinChi* p = QuanLyDiem::dsLopTC; p; p = p->next) {
-//        if (p->NIENKHOA == nienKhoa &&
-//            p->HOCKY == hocKy &&
-//            p->NHOM == nhom &&
-//            p->MAMH == mamh)
-//        {
-//            ltc = p;
-//            break;
-//        }
-//    }
-//
-//    if (!ltc) {
-//        std::cout << "Khong tim thay lop tin chi!\n";
-//        system("pause");
-//        return; // Dùng return d? thoát hàm
-//    }
-//
-//    // IN DANH SACH BANG DIEM
-//    system("cls");
-//    std::cout << "=== NHAP DIEM MON: " << tenMH << " ===\n";
-//    std::cout << "Nien khoa: " << nienKhoa
-//              << " | Hoc ky: " << hocKy
-//              << " | Nhom: " << nhom << "\n\n";
-//
-//    std::cout << std::left << std::setw(5) << "STT"
-//              << std::setw(12) << "MASV"
-//              << std::setw(20) << "HO"
-//              << std::setw(12) << "TEN"
-//              << std::setw(6) << "DIEM" << "\n";
-//    std::cout << std::string(55, '-') << "\n";
-//
-//    int stt = 1;
-//    for (DangKy* dk = ltc->DSDK; dk; dk = dk->next) {
-//        // Tìm h? tên
-//        std::string ho = "", ten = "";
-//
-//        for (int i = 0; i < QuanLyDiem::dsLopSV->n; i++) {
-//            PTRSV sv = QuanLyDiem::dsLopSV->nodes[i]->FirstSV;
-//            while (sv) {
-//                if (sv->sv.MASV == dk->MASV) {
-//                    ho = sv->sv.HO;
-//                    ten = sv->sv.TEN;
-//                    break;
-//                }
-//                sv = sv->next;
-//            }
-//        }
-//
-//        std::cout << std::setw(5) << stt++
-//                  << std::setw(12) << dk->MASV
-//                  << std::setw(20) << ho
-//                  << std::setw(12) << ten
-//                  << std::setw(6) << (dk->DIEM < 0 ? "-" : std::to_string(dk->DIEM))
-//                  << "\n";
-//    }
-
-//    // NHAP DIEM
-//    std::cout << "\nNhap MASV de cap nhat diem (Rong = thoat):\n";
-//
-//    while (true) {
-//        std::string masv;
-//        std::cout << "MASV: ";
-//        std::getline(std::cin, masv);
-//        if (masv.empty()) break;
-//
-//        DangKy* dk = QuanLyDiem::dk_find(ltc->DSDK, masv);
-//        if (!dk) {
-//            std::cout << "Sinh vien khong co trong lop!\n";
-//            continue;
-//        }
-//
-//        float diem;
-//        std::cout << "Nhap diem: ";
-//        if (!(std::cin >> diem) || diem < 0 || diem > 10) {
-//            std::cout << "Diem khong hop le (phai la so tu 0 den 10)! Vui long nhap lai MASV.\n";
-//            std::cin.clear();
-//            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//            continue;
-//        }
-//        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//
-//        dk->DIEM = diem;
-//        //QuanLyDiem::ltc_save_to_file("loptinchi.txt");
-//
-//        std::cout << ">> Cap nhat diem thanh cong!\n";
-//    }
-//
-//    system("pause");
-//};
-
 void score_1(LopTinChi*& ltc) {
     cout << "\nNhap MASV de cap nhat diem (Rong = thoat):\n";
 
@@ -1212,6 +1077,8 @@ void score_inBangDiemTBLopThuong() {
     cout << "Tong sinh vien: " << ds.size() << "\n\n";
     system("pause");
 }
+
+
 // IN B?NG ÐI?M CAO NH?T THEO MÔN C?A L?P THU?NG
 void score_inBangDiemMonCaoNhatLopThuong() {
     system("cls");
@@ -1722,15 +1589,6 @@ DangKy* ltc_find_registration(int maLopTC, const string& masv) {
 	return dk_find(ltc->DSDK, masv);
 }
 
-bool ltc_set_score(int maLopTC, const string& masv, float diem) {
-    DangKy* dk = ltc_find_registration(maLopTC, masv);
-    if (!dk) return false;
-    dk->DIEM = diem;
-
-    // T? Ð?NG GHI FILE
-    ltc_save_to_file("loptinchi.txt");
-    return true;
-}
 
 void ltc_print_filtered(const string& nk, int hk, int nhom, const string& mamh) {
 	bool found = false;

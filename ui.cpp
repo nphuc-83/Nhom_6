@@ -1206,4 +1206,132 @@ namespace score_Border_maker {
 	}
 }
 
+namespace ltc_UI{
+	
+    void drawFunctionButtons(int x, int y) {
+        gotoxy(x, y);
+        SetColor(12, 15); cout << " A "; SetColor(7, 0); cout << ": ADD   ";
+        
+        gotoxy(x + 18, y);
+        SetColor(12, 15); cout << " D "; SetColor(7, 0); cout << ": DELETE  ";
+        
+        gotoxy(x + 36, y);
+        SetColor(12, 15); cout << " E "; SetColor(7, 0); cout << ": EDIT     ";
+        
+    }
+    
+    
+    // Hàm ph?: v? thanh tr?ng thái phân trang
+    void drawPagination(int currentPage, int totalPages, int x, int y) {
+        gotoxy(x, y);
+        SetColor(11, 0);
+        cout << " Trang " << currentPage << " / " << totalPages 
+             << "   (Su dung phim len/xuong de chuyen trang)";
+        SetColor(7, 0);
+    }
+    
+    
+    void ltc_print_all() {
+	    const int ROWS_PER_PAGE = 15;
+	
+	    while (true) {
+	        system("cls");
+	        ltc_sort_asc();  // s?p x?p tang d?n
+	
+	        cout << "\n";
+	        cout << setw(31) << "";
+	        setBGColor(14, 4);
+	        cout << "DANH SACH TAT CA LOP TIN CHI\n";
+	        setBGColor(0, 7);
+	        cout << endl;
+	
+	        if (!dsLopTC) {
+	            cout << "       (Chua co lop tin chi nao)\n";
+	            cout << string(100, '=') << "\n\n";
+	            return;
+	        }
+	
+	        // ===== Ð?M T?NG S? L?P =====
+	        int totalClasses = 0;
+	        for (LopTinChi* p = dsLopTC; p; p = p->next) totalClasses++;
+	
+	        int totalPages = (totalClasses == 0) ? 1
+	            : (totalClasses + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
+	
+	        static int currentPage = 1;
+	        if (currentPage > totalPages) currentPage = totalPages;
+	
+	        int startIdx = (currentPage - 1) * ROWS_PER_PAGE;
+	        int endIdx   = min(startIdx + ROWS_PER_PAGE, totalClasses);
+	
+	        // ===== IN HEADER =====
+	        textColor(14);
+	        cout << "+" << string(96, '-') << "+\n";
+	        cout << "|" << center("STT", 5)
+	             << "|" << center("MA LOP", 8)
+	             << "|" << center("MA MON", 10)
+	             << "|" << center("NHOM", 6)
+	             << "|" << center("NIEN KHOA", 13)
+	             << "|" << center("HOC KI", 8)
+	             << "|" << center("SI SO", 9)
+	             << "|" << center("SL MIN", 8)
+	             << "|" << center("SL MAX", 8)
+	             << "|" << center("TRANG THAI", 12)
+	             << "|\n";
+	        cout << "|" << string(96, '-') << "|\n";
+	
+	        // ===== IN D? LI?U THEO TRANG =====
+	        int index = 0;
+	        int stt   = startIdx + 1;
+	
+	        for (LopTinChi* p = dsLopTC; p; p = p->next, index++) {
+	            if (index < startIdx || index >= endIdx) continue;
+	                treeMH mon = mh_find(rootMonHoc, p->MAMH);
+	        		string tenMon = mon ? mon->mh.TENMH : "(Khong tim thay ten mon)";
+	
+	            // d?m si s?
+	            int siSo = 0;
+	            for (DangKy* dk = p->DSDK; dk; dk = dk->next)
+	                if (!dk->HUYDK) siSo++;
+	
+	            cout << "|";
+	            textColor(12);
+	            cout << center(to_string(stt++), 5);
+	            textColor(14);
+	
+	            cout << "|" << center(to_string(p->MALOPTC), 8)
+	                 << "|" << center(p->MAMH, 10)
+	                 << "|" << center(to_string(p->NHOM), 6)
+	                 << "|" << center(p->NIENKHOA, 13)
+		             << "|"  << center(to_string(p->HOCKY), 8)					
+		             << "|"  << center(to_string(siSo) +  "/" + pad2(p->SOSVMAX), 9)	
+		             << "|"  << center(pad2(p->SOSVMIN), 8)                   
+					 << "|"  << center(pad2(p->SOSVMAX), 8)                  
+		             << "|"  << center((p->HUYLOP ? string("DA HUY"): string("MO")), 12)
+		             << "|\n";
+	        }
+	
+	        cout << "+" << string(96, '-') << "+\n";
+	
+	        // ===== NÚT CH?C NANG & PHÂN TRANG =====
+	        drawFunctionButtons(8, 22);
+	        drawPagination(currentPage, totalPages, 8, 24);
+	
+	        // ===== X? LÝ PHÍM =====
+	        int key = _getch();
+	        if (key == 224) {
+	            key = _getch();
+	            if (key == 72 && currentPage > 1) currentPage--;          // ?
+	            else if (key == 80 && currentPage < totalPages) currentPage++; // ?
+	        }
+	        else if (key == 'a' || key == 'A') ltc_1_1(), ltc_sort_asc();
+	        else if (key == 'd' || key == 'D') ltc_1_2();
+	        else if (key == 'e' || key == 'E') ltc_1_3();
+	        
+	    }
+	}
+}
+
+
+
 

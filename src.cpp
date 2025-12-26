@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <fstream>
 #include "src.hpp"
+#include "ui.hpp"
 #include <sstream>
 #include <algorithm>
 #include <conio.h>
@@ -1456,72 +1457,6 @@ string pad2(int n) {
 }
 
 
-// HAM IN DS LOPTC
-void ltc_print_all() {
-	ltc_sort_asc();  // <<< S?P X?P TANG D?N
-    cout << "\n";
-    cout << setw(31) << "";
-	setBGColor(14, 4);  // yellow console, red text
-	cout << "DANH SACH TAT CA LOP TIN CHI\n";
-    setBGColor(0, 7);  // black console, white text
-    cout << endl;
-
-    if (!dsLopTC) {
-        cout << "       (Chua co lop tin chi nao)\n";
-        cout << string(100, '=') << "\n\n";
-        return;
-    }
-    	textColor(14); // vàng
-        cout << "+" << string(96, '-') << "+" << "\n";
-	    cout << "|" << center("STT", 5)
-	         << "|" << center("MA LOP", 8)
-	         << "|" << center("MA MON", 10)
-	         << "|" << center("NHOM", 6)
-	         << "|" << center("NIEN KHOA", 13)
-	         << "|" << center("HOC KI", 8)
-	         << "|" << center("SI SO", 9)
-	         << "|" << center("SL MIN", 8)
-	         << "|" << center("SL MAX", 8)
-	         << "|" << center("TRANG THAI", 12)
-	         << "|\n";
-		if (!dsLopTC) { cout << "(Chua co lop tin chi)\n"; return; }
-		cout << "|" << string(96, '-') << "|" << "\n";
-
-    int sttLop = 0;
-    for (LopTinChi* p = dsLopTC; p; p = p->next) {
-        sttLop++;
-        treeMH mon = mh_find(rootMonHoc, p->MAMH);
-        string tenMon = mon ? mon->mh.TENMH : "(Khong tim thay ten mon)";
-
-        // Ð?m si s? hi?n t?i (chua h?y)
-        int siSo = 0;
-        for (DangKy* dk = p->DSDK; dk; dk = dk->next) {
-            if (!dk->HUYDK) siSo++;
-        }
-
-        // In thông tin l?p
-        cout << "|"; textColor(12); // red
-		cout << center(to_string(sttLop), 5);
-		textColor(14); // vàng						
-        cout << "|"  << center(to_string(p->MALOPTC), 8)					
-             << "|"  << center(p->MAMH,10)					
-             << "|"  << center(to_string(p->NHOM), 6)						
-             << "|"  << center(p->NIENKHOA, 13)						
-             << "|"  << center(to_string(p->HOCKY), 8)					
-             << "|"  << center(to_string(siSo) +  "/" + pad2(p->SOSVMAX), 9)	
-             << "|"  << center(pad2(p->SOSVMIN), 8)                   
-			 << "|"  << center(pad2(p->SOSVMAX), 8)                  
-             << "|"  << center((p->HUYLOP ? string("DA HUY"): string("MO")), 12)
-             << "|\n";
-        
-        cout << "";
-    }
-    cout << "+" << string(96, '-') << "+" << "\n\n";
-    cout << string(100, '=') << "\n\n";
-    textColor(7); // reset white color
-}
-
-
  // IN DSSV DANG KI LOP TIN CHI
 void dsdk_ltc_print(LopTinChi* p, DS_LOPSV* dsLopSV) {
     if (!p || !p->DSDK) {
@@ -1596,7 +1531,7 @@ void ltc_print_filtered(const string& nk, int hk, int nhom, const string& mamh) 
 		if (p->NIENKHOA == nk && p->HOCKY == hk && p->NHOM == nhom && p->MAMH == mamh) {
 			found = true;
 			cout << "\n=== LOP TC Ma: " << p->MALOPTC << " ===\n";
-			ltc_print_all(); // optional: could print only this; keep simple: print registrations next
+			ltc_UI::ltc_print_all(); // optional: could print only this; keep simple: print registrations next
 			dk_print(p->DSDK);
 		}
 	}
@@ -1708,7 +1643,7 @@ void ltc_2() {
     system("cls");
 
     QuanLyDiem::ltc_load_from_file("loptinchi.txt");
-    QuanLyDiem::ltc_print_all();
+    ltc_UI::ltc_print_all();
 
     cout << "Nhap ma lop: ";
     int ma;

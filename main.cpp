@@ -30,7 +30,7 @@ int main() {
                 do {
                     system("cls");
                     
-                    ltc_print_all();
+                    ltc_UI::ltc_print_all();
                     
                     cout << "\n--- Nhap danh sach lop Tin Chi ---\n";
                     cout << "1. Them lop moi\n2. Xoa lop theo ma\n3. Sua lop\n0. Quay lai\nChon: ";

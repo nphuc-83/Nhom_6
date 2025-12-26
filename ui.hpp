@@ -105,4 +105,10 @@ namespace score_Border_maker {
 	);
 }
 
+namespace ltc_UI{
+	void drawFunctionButtons(int x, int y);
+	void drawPagination(int currentPage, int totalPages, int x, int y);
+	void ltc_print_all();
+}
+
 #endif

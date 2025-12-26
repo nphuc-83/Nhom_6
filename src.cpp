@@ -90,6 +90,15 @@ treeMH mh_insert(treeMH root, treeMH node) {
     return root;
 }
 
+// ktra  mon hoc co dang duoc su dung 
+bool mh_is_used_in_loptc(const string& mamh) {
+    for (LopTinChi* p = dsLopTC; p; p = p->next) {
+        if (p->MAMH == mamh) {
+            return true;
+        }
+    }
+    return false;
+} 
 // ---- Tìm môn h?c ----
 treeMH mh_find(treeMH root, const string& mamh) {
     if (!root || root->mh.MAMH == mamh) return root;
@@ -263,19 +272,31 @@ void mh_load_from_file(const string& filename) {
     cout << "Da tai du lieu tu file thanh cong!\n";
 }
 void mh_print_all() {
-    cout << "\n===== DANH SÁCH MÔN H?C HI?N CÓ =====\n";
+	cout << "\n";
+    cout << setw(22) << "";
+    setBGColor(14, 4);   
+	cout << " DANH SACH MON HOC HIEN CO \n";
+    setBGColor(0, 7);  // black console, white text
+    cout << endl;
     if (!rootMonHoc) {
-        cout << "(Danh sách tr?ng)\n";
+        cout << "(Danh sach trong)\n";
+        cout << string(90, '=') << "\n\n";
         return;
     }
-
-    cout << left << setw(12) << "MAMH"
-         << setw(50) << "TENMH"
-         << setw(6) << "LT"
-         << setw(6) << "TH" << "\n";
-    cout << string(74, '-') << "\n";
+    textColor(14); // vàng
+    cout << "+" << string(72, '-') << "+\n";
+    cout << "|"
+         << center("MA MH", 12)
+         << "|" << center("TEN MON HOC", 45)
+         << "|" << center("LT", 6)
+         << "|" << center("TH", 6)
+         << "|\n";
+    cout << "|" << string(72, '-') << "|\n";
+    textColor(7);
     mh_inorder_print(rootMonHoc);
-    cout << "======================================\n\n";
+    textColor(14); // vàng
+    cout << "+" << string(72, '-') << "+\n\n";
+    textColor(7); // reset
 }
 // ==================== SINH VIÊN ====================
 
@@ -298,42 +319,54 @@ void sv_clear(nodeSV*& head) {
         delete t;
     }
 }
-void sv_print_all_in_class(LopSV* lop) {
+void sv_print_all_in_class(LopSV* lop) {	
+	cout << "\n";
+    cout << setw(15) << "";
+    setBGColor(14, 4); // nen vang, chu do
+    cout << "DANH SACH SINH VIEN CUA LOP\n";
+    setBGColor(0, 7);  // nen den, chu trang
+    cout << "\n";
     if (lop == nullptr) {
         cout << ">> Lop khong ton tai!\n";
+        cout << string(100, '=') << "\n\n";
         return;
     }
-
-    cout << "\n=== DANH SACH SINH VIEN CUA LOP: " 
-         << lop->TENLOP << " (" << lop->MALOP << ") ===\n";
-
+    cout << " Lop: " << lop->TENLOP << " (" << lop->MALOP << ")\n\n";
     if (lop->FirstSV == nullptr) {
         cout << "(Chua co sinh vien nao trong lop)\n";
+        cout << string(100, '=') << "\n\n";
         return;
     }
-
-    cout << left << setw(5) << "STT"
-         << setw(16) << "MASV"
-         << setw(20) << "HO"
-         << setw(12) << "TEN"
-         << setw(8) << "PHAI"
-         << setw(15) << "SODT"
-         << setw(30) << "EMAIL" << "\n";
-    cout << string(106, '-') << "\n";
-
+    textColor(14);
+    cout << "+" << string(97, '-') << "+\n";
+    cout << "|" << center("STT", 6)
+         << "|" << center("MASV", 16)
+         << "|" << center("HO", 12)
+         << "|" << center("TEN", 10)
+         << "|" << center("PHAI", 8)
+         << "|" << center("SODT", 15)
+         << "|" << center("EMAIL",24 )
+         << "|\n";
+    cout << "|" << string(97, '-') << "|\n";
     int stt = 0;
     for (nodeSV* p = lop->FirstSV; p != nullptr; p = p->next) {
-        cout << left << setw(5) << ++stt
-             << setw(16) << p->sv.MASV
-             << setw(20) << p->sv.HO
-             << setw(12) << p->sv.TEN
-             << setw(8) << p->sv.PHAI
-             << setw(15) << p->sv.SODT
-             << setw(30) << p->sv.Email << "\n";
+        stt++;
+        cout << "|";
+        textColor(12); // do
+        cout << center(to_string(stt), 6);
+        textColor(14); // vang
+        cout << "|" << center(p->sv.MASV, 16)
+             << "|" << center(p->sv.HO, 12)
+             << "|" << center(p->sv.TEN, 10)
+             << "|" << center(p->sv.PHAI, 8)
+             << "|" << center(p->sv.SODT, 15)
+             << "|" << center(p->sv.Email, 24)
+             << "|\n";
     }
+    cout << "+" << string(97, '-') << "+\n\n";
+    cout << string(100, '=') << "\n\n";
+    textColor(7); // reset chu trang
 }
-
-
 // ==================== L?P SINH VIÊN ====================
 
 bool validate_MALOP(const string& malop) {
@@ -425,27 +458,40 @@ bool dssv_edit(const string& malop, const string& newTen) {
 }
 
 void dssv_print_all() {
+	cout << "\n";
+    cout << setw(20) << "";
+    setBGColor(14, 4); // nen vang, chu do 
+    cout << "DANH SACH LOP SINH VIEN\n";
+    setBGColor(0, 7);  // nen den, chu trang
+    cout << "\n";
     if (dsLopSV == nullptr || dsLopSV->n == 0) {
         cout << endl <<  "DANH SACH LOP RONG!\n" << endl;
+        cout << string(80, '=') << "\n\n";
         return;
     }
-
-    cout << left << setw(10) << "STT"
-         << setw(20) << "MA LOP"
-         << setw(40) << "TEN LOP" << endl;
-    cout << string(70, '-') << endl;
-
-    int count = 0;
+    textColor(14);
+    cout << "+" << string(55, '-') << "+\n";
+    cout << "|" << center("STT", 6)
+         << "|" << center("MA LOP", 15)
+         << "|" << center("TEN LOP", 32)
+         << "|\n";
+    cout << "|" << string(55, '-') << "|\n";
+    int count=0; 
     for (int i = 0; i < MAX_LOPSV; i++) {
         if (dsLopSV->nodes[i] != nullptr) {
-            cout << left << setw(10) << (++count)
-                 << setw(20) << dsLopSV->nodes[i]->MALOP
-                 << setw(40) << dsLopSV->nodes[i]->TENLOP << endl;
+            count++;
+            cout << "|";
+            textColor(12); // do 
+            cout << center(to_string(count), 6);
+            textColor(14); // vang
+            cout << "|" << center(dsLopSV->nodes[i]->MALOP, 15)
+                 << "|" << center(dsLopSV->nodes[i]->TENLOP, 32)
+                 << "|\n";
         }
     }
-
-    if (count == 0)
-        cout << "Chua co lop nao trong danh sach.\n";
+    cout << "+" << string(55, '-') << "+\n\n";
+    cout << string(80, '=') << "\n\n";
+    textColor(7); // reset chu trang
 }
 
 LopSV* dssv_find(string &malop) {
@@ -1828,52 +1874,66 @@ void mh_1() {
     system("cls");
     QuanLyDiem::mh_load_from_file("monhoc.txt");
     cout << "======= QUAN LI MON HOC =======\n";
-
     string MAMH, TENMH;
     int STCLT, STCTH;
-
     QuanLyDiem::mh_print_all();
-
     MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc: ");
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     TENMH = checkTen("Vui long nhap ten Mon Hoc: ");
     STCLT = nhapSTC("so tin chi ly thuyet");
     STCTH = nhapSTC("so tin chi thuc hanh");
-
     QuanLyDiem::treeMH node = new QuanLyDiem::nodeMH;
-
     node->mh.MAMH = MAMH;
     node->mh.TENMH = TENMH;
     node->mh.STCLT = STCLT;
     node->mh.STCTH = STCTH;
     node->mh.height = 1;
-
     node->left = nullptr;
     node->right = nullptr;
-
     // Chèn vào cây AVL
     QuanLyDiem::rootMonHoc = QuanLyDiem::mh_insert(QuanLyDiem::rootMonHoc, node);    
     QuanLyDiem::mh_save_to_file("monhoc.txt");
     system("cls");
     QuanLyDiem::mh_print_all();
     cout << ">> Da them mon hoc thanh cong!\n";
-
     system("pause");
 }
 
 void mh_2() {
 	system("cls");
 	QuanLyDiem::mh_load_from_file("monhoc.txt");
+	QuanLyDiem::ltc_load_from_file("loptinchi.txt");
     string MAMH;
     QuanLyDiem::mh_print_all();
     MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc can xoa: ");
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    
+    // ktra mon hoc co ton tai khong 
+    if (QuanLyDiem::mh_find(QuanLyDiem::rootMonHoc, MAMH) == nullptr) {
+        cout << "\n>> Loi: Khong tim thay mon hoc co ma '" << MAMH << "'!\n";
+        system("pause");
+        return;
+    }
+    //  XAC NHAN XOA
+    cout << "\n>> Xac nhan xoa mon hoc '" << MAMH << "'? (Y/N): ";
+    char confirm;
+    cin >> confirm;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    if (confirm != 'Y' && confirm != 'y') {
+        cout << ">> Da huy thao tac xoa.\n";
+        system("pause");
+        return;
+    }
+    //ktra mon hoc co dang duoc su dung hay khong  
+    if (QuanLyDiem::mh_is_used_in_loptc(MAMH)) {
+        cout << "\n>> Loi: Khong the xoa!\n";
+        cout << "   Mon hoc '" << MAMH << "' dang duoc su dung trong cac lop tin chi.\n";
+        cout << "   Vui long xoa cac lop tin chi lien quan truoc!\n";
+        system("pause");
+        return;
+    }
     QuanLyDiem::rootMonHoc = QuanLyDiem::mh_remove(QuanLyDiem::rootMonHoc, MAMH);
-    
     QuanLyDiem::mh_save_to_file("monhoc.txt");
     cout << ">> Da xoa mon hoc (neu ton tai)!\n";
-
     QuanLyDiem::mh_print_all();
     system("pause");
 }
@@ -1889,119 +1949,150 @@ void mh_3() {
     cout << "Vui long nhap ten mon hoc moi: ";
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     TENMH = checkTen("Vui long nhap ten Mon Hoc moi: ");
-
     STCLT = nhapSTC("Vui long nhap lai so tin chi ly thuyet");
     STCTH = nhapSTC("Vui long nhap lai so tin chi thuc hanh");
-
     if (QuanLyDiem::mh_edit(MAMH, TENMH, STCLT, STCTH)) {
     	QuanLyDiem::mh_save_to_file("monhoc.txt");
         cout << ">> Da chinh sua mon hoc thanh cong!\n";
     } else {
         cout << ">> Khong tim thay mon hoc!\n";
     }
-
-    QuanLyDiem::mh_print_all();
     system("pause");
 }
-
 
 void mh_4() {
 	system("cls");
 	QuanLyDiem::mh_load_from_file("monhoc.txt");
-    cout << "======= DANH SACH MON HOC =======\n";
     QuanLyDiem::mh_print_all();
     system("pause");
 }
 
 void dssv_1() {
     system("cls");
-    cout << "======= QUAN LI DANH SACH SINH VIEN =======\n";
+    cout << setw(14) << "";
+    setBGColor(14, 4);
+    cout << "QUAN LY DANH SACH LOP SINH VIEN\n";
+    setBGColor(0, 7);
+    cout << "\n";
 
     QuanLyDiem::dssv_print_all();
 
-    string MALOP, TENLOP;
+    cout << "\n";
+    textColor(11);
+    cout << ">>> THEM LOP SINH VIEN MOI\n";
+    textColor(7);
 
-    MALOP = checkMa(15, "Vui long nhap Ma Lop Hoc: ");
-    TENLOP = checkTen("Vui long nhap ten Lop Hoc: ");
+    string MALOP = checkMa(15, "Nhap MA LOP: ");
+    string TENLOP = checkTen("Nhap TEN LOP: ");
 
     if (QuanLyDiem::dssv_insert(MALOP, TENLOP)) {
-        cout << "Them thanh cong\n";
+        textColor(10);
+        cout << "\nThem lop thanh cong!\n";
         QuanLyDiem::dssv_save_to_file("lopSV.txt");
     } else {
-        cout << "Danh sach lop da day!\n";
+        textColor(12);
+        cout << "\nDanh sach lop da day!\n";
     }
 
+    textColor(7);
     system("pause");
 }
 
 void dssv_2() {
     system("cls");
-    cout << "======= QUAN LI DANH SACH SINH VIEN =======\n";
-
+    cout << setw(14) << "";
+    setBGColor(14, 4);
+    cout <<"QUAN LY DANH SACH LOP SINH VIEN\n";
+    setBGColor(0, 7);
+    cout << "\n";
     QuanLyDiem::dssv_print_all();
-
-    string MALOP = checkMa(15, "Vui long nhap Ma Lop Hoc can xoa: ");
-
+    cout << "\n";
+    textColor(11);
+    cout << ">>> XOA LOP SINH VIEN\n";
+    textColor(7);
+    string MALOP = checkMa(15, "Nhap MA LOP can xoa: ");
     if (QuanLyDiem::dssv_remove(MALOP)) {
-        cout << "Xoa thanh cong\n";
+        textColor(10);
+        cout << "\nXoa lop thanh cong!\n";
         QuanLyDiem::dssv_save_to_file("lopSV.txt");
     } else {
-        cout << "Danh sach lop khong ton tai!\n";
+        textColor(12);
+        cout << "\nKhong tim thay lop can xoa!\n";
     }
-
+    textColor(7);
     system("pause");
 }
 
 void dssv_3() {
     system("cls");
-    cout << "======= QUAN LI DANH SACH SINH VIEN =======\n";
+    cout << setw(14) << "";
+    setBGColor(14, 4);
+    cout <<"QUAN LY DANH SACH LOP SINH VIEN\n";
+    setBGColor(0, 7);
+    cout << "\n";
 
     QuanLyDiem::dssv_print_all();
+    cout << "\n";
+    textColor(11);
+    cout << ">>> DIEU CHINH TEN LOP\n";
+    textColor(7);
 
-    string MALOP = checkMa(15, "Vui long nhap Ma Lop Hoc can dieu chinh: ");
-    string newTen = checkTen("Vui long nhap ten Lop Hoc moi: ");
+    string MALOP = checkMa(15, "Nhap MA LOP can sua: ");
+    string newTen = checkTen("Nhap TEN LOP moi: ");
 
     if (QuanLyDiem::dssv_edit(MALOP, newTen)) {
-        cout << "Dieu chinh thanh cong\n";
+        textColor(10);
+        cout << "\nCap nhat thanh cong!\n";
         QuanLyDiem::dssv_save_to_file("lopSV.txt");
     } else {
-        cout << "Danh sach lop khong ton tai!\n";
+        textColor(12);
+        cout << "\nKhong tim thay lop can sua!\n";
     }
 
+    textColor(7);
     system("pause");
 }
 
 void dssv_4_1(LopSV* lop) {
+	system("cls");
+	sv_print_all_in_class(lop);
     QuanLyDiem::SinhVien sv;
-
-    cout << "\n=== THEM SINH VIEN MOI ===\n";
-    cout << "Ma SV: "; getline(cin, sv.MASV);
-    cout << "Ho: "; getline(cin, sv.HO);
-    cout << "Ten: "; getline(cin, sv.TEN);
-    cout << "Phai (Nam/Nu): "; getline(cin, sv.PHAI);
-    cout << "So dien thoai: "; getline(cin, sv.SODT);
-    cout << "Email: "; getline(cin, sv.Email);
-
+    cout << "\n";
+    textColor(11);
+    cout << ">>> THEM SINH VIEN MOI ";
+    textColor(7);
+    cout << "\n";    
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+    cout << " Ma SV        : "; getline(cin, sv.MASV);
+    cout << " Ho           : "; getline(cin, sv.HO);
+    cout << " Ten          : "; getline(cin, sv.TEN);
+    cout << " Phai (Nam/Nu): "; getline(cin, sv.PHAI);
+    cout << " So dien thoai: "; getline(cin, sv.SODT);
+    cout << " Email        : "; getline(cin, sv.Email);
     if (QuanLyDiem::sv_insert(lop, sv)) {
+    	textColor(10);
         cout << ">> Them thanh cong!\n";
         QuanLyDiem::dssv_save_to_file("lopSV.txt");
     } else {
+    	textColor(12);
         cout << ">> Loi: Trung ma sinh vien hoac loi khac!\n";
     }
-
+    textColor(7);
     system("pause");
 }
 
 void dssv_4_2(LopSV* lop) {
+	system("cls");
+	sv_print_all_in_class(lop);
     string masv;
+    textColor(11);
     cout << "\nNhap ma sinh vien can xoa: ";
+    textColor(7);
     getline(cin, masv);
-
     QuanLyDiem::nodeSV*& head = lop->FirstSV;
     QuanLyDiem::nodeSV* cur = head;
     QuanLyDiem::nodeSV* prev = nullptr;
     bool found = false;
-
     while (cur) {
         if (cur->sv.MASV == masv) {
             if (!prev) head = cur->next;
@@ -2013,33 +2104,35 @@ void dssv_4_2(LopSV* lop) {
         prev = cur;
         cur = cur->next;
     }
-
     cout << (found ? ">> Da xoa thanh cong!\n" : ">> Khong tim thay sinh vien!\n");
     QuanLyDiem::dssv_save_to_file("lopSV.txt");
     system("pause");
 }
 
 void dssv_4_3(LopSV* lop) {
+	system("cls");
+	sv_print_all_in_class(lop);
     string masv;
+    textColor(11);
     cout << "\nNhap ma sinh vien can sua: ";
+    textColor(7);  
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
     getline(cin, masv);
-
     QuanLyDiem::nodeSV* p = lop->FirstSV;
     while (p && p->sv.MASV != masv) p = p->next;
-
     if (!p) {
         cout << ">> Khong tim thay sinh vien!\n";
         system("pause");
         return;
     }
-
+    textColor(11);
     cout << "=== SUA THONG TIN SINH VIEN ===\n";
-    cout << "Ho (" << p->sv.HO << "): "; getline(cin, p->sv.HO);
+    textColor(7);
+cout << "Ho (" << p->sv.HO << "): "; getline(cin, p->sv.HO);
     cout << "Ten (" << p->sv.TEN << "): "; getline(cin, p->sv.TEN);
     cout << "Phai (" << p->sv.PHAI << "): "; getline(cin, p->sv.PHAI);
     cout << "So dien thoai (" << p->sv.SODT << "): "; getline(cin, p->sv.SODT);
     cout << "Email (" << p->sv.Email << "): "; getline(cin, p->sv.Email);
-
     cout << ">> Cap nhat thanh cong!\n";
     QuanLyDiem::dssv_save_to_file("lopSV.txt");
     system("pause");

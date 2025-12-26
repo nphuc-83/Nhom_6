@@ -128,6 +128,7 @@ treeMH mh_find_by_name(treeMH root, const std::string& tenmh);
 void mh_inorder_print(treeMH root);
 void mh_clear(treeMH root);
 bool mh_edit(const string& mamh, const string& tenmh, int stclt, int stcth);
+bool mh_is_used_in_loptc(const string& mamh);
 void mh_save_to_file(const string& filename);
 void mh_load_from_file(const string& filename);
 void mh_print_all();  		// CHECK XEM MÔN H?C NH?P ?N CHUA

@@ -16,6 +16,7 @@ int QuanLiChucNang();
 int QuanLiLopTinChi();
 int QuanLiMonHoc();
 int QuanliLopSinhVien();
+int QuanLySinhVienTrongLopSV_UI();
 int QuanliDangKySinhVien();
 
 

@@ -54,45 +54,12 @@ int main() {
         }
         else if (mainMenu == 3) { // Quan Ly Sinh Vien
             if (subMenu == 1) {
-                // Ði?u ch?nh l?p h?c (thêm/xóa/s?a l?p)
-                int sub;
-                do {
-                    system("cls");
-                    dssv_load_from_file("lopSV.txt");
-                    dssv_print_all();
-                    cout << "\n1. Them lop hoc\n2. Xoa lop hoc\n3. Sua lop hoc\n0. Quay lai\nChon: ";
-                    cin >> sub;
-                    switch (sub) {
-                        case 1: dssv_1(); break;
-                        case 2: dssv_2(); break;
-                        case 3: dssv_3(); break;
-                    }
-                } while (sub != 0);
-            }
-            else if (subMenu == 2) {
-                // C?p nh?t sinh viên trong l?p
-                system("cls");
-                dssv_print_all();
-                string MALOP = checkMa(15, "Nhap ma lop can quan ly: ");
-                LopSV* lop = dssv_find(MALOP);
-                if (lop) {
-                    int subChoice;
-                    do {
-                        system("cls");
-                        sv_print_all_in_class(lop);
-                        cout << "\n1. Them SV\n2. Xoa SV\n3. Sua SV\n0. Quay lai\nChon: ";
-                        cin >> subChoice;
-                        switch (subChoice) {
-                            case 1: dssv_4_1(lop); break;
-                            case 2: dssv_4_2(lop); break;
-                            case 3: dssv_4_3(lop); break;
-                        }
-                    } while (subChoice != 0);
-                } else {
-                    cout << "Lop khong ton tai!\n";
-                    system("pause");
-                }
-            }
+                // quan li lop sv 
+                    QuanliLopSinhVien();
+            }else if (subMenu == 2) {
+                // quan li sv trong lopsv 
+                    QuanLySinhVienTrongLopSV_UI();
+                     }
         }
         else if (mainMenu == 4) { // Quan Ly Dang Ki
 	        if (subMenu == 1){
@@ -163,4 +130,5 @@ int main() {
     }
 
     return 0;
+
 }

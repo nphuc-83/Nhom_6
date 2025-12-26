@@ -308,8 +308,8 @@ int QuanLiChucNang() {
     return 0;
 }
 
-// ==================== CÁC HÀM CH?C NANG KHÁC ====================
-
+// ==================== CAC HAM CHUC NANG KHAC ====================
+//    =====QUAN LI MON HOC ==== 
 int QuanLiMonHoc() {
     while (true) {
         system("cls");
@@ -342,6 +342,81 @@ int QuanLiMonHoc() {
             Sleep(1000);
         }
     }
+    return 0;
+}
+//=========== QUAN LI LOP SV- SV TRONG LOPSV ==============
+int QuanliLopSinhVien() {
+	while (true) {
+        system("cls");
+        cout << "======= DIEU CHINH LOP SINH VIEN  =======\n";
+        QuanLyDiem::dssv_print_all();
+        
+        gotoxy(5, 24);
+        SetColor(11, 0);
+        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
+        SetColor(7, 0);  
+        drawFunctionButtons();   
+        int key = _getch();      
+        if (key == 27) break; // ESC    
+        if (key >= 'a' && key <= 'z') key = key - 32;       
+        bool validKey = false;     
+        switch (key) {
+            case 'A': validKey = true; system("cls"); dssv_1(); break;
+            case 'D': validKey = true; system("cls"); dssv_2(); break;
+            case 'E': validKey = true; system("cls"); dssv_3(); break; 
+            default : validKey = false; break;               
+        }   
+        if(!validKey && key != 27) {
+            gotoxy(5, 26);
+            SetColor(12, 0);
+            cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
+            SetColor(7, 0);
+            Sleep(1000);
+        }
+    }  
+    return 0;
+}
+
+int QuanLySinhVienTrongLopSV_UI() {
+    system("cls");
+    cout << "======= QUAN LY DANH SACH SINH VIEN TRONG LOPSV  =======\n";
+    QuanLyDiem::dssv_print_all();
+    string MALOP = checkMa(15, "Nhap ma lop can quan ly: ");
+    QuanLyDiem::LopSV* lop = QuanLyDiem::dssv_find(MALOP);
+    if (!lop) {
+        cout << "Lop khong ton tai!\n";
+        system("pause");
+        return 0;
+    }
+    while (true) {
+        system("cls");      
+        cout << "======= QUAN LY SINH VIEN - LOP " << lop->MALOP << " =======\n";
+        QuanLyDiem::sv_print_all_in_class(lop);
+        gotoxy(5, 24);
+        SetColor(11, 0);
+        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
+        SetColor(7, 0);
+        drawFunctionButtons();
+        int key = _getch();
+        if (key == 27) break; // ESC
+        if (key >= 'a' && key <= 'z') key = key - 32;
+        bool validKey = false;  
+        switch (key) {
+            case 'A': validKey = true; system("cls"); dssv_4_1(lop); break;            
+            case 'D': validKey = true; system("cls"); dssv_4_2(lop); break;
+            case 'E': validKey = true; system("cls"); dssv_4_3(lop); break;              
+            default:
+                validKey = false;
+                break;
+        }        
+if(!validKey && key != 27) {
+            gotoxy(5, 26);
+            SetColor(12, 0);
+            cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
+            SetColor(7, 0);
+            Sleep(1000);
+        }
+    }    
     return 0;
 }
 

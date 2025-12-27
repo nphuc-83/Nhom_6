@@ -169,12 +169,13 @@ void ltc_sort_asc();  // SORT TANG DAN THEO MÃ LOPTC
 
 // --- Score board ---
 void score_1(LopTinChi*& ltc);//case 4
-void score_inBangDiemTBLopThuong();	//case 6
+//void score_inBangDiemTBLopThuong();	//case 6
 void score_inBangDiemMonCaoNhatLopThuong(); //case 7
 
 bool score_kiemTraMonHoc(const std::string& tenMH, std::string& out_MAMH);   
 QuanLyDiem::LopTinChi* score_kiemTraLopTinChi(const std::string& mamh, const std::string& nienKhoa, int hocKy, int nhom);
 
+string score_tinhDTB(const string& masv);
 //// --- UI_Menu ---
 string center(const string &text, int width); // ham can giua
 void textColor(int color); // ham text color

@@ -30,7 +30,7 @@ int main() {
                 do {
                     system("cls");
                     
-                    ltc_UI::ltc_print_all();
+                    ltc_Border_Maker::ltc_print_all();
                     
                     cout << "\n--- Nhap danh sach lop Tin Chi ---\n";
                     cout << "1. Them lop moi\n2. Xoa lop theo ma\n3. Sua lop\n0. Quay lai\nChon: ";
@@ -129,8 +129,15 @@ int main() {
             		score_Border_maker::score_print_theo_monhoc(tenMH, nienkhoa, hocKy, nhom, ltc);
 		    	}
 			}
-			//ltc_2();
-            else if (subMenu == 3) score_inBangDiemTBLopThuong();
+            else if (subMenu == 3) {
+            	LopSV* lopsv = nullptr;
+		        
+            	if(score_UIPopup::popupNhapThongTin_lopsv(lopsv)){
+            		system("cls");
+            		score_Border_maker::score_print_dtb_malop(lopsv);
+					system("pause");
+		    	}
+			}
             else if (subMenu == 4) score_inBangDiemMonCaoNhatLopThuong();
         }
     }

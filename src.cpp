@@ -10,6 +10,7 @@
 #include <conio.h>
 #include <bits/stdc++.h>
 #include <limits>
+#include <cmath>
 
 using namespace std;
 
@@ -408,7 +409,7 @@ bool validate_TENLOP(const string& tenlop) {
     return true;
 }
 
-int dssv_find_index_lop(const string& malop) {
+int dssv_find_index_lop(const string& malop) {	
     for (int i = 0; i < QuanLyDiem::dsLopSV->n; ++i)
         if (QuanLyDiem::dsLopSV->nodes[i] && QuanLyDiem::dsLopSV->nodes[i]->MALOP == malop)
             return i;
@@ -497,7 +498,7 @@ void dssv_print_all() {
 
 LopSV* dssv_find(string &malop) {
 	for (int i = 0; i < MAX_LOPSV; i++) {
-            if (dsLopSV->nodes[i]->MALOP == malop)
+            if (dsLopSV->nodes[i] && dsLopSV->nodes[i]->MALOP == malop) //make sure ds ko bi trông)
                 return dsLopSV->nodes[i];
         }
         return nullptr;
@@ -980,103 +981,34 @@ LopTinChi* score_kiemTraLopTinChi(
 }
 
 // Tính di?m trung bình tích luy (có tr?ng s? tín ch?) c?a m?t sinh viên
-float tinhDiemTBTichLuy(const string& masv) {
+string score_tinhDTB(const string& masv) {
     float tongDiemTinChi = 0.0f;
     int tongTinChi = 0;
+
     for (LopTinChi* ltc = dsLopTC; ltc; ltc = ltc->next) {
-        if (ltc->HUYLOP) continue; // b? l?p b? h?y
+        if (ltc->HUYLOP) continue;
+
         DangKy* dk = dk_find(ltc->DSDK, masv);
-        if (!dk || dk->HUYDK || dk->DIEM < 0) continue; // chua có di?m ho?c dã h?y dang ký
+        if (!dk || dk->HUYDK || dk->DIEM < 0) continue;
+
         treeMH mon = mh_find(rootMonHoc, ltc->MAMH);
         if (!mon) continue;
+
         int tinChi = mon->mh.STCLT + mon->mh.STCTH;
-        if (tinChi == 0) tinChi = 1; // tránh chia 0
+        if (tinChi == 0) tinChi = 1;
+
         tongDiemTinChi += dk->DIEM * tinChi;
         tongTinChi += tinChi;
     }
-    return (tongTinChi > 0) ? (tongDiemTinChi / tongTinChi) : 0.0f;
-}
 
-// In b?ng di?m trung bình c?a m?t l?p tín ch? (case 6)
-void score_inBangDiemTBLopThuong() {
-    system("cls");
-    cout << "===== IN BANG DIEM TRUNG BINH TICH LUY THEO LOP THUONG =====\n\n";
+    if (tongTinChi == 0) return "-";
 
-    string maLop;
-    cout << "Nhap ma lop (vi du: 20KDL1): ";
-    cin >> maLop;
+    float dtb = tongDiemTinChi / tongTinChi;
+    dtb = std::round(dtb * 10.0f) / 10.0f;
 
-    // Chu?n hóa mã l?p (vi?t hoa, b? kho?ng tr?ng)
-    transform(maLop.begin(), maLop.end(), maLop.begin(), ::toupper);
-    maLop.erase(remove_if(maLop.begin(), maLop.end(), ::isspace), maLop.end());
-
-    // Tìm l?p trong danh sách l?p sinh viên
-    LopSV* lop = nullptr;
-    for (int i = 0; i < dsLopSV->n; ++i) {
-        string ma = dsLopSV->nodes[i]->MALOP;
-        transform(ma.begin(), ma.end(), ma.begin(), ::toupper);
-        ma.erase(remove_if(ma.begin(), ma.end(), ::isspace), ma.end());
-        if (ma == maLop) {
-            lop = dsLopSV->nodes[i];
-            break;
-        }
-    }
-
-    if (!lop || !lop->FirstSV) {
-        cout << "Khong tim thay lop hoac lop chua co sinh vien!\n";
-        system("pause");
-        return;
-    }
-
-    // Thu th?p d? li?u sinh viên + di?m TB
-    struct SinhVienDiem {
-        string masv, ho, ten;
-        float  diemTB;
-    };
-    vector<SinhVienDiem> ds;
-
-    for (PTRSV p = lop->FirstSV; p; p = p->next) {
-        float diem = tinhDiemTBTichLuy(p->sv.MASV);
-        ds.push_back({ p->sv.MASV, p->sv.HO, p->sv.TEN, diem });
-    }
-
-    // S?p x?p theo di?m TB gi?m d?n
-    sort(ds.begin(), ds.end(), [](const SinhVienDiem& a, const SinhVienDiem& b) {
-        return a.diemTB > b.diemTB;
-    });
-
-    // In b?ng
-    cout << "\n";
-    cout << string(100, '=') << "\n";
-    cout << center("BANG DIEM TRUNG BINH TICH LUY - LOP " + lop->MALOP + " (" + lop->TENLOP + ")", 100) << "\n";
-    cout << string(100, '=') << "\n\n";
-
-    cout << left
-         << setw(6)  << "STT"
-         << setw(14) << "MA SV"
-         << setw(25) << "HO"
-         << setw(15) << "TEN"
-         << setw(12) << "DIEM TB"
-         << "\n";
-    cout << string(100, '-') << "\n";
-
-    int stt = 1;
-    for (const auto& sv : ds) {
-        string ho = sv.ho.length() > 23 ? sv.ho.substr(0,20) + "..." : sv.ho;
-        string ten = sv.ten.length() > 13 ? sv.ten.substr(0,10) + "..." : sv.ten;
-
-        cout << left
-             << setw(6)  << stt++
-             << setw(14) << sv.masv
-             << setw(25) << ho
-             << setw(15) << ten
-             << setw(12) << fixed << setprecision(2) << sv.diemTB
-             << "\n";
-    }
-
-    cout << string(100, '-') << "\n";
-    cout << "Tong sinh vien: " << ds.size() << "\n\n";
-    system("pause");
+    stringstream ss;
+    ss << fixed << setprecision(1) << dtb;
+    return ss.str();   // ?? "5.2", "7.0"
 }
 
 
@@ -1531,7 +1463,7 @@ void ltc_print_filtered(const string& nk, int hk, int nhom, const string& mamh) 
 		if (p->NIENKHOA == nk && p->HOCKY == hk && p->NHOM == nhom && p->MAMH == mamh) {
 			found = true;
 			cout << "\n=== LOP TC Ma: " << p->MALOPTC << " ===\n";
-			ltc_UI::ltc_print_all(); // optional: could print only this; keep simple: print registrations next
+			ltc_Border_Maker::ltc_print_all(); // optional: could print only this; keep simple: print registrations next
 			dk_print(p->DSDK);
 		}
 	}
@@ -1643,7 +1575,7 @@ void ltc_2() {
     system("cls");
 
     QuanLyDiem::ltc_load_from_file("loptinchi.txt");
-    ltc_UI::ltc_print_all();
+    ltc_Border_Maker::ltc_print_all();
 
     cout << "Nhap ma lop: ";
     int ma;

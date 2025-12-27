@@ -69,8 +69,6 @@ namespace score_UIPopup{
         int& nhom,
         QuanLyDiem::LopTinChi*& ltc
     );
-    
-    
 	
 	bool score_popup_check_ltc(
 		std::string& tenMH,
@@ -79,6 +77,11 @@ namespace score_UIPopup{
         int& nhom,
         QuanLyDiem::LopTinChi*& ltc
 	);
+	
+	bool popupNhapThongTin_lopsv(
+        QuanLyDiem::LopSV*& lopsv
+	);
+	
 }
 namespace score_Border_maker {
 	void textColor(int color);
@@ -103,9 +106,13 @@ namespace score_Border_maker {
         
         QuanLyDiem::LopTinChi*& ltc
 	);
+	
+	void score_print_dtb_malop(
+		QuanLyDiem::LopSV*& lopsv
+	);
 }
 
-namespace ltc_UI{
+namespace ltc_Border_Maker{
 	void drawFunctionButtons(int x, int y);
 	void drawPagination(int currentPage, int totalPages, int x, int y);
 	void ltc_print_all();

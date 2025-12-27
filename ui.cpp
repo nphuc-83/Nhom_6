@@ -904,6 +904,53 @@ namespace score_UIPopup {
 			return true;
 		} while (true);
 	}
+	
+	bool popupNhapThongTin_lopsv(
+        QuanLyDiem::LopSV*& lopsv		// Du lieu dê tao bang danh sach
+	) {
+	    string malop = "";
+        int width = 44;
+        int height = 9; // +1 dòng báo l?i
+        
+
+        CONSOLE_SCREEN_BUFFER_INFO csbi;
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+        int cw = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+        int ch = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+
+        int x = (cw - width) / 2;
+        int y = (ch - height) / 2;
+
+        textColor(14);
+
+        gotoxy(x, y);
+        cout << "+------------------------------------------+";
+        gotoxy(x, y + 1);
+        cout << "|        NHAP THONG TIN LOP SINH VIEN      |";
+        gotoxy(x, y + 2);
+        cout << "+------------------------------------------+";
+        gotoxy(x, y + 3);
+        cout << "|  Ma Lop :                                |";
+        gotoxy(x, y + 4);
+        cout << "+------------------------------------------+";
+
+        // ===== Nh?p =====
+
+        // ma lop hoc
+        gotoxy(x + 2, y + 3); cout << ">";
+        gotoxy(x + 20, y + 3);
+        
+        getline(cin, malop);
+        
+        lopsv = QuanLyDiem::dssv_find(malop);	// Duyet de lay lopsv
+	    if (!lopsv) {
+	        popupError(x, y + 7, "LOI: Khong ton tai lop sinh vien!");
+	        return false;
+	    }
+	    
+        textColor(7);
+        return true;
+    }
 }
 
 namespace score_Border_maker {
@@ -1087,13 +1134,13 @@ namespace score_Border_maker {
         
         QuanLyDiem::LopTinChi*& ltc		// duyet du lieu ltc
 	) {
-		string temp = "BANG DIEM MON HOC THEO LOP TIN CHI ";
+		string temp = "BANG DIEM MON HOC CUA LOP TIN CHI ___ ";
         drawHeader(temp);
         
         const int ROWS_PER_PAGE = 15;
 		int currentPage = 1;
 		
-		// ===== Ð?M T?NG S? DÒNG =====
+		// ===== COUNT T?NG S? DÒNG =====
 		int totalRecords = 0;
 		for (DangKy* p = ltc->DSDK; p; p = p->next)
 		    totalRecords++;
@@ -1186,7 +1233,7 @@ namespace score_Border_maker {
 		    textColor(7);
 		    
 		    // ===== Nút ch?c nang & phân trang =====
-		    drawPagination(currentPage, totalPages, 8, 24);
+		    drawPagination(currentPage, totalPages, 8, 23);
 			gotoxy(8, 22);
         	SetColor(12, 15); cout << " ESC "; SetColor(7, 0); cout << ": Exit ";
 			// X? lý phím
@@ -1204,9 +1251,106 @@ namespace score_Border_maker {
 		    if (key == 27) break; // ESC
 		}
 	}
+
+	void score_print_dtb_malop(
+		QuanLyDiem::LopSV*& lopsv
+	){
+		string temp = "BANG DIEM TRUNG BINH CUA LOP ___";
+        drawHeader(temp);
+        
+        const int ROWS_PER_PAGE = 15;
+		int currentPage = 1;
+		
+		// ===== COUNT T?NG S? DÒNG =====
+		int totalRecords = 0;
+		for (PTRSV p = lopsv->FirstSV; p; p = p->next)
+		    totalRecords++;
+		
+		int totalPages = (totalRecords + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
+		if (totalPages == 0) totalPages = 1;
+		
+		while (true) {
+		    system("cls");
+		    drawHeader(temp);
+			
+		    int printedRows = 0;
+		    int stt = (currentPage - 1) * ROWS_PER_PAGE + 1;
+		
+		    // ===== reset danh sách sinh viên c?a l?p =====
+		    PTRSV node_sv = lopsv->FirstSV;
+		
+		    // skip d?n trang hi?n t?i
+		    int skip = (currentPage - 1) * ROWS_PER_PAGE;
+		    while (node_sv && skip--) node_sv = node_sv->next;
+		
+		    // ===== Thông tin l?p =====
+		    cout << endl;
+		    SetColor(10, 0);
+		    cout << "Ma lop: " << lopsv->MALOP
+		         << "    Ten lop: " << lopsv->TENLOP << endl;
+		    SetColor(7, 0);
+		
+		    // ===== Khung b?ng =====
+		    const int khungW = 65;
+		    textColor(14);
+		
+		    cout << "+" << string(khungW, '-') << "+\n";
+		    cout << "|"
+		         << center("STT", 5)        << "|"
+		         << center("MASV", 12)      << "|"
+		         << center("HO", 20)        << "|"
+		         << center("TEN", 12)       << "|"
+		         << center("DIEM TB", 10)   << "  |\n";
+		    cout << "|" << string(khungW, '-') << "|\n";
+		
+		    // ===== In d? li?u =====
+		    while (node_sv && printedRows < ROWS_PER_PAGE) {
+		    	// ===== CALCULATE DTB ======
+		    	string dtb;
+				dtb = score_tinhDTB(node_sv->sv.MASV);
+				
+		        cout << "|"
+		             << center(to_string(stt++), 5) << "|"
+		             << center(node_sv->sv.MASV, 12)     << "|"
+		             << center(node_sv->sv.HO, 20)       << "|"
+		             << center(node_sv->sv.TEN, 12)      << "|"
+		             << center(dtb, 10)             
+		             << "  |\n";
+		
+		        node_sv = node_sv->next;
+		        printedRows++;
+		    }
+		
+		    // ===== Bù dòng tr?ng =====
+		    for (int i = printedRows; i < ROWS_PER_PAGE; i++) {
+		        cout << "|"
+		             << center("", 5)  << "|"
+		             << center("", 12) << "|"
+		             << center("", 20) << "|"
+		             << center("", 12) << "|"
+		             << center("", 10) << "  |\n";
+		    }
+		
+		    cout << "+" << string(khungW, '-') << "+\n\n";
+		    textColor(7);
+		
+		    // ===== Ði?u hu?ng + thoát =====
+		    drawPagination(currentPage, totalPages, 8, 24);
+		    gotoxy(8, 22);
+		    SetColor(12, 15); cout << " ESC "; SetColor(7, 0); cout << ": Exit ";
+		
+		    int key = _getch();
+		    if (key == 224) {
+		        key = _getch();
+		        if (key == 72 && currentPage > 1) currentPage--;
+		        else if (key == 80 && currentPage < totalPages) currentPage++;
+		    }
+		    if (key == 27) break;
+		}
+	}
 }
 
-namespace ltc_UI{
+namespace ltc_Border_Maker{
 	
     void drawFunctionButtons(int x, int y) {
         gotoxy(x, y);

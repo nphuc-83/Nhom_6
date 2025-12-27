@@ -25,23 +25,7 @@ int main() {
 
         if (mainMenu == 1) { // Quan Ly Lop Tin Chi
             if (subMenu == 1) {
-                // Ði?u ch?nh danh sách l?p tín ch? (thêm/xóa/s?a)
-                int sub;
-                do {
-                    system("cls");
-                    
-                    ltc_Border_Maker::ltc_print_all();
-                    
-                    cout << "\n--- Nhap danh sach lop Tin Chi ---\n";
-                    cout << "1. Them lop moi\n2. Xoa lop theo ma\n3. Sua lop\n0. Quay lai\nChon: ";
-                    cin >> sub;
-                    cin.ignore();
-                    switch (sub) {
-                        case 1: ltc_1_1(); break;
-                        case 2: ltc_1_2(); break;
-                        case 3: ltc_1_3(); break;
-                    }
-                } while (sub != 0);
+				ltc_Border_Maker::ltc_print_all();
             }
         }
         else if (mainMenu == 2) { // Quan Ly Mon Hoc

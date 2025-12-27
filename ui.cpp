@@ -1362,6 +1362,12 @@ namespace ltc_Border_Maker{
         gotoxy(x + 36, y);
         SetColor(12, 15); cout << " E "; SetColor(7, 0); cout << ": EDIT     ";
         
+        gotoxy(x + 54, y);
+        SetColor(12, 15); cout << " L "; SetColor(7, 0); cout << ": LIST     ";
+        
+        gotoxy(x + 72, y);
+        SetColor(12, 15); cout << " ESC "; SetColor(7, 0); cout << ": EXIT     ";
+        
     }
     
     
@@ -1471,6 +1477,8 @@ namespace ltc_Border_Maker{
 	        else if (key == 'a' || key == 'A') ltc_1_1(), ltc_sort_asc();
 	        else if (key == 'd' || key == 'D') ltc_1_2();
 	        else if (key == 'e' || key == 'E') ltc_1_3();
+	        else if (key == 'l' || key == 'L') ltc_2();
+	        else if (key == 27) return;
 	        
 	    }
 	}

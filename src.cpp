@@ -1013,130 +1013,151 @@ string score_tinhDTB(const string& masv) {
 
 
 // IN B?NG ÐI?M CAO NH?T THEO MÔN C?A L?P THU?NG
-void score_inBangDiemMonCaoNhatLopThuong() {
-    system("cls");
-    cout << "===== IN BANG DIEM CAO NHAT THEO MON - LOP THUONG =====\n\n";
+//void score_inBangDiemMonCaoNhatLopThuong() {
+//    if (!lop || !lop->FirstSV) {
+//            cout << "Khong tim thay lop hoac lop chua co sinh vien!\n";
+//            system("pause");
+//            return;
+//        }
+//
+//        // Thu th?p t?t c? sinh viên trong l?p (s?p x?p theo MASV)
+//        vector<SinhVien> dsSV;
+//        for (PTRSV p = lop->FirstSV; p; p = p->next) {
+//            dsSV.push_back(p->sv);
+//        }
+//        sort(dsSV.begin(), dsSV.end(), [](const SinhVien& a, const SinhVien& b) {
+//            return a.MASV < b.MASV;
+//        });
+//
+//        // Thu th?p t?t c? môn unique mà có SV trong l?p h?c (không h?y, có di?m)
+//        set<string> dsMon;
+//        for (LopTinChi* ltc = dsLopTC; ltc; ltc = ltc->next) {
+//            if (ltc->HUYLOP) continue;
+//            
+//            for (DangKy* dk = ltc->DSDK; dk; dk = dk->next) {
+//                if (!dk->HUYDK && dk->DIEM >= 0.0f) {
+//                    // Ki?m tra MASV có trong l?p không
+//                    bool inLop = false;
+//                    for (const auto& sv : dsSV) {
+//                        if (sv.MASV == dk->MASV) {
+//                            inLop = true;
+//                            break;
+//                        }
+//                    }
+//                    if (inLop) {
+//                        dsMon.insert(ltc->MAMH);
+//                    }
+//                }
+//            }
+//        }
+//
+//        if (dsMon.empty()) {
+//            cout << "Lop chua co sinh vien hoc mon nao!\n";
+//            system("pause");
+//            return;
+//        }
+//
+//        vector<string> monList(dsMon.begin(), dsMon.end());
+//}
 
-    string maLop;
-    cout << "Nhap ma lop (vi du: 20KDL1): ";
-    cin >> maLop;
 
-    // Chu?n hóa mã l?p
-    transform(maLop.begin(), maLop.end(), maLop.begin(), ::toupper);
-    maLop.erase(remove_if(maLop.begin(), maLop.end(), ::isspace), maLop.end());
 
-    // Tìm l?p
-    LopSV* lop = nullptr;
-    for (int i = 0; i < dsLopSV->n; ++i) {
-        string ma = dsLopSV->nodes[i]->MALOP;
-        transform(ma.begin(), ma.end(), ma.begin(), ::toupper);
-        ma.erase(remove_if(ma.begin(), ma.end(), ::isspace), ma.end());
-        if (ma == maLop) {
-            lop = dsLopSV->nodes[i];
-            break;
+int collectSV(LopSV* lop, SinhVien dsSV[]) {
+    int n = 0;
+    for (PTRSV p = lop->FirstSV; p; p = p->next)
+        dsSV[n++] = p->sv;
+
+    // Selection sort theo MASV
+    for (int i = 0; i < n - 1; i++) {
+        int minIdx = i;
+        for (int j = i + 1; j < n; j++)
+            if (dsSV[j].MASV < dsSV[minIdx].MASV)
+                minIdx = j;
+
+        if (minIdx != i) {
+            SinhVien t = dsSV[i];
+            dsSV[i] = dsSV[minIdx];
+            dsSV[minIdx] = t;
         }
     }
+    return n;
+}
 
-    if (!lop || !lop->FirstSV) {
-        cout << "Khong tim thay lop hoac lop chua co sinh vien!\n";
-        system("pause");
-        return;
-    }
+bool existMon(const string& mamh, string dsMon[], int soMon) {
+    for (int i = 0; i < soMon; i++)
+        if (dsMon[i] == mamh) return true;
+    return false;
+}
 
-    // Thu th?p t?t c? sinh viên trong l?p (s?p x?p theo MASV)
-    vector<SinhVien> dsSV;
-    for (PTRSV p = lop->FirstSV; p; p = p->next) {
-        dsSV.push_back(p->sv);
-    }
-    sort(dsSV.begin(), dsSV.end(), [](const SinhVien& a, const SinhVien& b) {
-        return a.MASV < b.MASV;
-    });
+int collectMon(SinhVien dsSV[], int soSV, string dsMon[]) {
+    int soMon = 0;
 
-    // Thu th?p t?t c? môn unique mà có SV trong l?p h?c (không h?y, có di?m)
-    set<string> dsMon;  // S? d?ng set d? unique và s?p x?p
     for (LopTinChi* ltc = dsLopTC; ltc; ltc = ltc->next) {
         if (ltc->HUYLOP) continue;
+
         for (DangKy* dk = ltc->DSDK; dk; dk = dk->next) {
-            if (!dk->HUYDK && dk->DIEM >= 0.0f) {
-                // Ki?m tra MASV có trong l?p không
-                bool inLop = false;
-                for (const auto& sv : dsSV) {
-                    if (sv.MASV == dk->MASV) {
-                        inLop = true;
-                        break;
-                    }
+            if (dk->HUYDK || dk->DIEM < 0) continue;
+
+            bool inLop = false;
+            for (int i = 0; i < soSV; i++)
+                if (dsSV[i].MASV == dk->MASV) {
+                    inLop = true;
+                    break;
                 }
-                if (inLop) {
-                    dsMon.insert(ltc->MAMH);
-                }
-            }
+
+            if (inLop && !existMon(ltc->MAMH, dsMon, soMon))
+                dsMon[soMon++] = ltc->MAMH;
         }
     }
-
-    if (dsMon.empty()) {
-        cout << "Lop chua co sinh vien hoc mon nao!\n";
-        system("pause");
-        return;
-    }
-
-    // In b?ng
-    cout << "\n";
-    cout << string(100, '=') << "\n";
-    cout << center("BANG DIEM CAO NHAT THEO MON - LOP " + lop->MALOP + " (" + lop->TENLOP + ")", 100) << "\n";
-    cout << string(100, '=') << "\n\n";
-
-    // Header
-    cout << left
-         << setw(6)  << "STT"
-         << setw(14) << "MA SV"
-         << setw(30) << "HO TEN";
-
-    // In c?t cho t?ng môn
-    int colWidth = 10;  // Ð? r?ng c?t di?m
-    for (const auto& mamh : dsMon) {
-        cout << setw(colWidth) << mamh;
-    }
-    cout << "\n";
-    cout << string(100, '-') << "\n";
-
-    // In d? li?u cho t?ng SV
-    int stt = 1;
-    for (const auto& sv : dsSV) {
-        string hoTen = sv.HO + " " + sv.TEN;
-        if (hoTen.length() > 28) hoTen = hoTen.substr(0, 25) + "...";
-
-        cout << left
-             << setw(6)  << stt++
-             << setw(14) << sv.MASV
-             << setw(30) << hoTen;
-
-        // Tìm di?m cao nh?t cho t?ng môn
-        for (const auto& mamh : dsMon) {
-            float diemMax = -1.0f;  // Kh?i t?o < 0
-
-            // Duy?t t?t c? LopTinChi có MAMH này
-            for (LopTinChi* ltc = dsLopTC; ltc; ltc = ltc->next) {
-                if (ltc->MAMH == mamh && !ltc->HUYLOP) {
-                    DangKy* dk = dk_find(ltc->DSDK, sv.MASV);
-                    if (dk && !dk->HUYDK && dk->DIEM >= 0.0f) {
-                        diemMax = max(diemMax, dk->DIEM);
-                    }
-                }
-            }
-
-            if (diemMax >= 0.0f) {
-                cout << setw(colWidth) << fixed << setprecision(1) << diemMax;
-            } else {
-                cout << setw(colWidth) << "-";
-            }
-        }
-        cout << "\n";
-    }
-
-    cout << string(100, '-') << "\n";
-    cout << "Tong sinh vien: " << dsSV.size() << " | Tong mon: " << dsMon.size() << "\n\n";
-    system("pause");
+    return soMon;
 }
+
+int findSV(const string& masv, SinhVien dsSV[], int soSV) {
+    for (int i = 0; i < soSV; i++)
+        if (dsSV[i].MASV == masv) return i;
+    return -1;
+}
+
+int findMon(const string& mamh, string dsMon[], int soMon) {
+    for (int i = 0; i < soMon; i++)
+        if (dsMon[i] == mamh) return i;
+    return -1;
+}
+
+void buildBangDiem(
+    SinhVien dsSV[], int soSV,
+    string dsMon[], int soMon,
+    float bangDiem[][100]
+) {
+    for (int i = 0; i < soSV; i++)
+        for (int j = 0; j < soMon; j++)
+            bangDiem[i][j] = -1;
+
+    for (LopTinChi* ltc = dsLopTC; ltc; ltc = ltc->next) {
+        if (ltc->HUYLOP) continue;
+
+        int m = findMon(ltc->MAMH, dsMon, soMon);
+        if (m == -1) continue;
+
+        for (DangKy* dk = ltc->DSDK; dk; dk = dk->next) {
+            if (dk->HUYDK || dk->DIEM < 0) continue;
+
+            int s = findSV(dk->MASV, dsSV, soSV);
+            if (s == -1) continue;
+
+            if (dk->DIEM > bangDiem[s][m])
+                bangDiem[s][m] = dk->DIEM;
+        }
+    }
+}
+
+
+
+
+
+
+
+
 // === T? Ð?NG LOAD KHI KH?I Ð?NG ===
 void ltc_auto_load() {
     ltc_load_from_file("loptinchi.txt");

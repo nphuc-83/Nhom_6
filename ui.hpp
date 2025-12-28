@@ -110,6 +110,23 @@ namespace score_Border_maker {
 	void score_print_dtb_malop(
 		QuanLyDiem::LopSV*& lopsv
 	);
+	void drawPage(
+	    QuanLyDiem::LopSV* lop,
+	    QuanLyDiem::SinhVien dsSV[], int soSV,
+	    std::string dsMon[], int soMon,
+	    float bangDiem[][100],
+	    int start, int end
+	);
+	
+	void navigate(
+	    QuanLyDiem::LopSV* lop,
+	    QuanLyDiem::SinhVien dsSV[], int soSV,
+	    std::string dsMon[], int soMon,
+	    float bangDiem[][100]
+	);
+	void score_print_bangdiemtongket(
+		QuanLyDiem::LopSV*& lopsv
+	);
 }
 
 namespace ltc_Border_Maker{

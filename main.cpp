@@ -122,7 +122,16 @@ int main() {
 					system("pause");
 		    	}
 			}
-            else if (subMenu == 4) score_inBangDiemMonCaoNhatLopThuong();
+            else if (subMenu == 4) {
+            	LopSV* lopsv = nullptr;
+		        
+            	if(score_UIPopup::popupNhapThongTin_lopsv(lopsv)){
+            		system("cls");
+            		score_Border_maker::score_print_bangdiemtongket(lopsv);
+
+					system("pause");
+		    	}
+			}
         }
     }
 

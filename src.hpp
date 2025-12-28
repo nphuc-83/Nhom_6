@@ -176,6 +176,32 @@ bool score_kiemTraMonHoc(const std::string& tenMH, std::string& out_MAMH);
 QuanLyDiem::LopTinChi* score_kiemTraLopTinChi(const std::string& mamh, const std::string& nienKhoa, int hocKy, int nhom);
 
 string score_tinhDTB(const string& masv);
+
+
+
+int collectSV(LopSV* lop, SinhVien dsSV[]);
+
+bool existMon(const std::string& mamh, std::string dsMon[], int soMon);
+
+int collectMon(
+    SinhVien dsSV[], int soSV,
+    std::string dsMon[]
+);
+
+int findSV(const std::string& masv, SinhVien dsSV[], int soSV);
+int findMon(const std::string& mamh, std::string dsMon[], int soMon);
+
+void buildBangDiem(
+    SinhVien dsSV[], int soSV,
+    std::string dsMon[], int soMon,
+    float bangDiem[][100]
+);
+
+
+
+
+
+
 //// --- UI_Menu ---
 string center(const string &text, int width); // ham can giua
 void textColor(int color); // ham text color

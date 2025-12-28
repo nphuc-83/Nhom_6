@@ -1252,9 +1252,7 @@ namespace score_Border_maker {
 		}
 	}
 
-	void score_print_dtb_malop(
-		QuanLyDiem::LopSV*& lopsv
-	){
+	void score_print_dtb_malop(QuanLyDiem::LopSV*& lopsv) {
 		string temp = "BANG DIEM TRUNG BINH CUA LOP ___";
         drawHeader(temp);
         
@@ -1348,7 +1346,236 @@ namespace score_Border_maker {
 		    if (key == 27) break;
 		}
 	}
-}
+
+//	void score_print_bangdiemtongket(QuanLyDiem::LopSV*& lopsv) {
+//		string temp = "BANG DIEM TONG KET CUA LOP ___";
+//        drawHeader(temp);
+//        
+//        const int ROWS_PER_PAGE = 15;
+//		int currentPage = 1;
+//		
+//		// ===== COUNT T?NG S? DÒNG =====
+//		int totalRecords = 0;
+//		for (PTRSV p = lopsv->FirstSV; p; p = p->next)
+//		    totalRecords++;
+//		
+//		int totalPages = (totalRecords + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
+//		if (totalPages == 0) totalPages = 1;
+//		
+//		while (true) {
+//		    system("cls");
+//		    drawHeader(temp);
+//			
+//		    int printedRows = 0;
+//		    int stt = (currentPage - 1) * ROWS_PER_PAGE + 1;
+//		
+//		    // ===== reset danh sách sinh viên c?a l?p =====
+//		    PTRSV node_sv = lopsv->FirstSV;
+//		
+//		    // skip d?n trang hi?n t?i
+//		    int skip = (currentPage - 1) * ROWS_PER_PAGE;
+//		    while (node_sv && skip--) node_sv = node_sv->next;
+//		
+//		    // ===== Thông tin l?p =====
+//		    cout << endl;
+//		    SetColor(10, 0);
+//		    cout << "Ma lop: " << lopsv->MALOP
+//		         << "    Ten lop: " << lopsv->TENLOP << endl;
+//		    SetColor(7, 0);
+//		
+//		    // ===== Khung b?ng =====
+//		    const int khungW = 65;
+//		    textColor(14);
+//		
+//		    cout << "+" << string(khungW, '-') << "+\n";
+//		    cout << "|"
+//		         << center("STT", 5)        << "|"
+//		         << center("MASV", 12)      << "|"
+//		         << center("HO", 20)        << "|"
+//		         << center("TEN", 12)       << "|"
+//		         << center("DIEM TB", 10)   << "  |\n";
+//		    cout << "|" << string(khungW, '-') << "|\n";
+//		
+//		    // ===== In d? li?u =====
+//		    while (node_sv && printedRows < ROWS_PER_PAGE) {
+//		    	// ===== CALCULATE DTB ======
+//		    	string dtb;
+//				dtb = score_tinhDTB(node_sv->sv.MASV);
+//				
+//		        cout << "|"
+//		             << center(to_string(stt++), 5) << "|"
+//		             << center(node_sv->sv.MASV, 12)     << "|"
+//		             << center(node_sv->sv.HO, 20)       << "|"
+//		             << center(node_sv->sv.TEN, 12)      << "|"
+//		             << center(dtb, 10)             
+//		             << "  |\n";
+//		
+//		        node_sv = node_sv->next;
+//		        printedRows++;
+//		    }
+//		
+//		    // ===== Bù dòng tr?ng =====
+//		    for (int i = printedRows; i < ROWS_PER_PAGE; i++) {
+//		        cout << "|"
+//		             << center("", 5)  << "|"
+//		             << center("", 12) << "|"
+//		             << center("", 20) << "|"
+//		             << center("", 12) << "|"
+//		             << center("", 10) << "  |\n";
+//		    }
+//		
+//		    cout << "+" << string(khungW, '-') << "+\n\n";
+//		    textColor(7);
+//		
+//		    // ===== Ði?u hu?ng + thoát =====
+//		    drawPagination(currentPage, totalPages, 8, 24);
+//		    gotoxy(8, 22);
+//		    SetColor(12, 15); cout << " ESC "; SetColor(7, 0); cout << ": Exit ";
+//		
+//		    int key = _getch();
+//		    if (key == 224) {
+//		        key = _getch();
+//		        if (key == 72 && currentPage > 1) currentPage--;
+//		        else if (key == 80 && currentPage < totalPages) currentPage++;
+//		    }
+//		    if (key == 27) break;
+//		}
+//	}
+
+	void drawPage(
+	    LopSV* lop,
+	    SinhVien dsSV[], int soSV,
+	    string dsMon[], int soMon,
+	    float bangDiem[][100],
+	    int start, int end
+	) {
+		const int ROWS_PER_PAGE = 15;
+	    system("cls");
+	    string temp = "BANG DIEM TONG KET ___";
+	    drawHeader(temp);
+	
+	    cout << "\nMa lop: " << lop->MALOP
+	         << "    Ten lop: " << lop->TENLOP << "\n\n";
+	
+	    // ===== TÍNH CHI?U R?NG KHUNG =====
+	    const int colSTT = 5;
+	    const int colMASV = 12;
+	    const int colHO = 20;
+	    const int colTEN = 12;
+	    const int colMON = 8;
+	
+	    int khungW =
+	        colSTT + colMASV + colHO + colTEN +
+	        soMon * colMON +
+	        (4 + soMon) * 1; // s? d?u '|'
+	
+	    textColor(14);
+	
+	    // ===== HEADER KHUNG =====
+	    cout << "+" << string(khungW - 1, '-') << "+\n";
+	    cout << "|"
+	         << center("STT", colSTT)  << "|"
+	         << center("MASV", colMASV) << "|"
+	         << center("HO", colHO)    << "|"
+	         << center("TEN", colTEN);
+	
+	    for (int j = 0; j < soMon; j++)
+	        cout << "|" << center(dsMon[j], colMON);
+	
+	    cout << "|\n";
+	    cout << "|" << string(khungW - 1, '-') << "|\n";
+	
+	    // ===== D? LI?U =====
+	    int printedRows = 0;
+	    int stt = start + 1;
+	
+	    for (int i = start; i < end; i++) {
+	        cout << "|"
+	             << center(to_string(stt++), colSTT) << "|"
+	             << center(dsSV[i].MASV, colMASV)    << "|"
+	             << center(dsSV[i].HO, colHO)        << "|"
+	             << center(dsSV[i].TEN, colTEN);
+	
+	        for (int j = 0; j < soMon; j++) {
+	            if (bangDiem[i][j] >= 0) {
+	                ostringstream oss;
+	                oss << fixed << setprecision(1) << bangDiem[i][j];
+	                cout << "|" << center(oss.str(), colMON);
+	            } else {
+	                cout << "|" << center("-", colMON);
+	            }
+	        }
+	
+	        cout << "|\n";
+	        printedRows++;
+	    }
+	
+	    // ===== BÙ DÒNG TR?NG =====
+	    for (int i = printedRows; i < ROWS_PER_PAGE; i++) {
+	        cout << "|"
+	             << center("", colSTT)  << "|"
+	             << center("", colMASV) << "|"
+	             << center("", colHO)   << "|"
+	             << center("", colTEN);
+	
+	        for (int j = 0; j < soMon; j++)
+	            cout << "|" << center("", colMON);
+	
+	        cout << "|\n";
+	    }
+	
+	    cout << "+" << string(khungW - 1, '-') << "+\n\n";
+	    textColor(7);
+	}
+
+
+	
+	void navigate(
+	    LopSV* lop,
+	    SinhVien dsSV[], int soSV,
+	    string dsMon[], int soMon,
+	    float bangDiem[][100]
+	) {
+	    const int ROWS = 15;
+	    int totalPage = (soSV + ROWS - 1) / ROWS;
+	    int page = 1;
+	
+	    while (true) {
+	        int start = (page - 1) * ROWS;
+	        int end   = min(start + ROWS, soSV);
+	
+	        drawPage(lop, dsSV, soSV, dsMon, soMon, bangDiem, start, end);
+	
+	        drawPagination(page, totalPage, 8, 24);
+	        gotoxy(8, 22);
+	        SetColor(12, 15); cout << " ESC "; SetColor(7, 0); cout << ": Exit ";
+	
+	        int key = _getch();
+	        if (key == 224) {
+	            key = _getch();
+	            if (key == 72 && page > 1) page--;
+	            if (key == 80 && page < totalPage) page++;
+	        }
+	        if (key == 27) break;
+	    }
+	}
+	
+	void score_print_bangdiemtongket(LopSV*& lop) {
+	    if (!lop || !lop->FirstSV) return;
+					
+	    SinhVien dsSV[200];
+	    string dsMon[100];
+	    float bangDiem[200][100];
+	
+	    int soSV  = collectSV(lop, dsSV);
+	    int soMon = collectMon(dsSV, soSV, dsMon);
+	    if (soMon == 0) return;
+	
+	    buildBangDiem(dsSV, soSV, dsMon, soMon, bangDiem);
+	    score_Border_maker::navigate(lop, dsSV, soSV, dsMon, soMon, bangDiem);
+	}
+
+}//namespace 
 
 namespace ltc_Border_Maker{
 	

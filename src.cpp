@@ -834,7 +834,6 @@ void ltc_load_from_file(const string& filename) {
     fin.close();
     current_id = max_id + 1;
 
-    cout << "Da tai " << filename << " thanh cong (khong dung vector, co DSDK)!\n";
 }
 
 LopTinChi* ltc_find(const std::string& nk, int hk, int nhom, const std::string& mamh) {
@@ -1416,10 +1415,23 @@ void dsdk_ltc_print(LopTinChi* p, DS_LOPSV* dsLopSV) {
         cout << "\nLop nay hien khong co sinh vien dang ky!\n";
         return;
     }
-
-    cout << "\n===== DANH SACH SINH VIEN DANG KY LOP " << p->MALOPTC << " =====\n";
-    cout << "        | STT | MASV       | HO TEN                  | DIEM  | TT     \n";
-    cout << "        |-----|------------|-------------------------|-------|--------\n";
+	cout << "\n";
+	cout << setw(31) << "";
+	setBGColor(14, 4);
+    cout << "DANH SACH SINH VIEN DANG KY LOP " << p->MALOPTC << " \n";
+    setBGColor(0, 7);
+    cout << endl;
+    textColor(14);
+    cout << "+" << string(63, '-') << "+\n";
+//    cout << "        | STT | MASV       | HO TEN                  | DIEM  | TT     \n";
+//    cout << "        |-----|------------|-------------------------|-------|--------\n";
+	cout<< "|" << center("STT", 5)
+		<< "|" << center("MASV", 12) 
+		<< "|" << center("HO TEN", 24)
+		<< "|" << center("DIEM", 6)
+		<< "|" << center("TRANG THAI", 12)
+		<< "|\n";
+	cout<< "|" << string(63, '-') << "|\n";
 
     int stt = 0;
 
@@ -1446,14 +1458,19 @@ void dsdk_ltc_print(LopTinChi* p, DS_LOPSV* dsLopSV) {
         string hoten = ho + " " + ten;
         if (hoten.length() > 23) hoten = hoten.substr(0, 20) + "...";
 
-        cout << "        | "
-             << setw(3)  << left << stt
-             << "| " << setw(10) << dk->MASV
-             << "| " << setw(23) << hoten
-             << "| " << setw(5)  << (dk->DIEM < 0 ? "Chua" : to_string((int)dk->DIEM))
-             << "| " << (dk->HUYDK ? "Huy" : "OK")
-             << "\n";
+        cout << "|";
+		textColor(12);
+	    cout << center(to_string(stt), 5);
+	    textColor(14);
+//             << setw(3)  << left << stt
+		cout << "| " << center(dk->MASV,11)
+             << "| " << center(hoten,23)
+             << "| " << center((dk->DIEM < 0 ? "Chua" : to_string((int)dk->DIEM)),5)
+             << "| " << 
+			 center((dk->HUYDK ? "Huy" : "OK"),11)
+             << "|\n";
     }
+    cout << "+" << string(63, '-') << "+\n";
 }
 
 
@@ -1527,15 +1544,30 @@ void ltc_1_1() {
 
 void ltc_1_2() {
     int id;
+    cout << "\n\n";
+    textColor(10);
     cout << "Nhap ma lop can xoa: ";
+    textColor(7);
     cin >> id; 
-    cin.ignore();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     if (QuanLyDiem::ltc_remove_by_id(id)) {
+    	textColor(10);
         cout << "Da xoa.\n";
+        textColor(7);
         QuanLyDiem::ltc_save_to_file("loptinchi.txt");
-    } else {
+    } 
+    else if (cin.fail()) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        textColor(10);
+        cout << "Ma lop khong hop le!\n";
+        textColor(7);
+    }
+    else {
+    	textColor(10);
         cout << "Khong tim thay hoac lop co dang ky.\n";
+        textColor(7);
     }
 
     system("pause");
@@ -1593,10 +1625,8 @@ void ltc_1_3() {
 }
 
 void ltc_2() {
-    system("cls");
 
     QuanLyDiem::ltc_load_from_file("loptinchi.txt");
-    ltc_Border_Maker::ltc_print_all();
 
     cout << "Nhap ma lop: ";
     int ma;

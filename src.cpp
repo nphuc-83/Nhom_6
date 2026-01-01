@@ -132,10 +132,14 @@ treeMH mh_find_by_name(treeMH root, const string& tenmh) {
 void mh_inorder_print(treeMH root) {
     if (!root) return;
     mh_inorder_print(root->left);
-    cout << left << setw(12) << root->mh.MAMH
-         << setw(50) << root->mh.TENMH
-         << setw(6) << root->mh.STCLT
-         << setw(6) << root->mh.STCTH << "\n";
+    textColor(14);
+    cout << "|"
+         << center(root->mh.MAMH, 12)
+         << "|" << center(root->mh.TENMH, 45)
+         << "|" << center(to_string(root->mh.STCLT), 6)
+         << "|" << center(to_string(root->mh.STCTH), 6)
+         << "|\n";
+
     mh_inorder_print(root->right);
 }
 

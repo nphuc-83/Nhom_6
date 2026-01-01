@@ -19,7 +19,54 @@ int QuanliLopSinhVien();
 int QuanLySinhVienTrongLopSV_UI();
 int QuanliDangKySinhVien();
 
+namespace main_UI {
 
+    // ===== Console utils =====
+    void SetColor(int text, int bg);
+    void gotoxy(int x, int y);
+    void hideCursor();
+    void clearLine(int y, int startX, int width);
+
+    // ===== Header =====
+    void drawHeader(string& tieude);
+
+    // ===== Menu items =====
+    void drawMainMenuItem(const Menu& menu, int index, bool isSelected);
+    void drawSubMenuItem(const string& option, int index, bool isSelected);
+
+    // ===== Menu render =====
+    void drawMainMenu(const vector<Menu>& menus, int current);
+    void drawSubMenu(const Menu& m, int current);
+
+    // ===== Buttons & hints =====
+    void drawFunctionButtons();
+    void clearSubMenuArea();
+    void drawEscHint(bool show);
+
+    // ===== Main menu controller =====
+    int QuanLiChucNang();
+}
+namespace mh_Border_Maker {
+
+    // ===== Console utilities =====
+    void SetColor(int text, int bg);
+    void textColor(int color);
+    void gotoxy(int x, int y);
+
+    // ===== String helpers =====
+    std::string center(const std::string& s, int width);
+
+    // ===== UI components =====
+    void drawFunctionButtons(int x, int y);
+    void drawPagination(int currentPage, int totalPages, int x, int y);
+
+    // ===== Main table =====
+    // return:
+    // 0 = EXIT
+    // 1 = ADD
+    // 2 = DELETE
+    int mh_table(QuanLyDiem::treeMH rootMonHoc);
+}
 namespace dk_UIPopup {
 
     // ===== Console utils =====

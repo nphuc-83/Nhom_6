@@ -125,7 +125,7 @@ treeMH mh_remove(treeMH root, const string& mamh);
 treeMH mh_find(treeMH root, const string& mamh);
 treeMH mh_find_by_name(treeMH root, const std::string& tenmh);
 
-void mh_inorder_print(treeMH root);
+void mh_inorder_collect(treeMH root, treeMH* arr, int& count);
 void mh_clear(treeMH root);
 bool mh_edit(const string& mamh, const string& tenmh, int stclt, int stcth);
 bool mh_is_used_in_loptc(const string& mamh);

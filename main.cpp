@@ -15,7 +15,7 @@ int main() {
     ltc_load_from_file("loptinchi.txt");
 
     while (true) {
-        int choice = QuanLiChucNang();  // Ch? tr? v? mã ch?n
+        int choice = main_UI::QuanLiChucNang();  // Ch? tr? v? mã ch?n
         if (choice == 0) break;
 
         int mainMenu = choice / 10;      // 1 d?n 6
@@ -29,7 +29,47 @@ int main() {
             }
         }
         else if (mainMenu == 2) { // Quan Ly Mon Hoc
-            if (subMenu == 1) QuanLiMonHoc();
+            if (subMenu == 1) {
+            	int menu_choice = mh_Border_Maker::mh_table(rootMonHoc);
+            	switch (menu_choice) {
+		            case 1:
+					    mh_1();
+					    system("cls");
+					    mh_Border_Maker::mh_table(rootMonHoc);
+					    cout << "\n>> Da them mon hoc thanh cong!";
+					    system("pause");
+					    break;
+
+					
+					case 2: {
+					    mh_2();
+					    system("cls");
+					    mh_Border_Maker::mh_table(rootMonHoc);
+					    cout << "\n>> Xoa mon hoc thanh cong!";
+					    system("pause");
+					    break;
+					}
+					
+					case 3: {
+					    mh_3();
+					    system("cls");
+					    mh_Border_Maker::mh_table(rootMonHoc);
+					    cout << "\n>> Dieu Chinh mon hoc thanh cong!";
+					    system("pause");
+					    break;
+					}
+
+		            case 0:
+		                cout << "Quay lai menu chinh...\n";
+		                system("pause");
+		                subMenu = 0;
+		                break;
+		            default:
+		                cout << "Lua chon khong hop le!\n";
+		                system("pause");
+		        }
+            	
+			}
             else if (subMenu == 2) {
                 mh_4();
                 cout << "\nNhan phim bat ky de quay lai...";
@@ -39,10 +79,10 @@ int main() {
         else if (mainMenu == 3) { // Quan Ly Sinh Vien
             if (subMenu == 1) {
                 // quan li lop sv 
-                    QuanliLopSinhVien();
+//                    QuanliLopSinhVien();
             }else if (subMenu == 2) {
                 // quan li sv trong lopsv 
-                    QuanLySinhVienTrongLopSV_UI();
+//                    QuanLySinhVienTrongLopSV_UI();
                      }
         }
         else if (mainMenu == 4) { // Quan Ly Dang Ki

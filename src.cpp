@@ -129,18 +129,12 @@ treeMH mh_find_by_name(treeMH root, const string& tenmh) {
 }
 
 // ---- Duy?t in LNR ----
-void mh_inorder_print(treeMH root) {
+void mh_inorder_collect(treeMH root, treeMH* arr, int& count) {
     if (!root) return;
-    mh_inorder_print(root->left);
-    textColor(14);
-    cout << "|"
-         << center(root->mh.MAMH, 12)
-         << "|" << center(root->mh.TENMH, 45)
-         << "|" << center(to_string(root->mh.STCLT), 6)
-         << "|" << center(to_string(root->mh.STCTH), 6)
-         << "|\n";
 
-    mh_inorder_print(root->right);
+    mh_inorder_collect(root->left, arr, count);
+    arr[count++] = root;
+    mh_inorder_collect(root->right, arr, count);
 }
 
 // ---- Gi?i phóng cây ----
@@ -277,33 +271,7 @@ void mh_load_from_file(const string& filename) {
     fin.close();
     cout << "Da tai du lieu tu file thanh cong!\n";
 }
-void mh_print_all() {
-	cout << "\n";
-    cout << setw(22) << "";
-    setBGColor(14, 4);   
-	cout << " DANH SACH MON HOC HIEN CO \n";
-    setBGColor(0, 7);  // black console, white text
-    cout << endl;
-    if (!rootMonHoc) {
-        cout << "(Danh sach trong)\n";
-        cout << string(90, '=') << "\n\n";
-        return;
-    }
-    textColor(14); // vàng
-    cout << "+" << string(72, '-') << "+\n";
-    cout << "|"
-         << center("MA MH", 12)
-         << "|" << center("TEN MON HOC", 45)
-         << "|" << center("LT", 6)
-         << "|" << center("TH", 6)
-         << "|\n";
-    cout << "|" << string(72, '-') << "|\n";
-    textColor(7);
-    mh_inorder_print(rootMonHoc);
-    textColor(14); // vàng
-    cout << "+" << string(72, '-') << "+\n\n";
-    textColor(7); // reset
-}
+
 // ==================== SINH VIÊN ====================
 
 
@@ -1015,56 +983,6 @@ string score_tinhDTB(const string& masv) {
 }
 
 
-// IN B?NG ÐI?M CAO NH?T THEO MÔN C?A L?P THU?NG
-//void score_inBangDiemMonCaoNhatLopThuong() {
-//    if (!lop || !lop->FirstSV) {
-//            cout << "Khong tim thay lop hoac lop chua co sinh vien!\n";
-//            system("pause");
-//            return;
-//        }
-//
-//        // Thu th?p t?t c? sinh viên trong l?p (s?p x?p theo MASV)
-//        vector<SinhVien> dsSV;
-//        for (PTRSV p = lop->FirstSV; p; p = p->next) {
-//            dsSV.push_back(p->sv);
-//        }
-//        sort(dsSV.begin(), dsSV.end(), [](const SinhVien& a, const SinhVien& b) {
-//            return a.MASV < b.MASV;
-//        });
-//
-//        // Thu th?p t?t c? môn unique mà có SV trong l?p h?c (không h?y, có di?m)
-//        set<string> dsMon;
-//        for (LopTinChi* ltc = dsLopTC; ltc; ltc = ltc->next) {
-//            if (ltc->HUYLOP) continue;
-//            
-//            for (DangKy* dk = ltc->DSDK; dk; dk = dk->next) {
-//                if (!dk->HUYDK && dk->DIEM >= 0.0f) {
-//                    // Ki?m tra MASV có trong l?p không
-//                    bool inLop = false;
-//                    for (const auto& sv : dsSV) {
-//                        if (sv.MASV == dk->MASV) {
-//                            inLop = true;
-//                            break;
-//                        }
-//                    }
-//                    if (inLop) {
-//                        dsMon.insert(ltc->MAMH);
-//                    }
-//                }
-//            }
-//        }
-//
-//        if (dsMon.empty()) {
-//            cout << "Lop chua co sinh vien hoc mon nao!\n";
-//            system("pause");
-//            return;
-//        }
-//
-//        vector<string> monList(dsMon.begin(), dsMon.end());
-//}
-
-
-
 int collectSV(LopSV* lop, SinhVien dsSV[]) {
     int n = 0;
     for (PTRSV p = lop->FirstSV; p; p = p->next)
@@ -1651,99 +1569,94 @@ void ltc_2() {
 }
 
 void mh_1() {
-    system("cls");
     QuanLyDiem::mh_load_from_file("monhoc.txt");
-    cout << "======= QUAN LI MON HOC =======\n";
+	cout << endl;
     string MAMH, TENMH;
     int STCLT, STCTH;
-    QuanLyDiem::mh_print_all();
+
     MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc: ");
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     TENMH = checkTen("Vui long nhap ten Mon Hoc: ");
     STCLT = nhapSTC("so tin chi ly thuyet");
     STCTH = nhapSTC("so tin chi thuc hanh");
+
     QuanLyDiem::treeMH node = new QuanLyDiem::nodeMH;
-    node->mh.MAMH = MAMH;
+    node->mh.MAMH  = MAMH;
     node->mh.TENMH = TENMH;
     node->mh.STCLT = STCLT;
     node->mh.STCTH = STCTH;
     node->mh.height = 1;
     node->left = nullptr;
     node->right = nullptr;
-    // Chèn vào cây AVL
-    QuanLyDiem::rootMonHoc = QuanLyDiem::mh_insert(QuanLyDiem::rootMonHoc, node);    
+
+    QuanLyDiem::rootMonHoc =
+        QuanLyDiem::mh_insert(QuanLyDiem::rootMonHoc, node);
+
     QuanLyDiem::mh_save_to_file("monhoc.txt");
-    system("cls");
-    QuanLyDiem::mh_print_all();
-    cout << ">> Da them mon hoc thanh cong!\n";
-    system("pause");
 }
+
 
 void mh_2() {
-	system("cls");
-	QuanLyDiem::mh_load_from_file("monhoc.txt");
-	QuanLyDiem::ltc_load_from_file("loptinchi.txt");
-    string MAMH;
-    QuanLyDiem::mh_print_all();
-    MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc can xoa: ");
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    // ktra mon hoc co ton tai khong 
-    if (QuanLyDiem::mh_find(QuanLyDiem::rootMonHoc, MAMH) == nullptr) {
-        cout << "\n>> Loi: Khong tim thay mon hoc co ma '" << MAMH << "'!\n";
-        system("pause");
+    QuanLyDiem::mh_load_from_file("monhoc.txt");
+    QuanLyDiem::ltc_load_from_file("loptinchi.txt");
+	cout << endl;
+    string MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc can xoa: ");
+
+    if (!QuanLyDiem::mh_find(QuanLyDiem::rootMonHoc, MAMH)) {
+        cout << ">> Khong tim thay mon hoc!\n";
         return;
     }
-    //  XAC NHAN XOA
-    cout << "\n>> Xac nhan xoa mon hoc '" << MAMH << "'? (Y/N): ";
-    char confirm;
-    cin >> confirm;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    if (confirm != 'Y' && confirm != 'y') {
-        cout << ">> Da huy thao tac xoa.\n";
-        system("pause");
-        return;
-    }
-    //ktra mon hoc co dang duoc su dung hay khong  
+
     if (QuanLyDiem::mh_is_used_in_loptc(MAMH)) {
-        cout << "\n>> Loi: Khong the xoa!\n";
-        cout << "   Mon hoc '" << MAMH << "' dang duoc su dung trong cac lop tin chi.\n";
-        cout << "   Vui long xoa cac lop tin chi lien quan truoc!\n";
-        system("pause");
+        cout << ">> Mon hoc dang duoc su dung, khong the xoa!\n";
         return;
     }
-    QuanLyDiem::rootMonHoc = QuanLyDiem::mh_remove(QuanLyDiem::rootMonHoc, MAMH);
+
+    cout << ">> Xac nhan xoa '" << MAMH << "' (Y/N): ";
+    char c;
+    cin >> c;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    if (c != 'Y' && c != 'y') {
+        cout << ">> Da huy thao tac.\n";
+        return;
+    }
+
+    QuanLyDiem::rootMonHoc =
+        QuanLyDiem::mh_remove(QuanLyDiem::rootMonHoc, MAMH);
+
     QuanLyDiem::mh_save_to_file("monhoc.txt");
-    cout << ">> Da xoa mon hoc (neu ton tai)!\n";
-    QuanLyDiem::mh_print_all();
-    system("pause");
+    cout << ">> Da xoa mon hoc thanh cong!\n";
 }
 
+
+
 void mh_3() {
-	system("cls");
-	QuanLyDiem::mh_load_from_file("monhoc.txt");
+    QuanLyDiem::mh_load_from_file("monhoc.txt");
+	cout << endl;
     string MAMH, TENMH;
     int STCLT, STCTH;
-    QuanLyDiem::mh_print_all();
-    cout << "Vui long nhap ma mon hoc can chinh sua: ";
-    MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc: ");
-    cout << "Vui long nhap ten mon hoc moi: ";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    MAMH  = checkMa(10, "Vui long nhap Ma Mon Hoc can chinh sua: ");
     TENMH = checkTen("Vui long nhap ten Mon Hoc moi: ");
-    STCLT = nhapSTC("Vui long nhap lai so tin chi ly thuyet");
-    STCTH = nhapSTC("Vui long nhap lai so tin chi thuc hanh");
-    if (QuanLyDiem::mh_edit(MAMH, TENMH, STCLT, STCTH)) {
-    	QuanLyDiem::mh_save_to_file("monhoc.txt");
-        cout << ">> Da chinh sua mon hoc thanh cong!\n";
-    } else {
+    STCLT = nhapSTC("Nhap so tin chi ly thuyet moi");
+    STCTH = nhapSTC("Nhap so tin chi thuc hanh moi");
+
+    if (!QuanLyDiem::mh_edit(MAMH, TENMH, STCLT, STCTH)) {
         cout << ">> Khong tim thay mon hoc!\n";
+        return;
     }
-    system("pause");
+
+    QuanLyDiem::mh_save_to_file("monhoc.txt");
+    cout << ">> Da chinh sua mon hoc thanh cong!\n";
 }
+
+
 
 void mh_4() {
 	system("cls");
 	QuanLyDiem::mh_load_from_file("monhoc.txt");
-    QuanLyDiem::mh_print_all();
+    mh_Border_Maker::mh_table(rootMonHoc);
     system("pause");
 }
 

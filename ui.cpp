@@ -13,6 +13,9 @@
 using namespace QuanLyDiem;
 
 // ==================== CÁC HÀM V? GIAO DI?N ====================
+namespace main_UI {
+
+// ==================== TI?N ÍCH CONSOLE ====================
 
 void SetColor(int text, int bg) {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -34,27 +37,30 @@ void hideCursor() {
 
 void clearLine(int y, int startX, int width) {
     gotoxy(startX, y);
-    for(int i = 0; i < width; i++) cout << " ";
+    for (int i = 0; i < width; i++) cout << " ";
 }
+
+// ==================== HEADER ====================
 
 void drawHeader(string& tieude) {
     SetColor(12, 14);
-    int len1 = 13;
+
     int startX1 = 33;
     gotoxy(startX1, 0);
-    for(int i = 0; i < len1 + 7; i++) cout << " ";
+    for (int i = 0; i < 20; i++) cout << " ";
     gotoxy(startX1 + 4, 0);
     cout << "DO AN - DE 2";
 
-    int len2 = 44;
     int startX2 = 18;
     gotoxy(startX2, 1);
-    for(int i = 0; i < len2 + 10; i++) cout << " ";
+    for (int i = 0; i < 54; i++) cout << " ";
     gotoxy(startX2 + 4, 1);
     cout << tieude;
 
     SetColor(7, 0);
 }
+
+// ==================== MENU ITEM ====================
 
 void drawMainMenuItem(const Menu& menu, int index, bool isSelected) {
     int startY = 4;
@@ -68,9 +74,9 @@ void drawMainMenuItem(const Menu& menu, int index, bool isSelected) {
     if (isSelected) SetColor(12, 14);
     else SetColor(0, 15);
 
-    for(int row = 0; row < itemHeight; row++) {
+    for (int row = 0; row < itemHeight; row++) {
         gotoxy(leftMargin, y + row);
-        for(int col = 0; col < itemWidth; col++) cout << " ";
+        for (int col = 0; col < itemWidth; col++) cout << " ";
     }
 
     gotoxy(leftMargin + 1, y + 1);
@@ -91,9 +97,9 @@ void drawSubMenuItem(const string& option, int index, bool isSelected) {
     if (isSelected) SetColor(12, 14);
     else SetColor(12, 15);
 
-    for(int row = 0; row < itemHeight; row++) {
+    for (int row = 0; row < itemHeight; row++) {
         gotoxy(startX, y + row);
-        for(int col = 0; col < itemWidth; col++) cout << " ";
+        for (int col = 0; col < itemWidth; col++) cout << " ";
     }
 
     gotoxy(startX + 2, y + 1);
@@ -102,17 +108,17 @@ void drawSubMenuItem(const string& option, int index, bool isSelected) {
     SetColor(7, 0);
 }
 
+// ==================== MENU V? ====================
+
 void drawMainMenu(const vector<Menu>& menus, int current) {
     int startY = 4;
-    int itemWidth = 28;
     int itemHeight = 3;
     int spacing = 1;
-    int leftMargin = 2;
 
     SetColor(7, 0);
-    for(int y = startY; y < startY + (int)menus.size() * (itemHeight + spacing) + 2; y++) {
+    for (int y = startY; y < startY + (int)menus.size() * (itemHeight + spacing) + 2; y++) {
         gotoxy(0, y);
-        for(int x = 0; x < 32; x++) cout << " ";
+        for (int x = 0; x < 32; x++) cout << " ";
     }
 
     for (int i = 0; i < (int)menus.size(); i++) {
@@ -123,69 +129,43 @@ void drawMainMenu(const vector<Menu>& menus, int current) {
 void drawSubMenu(const Menu& m, int current) {
     if (m.options.empty()) return;
 
-    int startX = 38;
     int startY = 4;
-    int itemWidth = 45;
     int itemHeight = 3;
     int spacing = 1;
 
     SetColor(7, 0);
-    for(int y = startY; y < startY + (int)m.options.size() * (itemHeight + spacing) + 2; y++) {
+    for (int y = startY; y < startY + (int)m.options.size() * (itemHeight + spacing) + 2; y++) {
         gotoxy(35, y);
-        for(int x = 0; x < 50; x++) cout << " ";
+        for (int x = 0; x < 50; x++) cout << " ";
     }
 
     for (int i = 0; i < (int)m.options.size(); i++) {
         drawSubMenuItem(m.options[i], i, i == current);
     }
-
-    SetColor(7, 0);
 }
 
-void drawButton(int x, int y, const string& key, const string& text) {
-    SetColor(12, 15);
-    gotoxy(x, y);
-    cout << " " << key << " ";
-
-    SetColor(7, 0);
-    cout << ": " << text << " ";
-}
+// ==================== PH? TR? ====================
 
 void drawFunctionButtons() {
-	int gap = 18;
-	int x = 5;
-	int y = 22;
-    // A - ADD
-    SetColor(12, 15);
-    gotoxy(x, y);
-    cout << " A ";
-    SetColor(7, 0);
-    cout << ": ADD  ";
+    int gap = 18;
+    int x = 5;
+    int y = 22;
 
-    // D - DELETE
     SetColor(12, 15);
-    gotoxy(x + gap, y);
-    cout << " D ";
-    SetColor(7, 0);
-    cout << ": DELETE  ";
+    gotoxy(x, y);           cout << " A ";
+    gotoxy(x + gap, y);     cout << " D ";
+    gotoxy(x + 2*gap, y);   cout << " E ";
+    gotoxy(x + 3*gap, y);   cout << " ESC ";
 
-    // E - EDIT
-    SetColor(12, 15);
-    gotoxy(x + 2*gap, y);
-    cout << " E ";
     SetColor(7, 0);
-    cout << ": EDIT  ";
-
-    // ESC - EXIT
-    SetColor(12, 15);
-    gotoxy(x + 3*gap, y);
-    cout << " ESC ";
-    SetColor(7, 0);
-    cout << ": EXIT";
+    gotoxy(x + 3, y);           cout << ": ADD  ";
+    gotoxy(x + gap + 3, y);     cout << ": DELETE  ";
+    gotoxy(x + 2*gap + 3, y);   cout << ": EDIT  ";
+    gotoxy(x + 3*gap + 5, y);   cout << ": EXIT";
 }
 
 void clearSubMenuArea() {
-    for(int y = 4; y < 30; y++) {
+    for (int y = 4; y < 30; y++) {
         clearLine(y, 35, 50);
     }
 }
@@ -196,7 +176,7 @@ void drawEscHint(bool show) {
         SetColor(8, 0);
         cout << "(Nhan ESC de quay lai menu chinh)";
     } else {
-        for(int i = 0; i < 40; i++) cout << " ";
+        for (int i = 0; i < 40; i++) cout << " ";
     }
     SetColor(7, 0);
 }
@@ -221,348 +201,419 @@ int QuanLiChucNang() {
         {"Thoat", {}}
     };
 
-    int currentMain = 0;
-    int oldMain = -1;
-    bool inSubMenu = false;
-    bool wasInSubMenu = false;
-    int currentSub = 0;
-    int oldSub = -1;
+    int currentMain = 0, oldMain = -1;
+    bool inSubMenu = false, wasInSubMenu = false;
+    int currentSub = 0, oldSub = -1;
 
     system("cls");
-    string temp = "CHUONG TRINH QUAN LY SINH VIEN THEO HE TIN CHI";
-    drawHeader(temp);
+    string title = "CHUONG TRINH QUAN LY SINH VIEN THEO HE TIN CHI";
+    drawHeader(title);
     drawMainMenu(menus, currentMain);
-    oldMain = currentMain;
 
     while (true) {
-        // C?p nh?t ch? khi có thay d?i
         if (oldMain != currentMain) {
-            drawMainMenuItem(menus[oldMain], oldMain, false);
-            drawMainMenuItem(menus[currentMain], currentMain, true);
-            oldMain = currentMain;
-        }
+		    if (oldMain >= 0)
+		        drawMainMenuItem(menus[oldMain], oldMain, false);
 		
-		// Xu ly submenu
+		    drawMainMenuItem(menus[currentMain], currentMain, true);
+		    oldMain = currentMain;
+		}
+
+
         if (inSubMenu && !wasInSubMenu) {
             drawSubMenu(menus[currentMain], currentSub);
             drawEscHint(true);
             oldSub = currentSub;
         } else if (inSubMenu && oldSub != currentSub) {
-            drawSubMenuItem(menus[currentMain].options[oldSub], oldSub, false);
-            drawSubMenuItem(menus[currentMain].options[currentSub], currentSub, true);
-            oldSub = currentSub;
-        } else if (!inSubMenu && wasInSubMenu) {
+		    if (oldSub >= 0)
+		        drawSubMenuItem(menus[currentMain].options[oldSub], oldSub, false);
+		
+		    drawSubMenuItem(menus[currentMain].options[currentSub], currentSub, true);
+		    oldSub = currentSub;
+		} else if (!inSubMenu && wasInSubMenu) {
             clearSubMenuArea();
             drawEscHint(false);
         }
 
         wasInSubMenu = inSubMenu;
-		
-		// Xu ly phim 
-		/*
-		72 = key up
-		80 = key down
-		13 = key enter
-		*/
+
         int key = _getch();
         if (key == 224) {
             key = _getch();
             if (!inSubMenu) {
                 if (key == 72) currentMain = (currentMain - 1 + menus.size()) % menus.size();
-                else if (key == 80) currentMain = (currentMain + 1) % menus.size();	
+                else if (key == 80) currentMain = (currentMain + 1) % menus.size();
             } else {
-                int optSize = menus[currentMain].options.size();
-                if (key == 72) currentSub = (currentSub - 1 + optSize) % optSize;	
-                else if (key == 80) currentSub = (currentSub + 1) % optSize;
+                int n = menus[currentMain].options.size();
+                if (key == 72) currentSub = (currentSub - 1 + n) % n;
+                else if (key == 80) currentSub = (currentSub + 1) % n;
             }
-        } else if (key == 13) { 
-		    if (!inSubMenu) {
-		        if (currentMain == 5) { // Thoát
-		            system("cls");
-		            gotoxy(35, 10);
-		            SetColor(14, 0);
-		            cout << "Thoat chuong trinh...";
-		            SetColor(7, 0);
-		            Sleep(1000);
-		            return 0;
-		        }
-		
-		        // N?u menu chính có submenu thì vào submenu, không return ngay
-		        if (!menus[currentMain].options.empty()) {
-		            inSubMenu = true;
-		            currentSub = 0; // m?c d?nh ch?n m?c d?u
-		        } else {
-		            // Menu chính không có submenu ? return luôn
-		            return (currentMain + 1) * 10;
-		        }
-		    } else {
-		        // Ðang ? submenu ? return giá tr? submenu
-		        return (currentMain + 1) * 10 + (currentSub + 1);
-		    }
+        } else if (key == 13) {
+            if (!inSubMenu) {
+                if (currentMain == 5) return 0;
+                if (!menus[currentMain].options.empty()) {
+                    inSubMenu = true;
+                    currentSub = 0;
+                }
+            } else {
+                return (currentMain + 1) * 10 + (currentSub + 1);
+            }
+        } else if (key == 27 && inSubMenu) {
+		    inSubMenu = false;
+		    oldSub = -1;
 		}
-		else if (key == 27 && inSubMenu) {
-		        inSubMenu = false;
-		    }
-		}
-
-    return 0;
-}
-
-// ==================== CAC HAM CHUC NANG KHAC ====================
-//    =====QUAN LI MON HOC ==== 
-int QuanLiMonHoc() {
-    while (true) {
-        system("cls");
-        QuanLyDiem::mh_load_from_file("monhoc.txt");
-        cout << "======= QUAN LI MON HOC =======\n";
-        QuanLyDiem::mh_print_all();
-        
-        gotoxy(5, 24);
-        SetColor(11, 0);
-        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
-        
-        SetColor(7, 0);
-        drawFunctionButtons();
-
-        int key = _getch();
-        if (key == 27) break;
-        if (key >= 'a' && key <= 'z') key -= 32;
-
-        bool validKey = false;
-        switch (key) {
-            case 'A': validKey = true; system("cls"); mh_1(); break;
-            case 'D': validKey = true; system("cls"); mh_2(); break;
-            case 'E': validKey = true; system("cls"); mh_3(); break;
-        }
-        if (!validKey && key != 27) {
-            gotoxy(5, 26);
-            SetColor(12, 0);
-            cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
-            SetColor(7, 0);
-            Sleep(1000);
-        }
     }
-    return 0;
 }
+
+} // namespace main_UI
+
+namespace mh_Border_Maker {
+	void SetColor(int text, int bg) {
+	    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	    SetConsoleTextAttribute(hConsole, (bg << 4) | text);
+	};
+    void textColor(int color) {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+    };
+
+    void gotoxy(int x, int y) {
+        COORD coord = { (SHORT)x, (SHORT)y };
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    };
+
+    string center(const string& s, int width) {
+        int len = s.length();
+        if (width <= len) return s.substr(0, width);
+        int left = (width - len) / 2;
+        int right = width - len - left;
+        return string(left, ' ') + s + string(right, ' ');
+    };
+
+    void drawFunctionButtons(int x, int y) {
+        gotoxy(x, y);
+        SetColor(12, 15); cout << " A "; SetColor(7, 0); cout << ": ADD   ";
+        
+        gotoxy(x + 18, y);
+        SetColor(12, 15); cout << " B "; SetColor(7, 0); cout << ": DELETE  ";
+        
+        gotoxy(x + 36, y);
+        SetColor(12, 15); cout << " C "; SetColor(7, 0); cout << ": EDIT  ";
+        
+        gotoxy(x + 54, y);
+        SetColor(12, 15); cout << " ESC "; SetColor(7, 0); cout << ": EXIT     ";
+    };
+
+    // Hàm ph?: v? thanh tr?ng thái phân trang
+    void drawPagination(int currentPage, int totalPages, int x, int y) {
+        gotoxy(x, y);
+        SetColor(11, 0);
+        cout << " Trang " << currentPage << " / " << totalPages 
+             << "   (Su dung phim len/xuong de chuyen trang)";
+        SetColor(7, 0);
+    };
+	
+	int mh_table(treeMH rootMonHoc) {
+	    treeMH mh_list[1000];
+	    int mh_count = 0;
+	
+	    mh_inorder_collect(rootMonHoc, mh_list, mh_count);
+	
+	    const int ROWS_PER_PAGE = 15;
+	    const int khungW = 72;
+	
+	    int currentPage = 1;
+	    int totalPages = (mh_count == 0) ? 1
+	                   : (mh_count + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
+	
+	    while (true) {
+	        system("cls");
+	
+	        string temp = "QUAN LI MON HOC";
+	        main_UI::drawHeader(temp);
+	
+	        textColor(14);
+	    	cout << endl;
+	        cout << "+" << string(khungW, '-') << "+\n";
+	        cout << "|"
+	             << center("MA MH", 12)
+	             << "|" << center("TEN MON HOC", 45)
+	             << "|" << center("LT", 6)
+	             << "|" << center("TH", 6)
+	             << "|\n";
+	        cout << "|" << string(khungW, '-') << "|\n";
+	
+	        int start = (currentPage - 1) * ROWS_PER_PAGE;
+	        int end   = min(start + ROWS_PER_PAGE, mh_count);
+	
+	        if (mh_count == 0) {
+	            textColor(12);
+	            cout << "|" << center("Danh sach trong", khungW) << "|\n";
+	        } else {
+	            for (int i = start; i < end; i++) {
+	                treeMH p = mh_list[i];
+	                cout << "|"
+	                     << center(p->mh.MAMH, 12)
+	                     << "|" << center(p->mh.TENMH, 45)
+	                     << "|" << center(to_string(p->mh.STCLT), 6)
+	                     << "|" << center(to_string(p->mh.STCTH), 6)
+	                     << "|\n";
+	            }
+	        }
+	
+	        int printed = end - start;
+	        for (int i = printed; i < ROWS_PER_PAGE; i++) {
+	            cout << "|"
+	                 << center("", 12)
+	                 << "|" << center("", 45)
+	                 << "|" << center("", 6)
+	                 << "|" << center("", 6)
+	                 << "|\n";
+	        }
+	
+	        cout << "+" << string(khungW, '-') << "+\n";
+	        textColor(7);
+	
+	        drawFunctionButtons(8, 22);
+	        drawPagination(currentPage, totalPages, 8, 24);
+	
+	        int key = _getch();
+	        if (key == 224) {
+	            key = _getch();
+	            if (key == 72 && currentPage > 1) currentPage--;
+	            else if (key == 80 && currentPage < totalPages) currentPage++;
+	        }
+	        else if (key == 27) return 0;
+	        else if (key == 'a' || key == 'A') return 1;
+	        else if (key == 'b' || key == 'B') return 2;
+	        else if (key == 'c' || key == 'C') return 2;
+	    }
+	}
+
+}	//namespace mh_UI
 //=========== QUAN LI LOP SV- SV TRONG LOPSV ==============
-int QuanliLopSinhVien() {
-	while (true) {
-        system("cls");
-        cout << "======= DIEU CHINH LOP SINH VIEN  =======\n";
-        QuanLyDiem::dssv_print_all();
-        
-        gotoxy(5, 24);
-        SetColor(11, 0);
-        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
-        SetColor(7, 0);  
-        drawFunctionButtons();   
-        int key = _getch();      
-        if (key == 27) break; // ESC    
-        if (key >= 'a' && key <= 'z') key = key - 32;       
-        bool validKey = false;     
-        switch (key) {
-            case 'A': validKey = true; system("cls"); dssv_1(); break;
-            case 'D': validKey = true; system("cls"); dssv_2(); break;
-            case 'E': validKey = true; system("cls"); dssv_3(); break; 
-            default : validKey = false; break;               
-        }   
-        if(!validKey && key != 27) {
-            gotoxy(5, 26);
-            SetColor(12, 0);
-            cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
-            SetColor(7, 0);
-            Sleep(1000);
-        }
-    }  
-    return 0;
-}
+//int QuanliLopSinhVien() {
+//	while (true) {
+//        system("cls");
+//        cout << "======= DIEU CHINH LOP SINH VIEN  =======\n";
+//        QuanLyDiem::dssv_print_all();
+//        
+//        gotoxy(5, 24);
+//        SetColor(11, 0);
+//        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
+//        SetColor(7, 0);  
+//        drawFunctionButtons();   
+//        int key = _getch();      
+//        if (key == 27) break; // ESC    
+//        if (key >= 'a' && key <= 'z') key = key - 32;       
+//        bool validKey = false;     
+//        switch (key) {
+//            case 'A': validKey = true; system("cls"); dssv_1(); break;
+//            case 'D': validKey = true; system("cls"); dssv_2(); break;
+//            case 'E': validKey = true; system("cls"); dssv_3(); break; 
+//            default : validKey = false; break;               
+//        }   
+//        if(!validKey && key != 27) {
+//            gotoxy(5, 26);
+//            SetColor(12, 0);
+//            cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
+//            SetColor(7, 0);
+//            Sleep(1000);
+//        }
+//    }  
+//    return 0;
+//}
 
-int QuanLySinhVienTrongLopSV_UI() {
-    system("cls");
-    cout << "======= QUAN LY DANH SACH SINH VIEN TRONG LOPSV  =======\n";
-    QuanLyDiem::dssv_print_all();
-    string MALOP = checkMa(15, "Nhap ma lop can quan ly: ");
-    QuanLyDiem::LopSV* lop = QuanLyDiem::dssv_find(MALOP);
-    if (!lop) {
-        cout << "Lop khong ton tai!\n";
-        system("pause");
-        return 0;
-    }
-    while (true) {
-        system("cls");      
-        cout << "======= QUAN LY SINH VIEN - LOP " << lop->MALOP << " =======\n";
-        QuanLyDiem::sv_print_all_in_class(lop);
-        gotoxy(5, 24);
-        SetColor(11, 0);
-        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
-        SetColor(7, 0);
-        drawFunctionButtons();
-        int key = _getch();
-        if (key == 27) break; // ESC
-        if (key >= 'a' && key <= 'z') key = key - 32;
-        bool validKey = false;  
-        switch (key) {
-            case 'A': validKey = true; system("cls"); dssv_4_1(lop); break;            
-            case 'D': validKey = true; system("cls"); dssv_4_2(lop); break;
-            case 'E': validKey = true; system("cls"); dssv_4_3(lop); break;              
-            default:
-                validKey = false;
-                break;
-        }        
-if(!validKey && key != 27) {
-            gotoxy(5, 26);
-            SetColor(12, 0);
-            cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
-            SetColor(7, 0);
-            Sleep(1000);
-        }
-    }    
-    return 0;
-}
+//int QuanLySinhVienTrongLopSV_UI() {
+//    system("cls");
+//    cout << "======= QUAN LY DANH SACH SINH VIEN TRONG LOPSV  =======\n";
+//    QuanLyDiem::dssv_print_all();
+//    string MALOP = checkMa(15, "Nhap ma lop can quan ly: ");
+//    QuanLyDiem::LopSV* lop = QuanLyDiem::dssv_find(MALOP);
+//    if (!lop) {
+//        cout << "Lop khong ton tai!\n";
+//        system("pause");
+//        return 0;
+//    }
+//    while (true) {
+//        system("cls");      
+//        cout << "======= QUAN LY SINH VIEN - LOP " << lop->MALOP << " =======\n";
+//        QuanLyDiem::sv_print_all_in_class(lop);
+//        gotoxy(5, 24);
+//        SetColor(11, 0);
+//        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
+//        SetColor(7, 0);
+//        drawFunctionButtons();
+//        int key = _getch();
+//        if (key == 27) break; // ESC
+//        if (key >= 'a' && key <= 'z') key = key - 32;
+//        bool validKey = false;  
+//        switch (key) {
+//            case 'A': validKey = true; system("cls"); dssv_4_1(lop); break;            
+//            case 'D': validKey = true; system("cls"); dssv_4_2(lop); break;
+//            case 'E': validKey = true; system("cls"); dssv_4_3(lop); break;              
+//            default:
+//                validKey = false;
+//                break;
+//        }        
+//if(!validKey && key != 27) {
+//            gotoxy(5, 26);
+//            SetColor(12, 0);
+//            cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
+//            SetColor(7, 0);
+//            Sleep(1000);
+//        }
+//    }    
+//    return 0;
+//}
 
 namespace dk_UIPopup {
-
-// ================= CURSOR =================
-void gotoxy(int x, int y) {
-    COORD c = { (SHORT)x, (SHORT)y };
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
-}
-
-// ================= COLOR =================
-void setColor(int color) {
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
-}
-
-// ================= DRAW WINDOW POPUP =================
-void drawPopupBox(int x, int y, int w, int h, const string& title) {
-    setColor(14); // Yellow border
-
-    // ===== Top border =====
-    gotoxy(x, y);
-    cout << "+" << string(w - 2, '=') << "+";
-
-    // ===== Title bar =====
-    gotoxy(x, y + 1);
-    cout << "|";
-
-    int titlePos = (w - title.size()) / 2;
-    if (titlePos < 1) titlePos = 1;
-
-    cout << string(titlePos - 1, ' ')
-         << title
-         << string(w - titlePos - title.size() - 1, ' ')
-         << "|";
-
-    // ===== Separator =====
-    gotoxy(x, y + 2);
-    cout << "+" << string(w - 2, '-') << "+";
-
-    // ===== Content =====
-    for (int i = 3; i < h - 1; i++) {
-        gotoxy(x, y + i);
-        cout << "|" << string(w - 2, ' ') << "|";
-    }
-
-    // ===== Bottom =====
-    gotoxy(x, y + h - 1);
-    cout << "+" << string(w - 2, '-') << "+";
-
-    setColor(7);
-}
-
-// ================= DRAW INPUT FIELD =================
-void drawInputField(int x, int y, const string& label, int width) {
-    gotoxy(x, y);
-    cout << label << " : [";
-    cout << string(width, ' ');
-    cout << "]";
-}
-
-// ================= SHOW INPUT CURSOR =================
-void showCursor(int x, int y) {
-    gotoxy(x, y);
-    cout << "|";
-}
-
-// ================= POPUP INPUT SINH VIEN =================
-bool inputSinhVien(
-    const string& title,
-    string& masv,
-    int& hocky,
-    string& nienkhoa
-) {
-    const int W = 60;
-    const int H = 12;
-
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    GetConsoleScreenBufferInfo(hConsole, &csbi);
-
-    int consoleWidth  = csbi.srWindow.Right  - csbi.srWindow.Left + 1;
-    int consoleHeight = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
-
-    int X = (consoleWidth  - W) / 2;
-    int Y = (consoleHeight - H) / 2;
-
-    while (true) {
-        system("cls");
-        drawPopupBox(X, Y, W, H, title);
-
-        // ===== Ma SV =====
-        drawInputField(X + 3, Y + 4, "Ma sinh vien", 20);
-        gotoxy(X + 20, Y + 4);
-        cin >> masv;
-
-        // ===== Hoc ky =====
-        drawInputField(X + 3, Y + 6, "Hoc ky (1-3)", 5);
-        gotoxy(X + 20, Y + 6);
-
-        if (!(cin >> hocky) || hocky < 1 || hocky > 3) {
-            cin.clear();
-            cin.ignore(1000, '\n');
-
-            setColor(12);
-            gotoxy(X + 3, Y + H - 2);
-            cout << "Hoc ky phai la so tu 1 den 3! Nhan phim bat ky...";
-            setColor(7);
-            getch();
-            continue;
-        }
-        cin.ignore(1000, '\n');
-
-        // ===== Nien khoa =====
-        drawInputField(X + 3, Y + 8, "Nien khoa", 20);
-        gotoxy(X + 20, Y + 8);
-        getline(cin, nienkhoa);
-
-        // ===== Validate =====
-        if (QuanLyDiem::dk_check_in4_sv(
-                *QuanLyDiem::dsLopSV,
-                masv,
-                hocky,
-                nienkhoa)) {
-
-            setColor(10);
-            gotoxy(X + 3, Y + H - 2);
-            cout << "Thong tin hop le!";
-            setColor(7);
-
-            Sleep(1000);
-            system("cls");
-            return true;
-        } else {
-            setColor(12);
-            gotoxy(X + 3, Y + H - 2);
-            cout << "Thong tin KHONG hop le! Nhan phim bat ky de nhap lai.";
-            setColor(7);
-            getch();
-        }
-    }
-}
+	
+	// ================= CURSOR =================
+	void gotoxy(int x, int y) {
+	    COORD c = { (SHORT)x, (SHORT)y };
+	    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
+	}
+	
+	// ================= COLOR =================
+	void setColor(int color) {
+	    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+	}
+	
+	// ================= DRAW WINDOW POPUP =================
+	void drawPopupBox(int x, int y, int w, int h, const string& title) {
+	    setColor(14); // Yellow border
+	
+	    // ===== Top border =====
+	    gotoxy(x, y);
+	    cout << "+" << string(w - 2, '=') << "+";
+	
+	    // ===== Title bar =====
+	    gotoxy(x, y + 1);
+	    cout << "|";
+	
+	    int titlePos = (w - title.size()) / 2;
+	    if (titlePos < 1) titlePos = 1;
+	
+	    cout << string(titlePos - 1, ' ')
+	         << title
+	         << string(w - titlePos - title.size() - 1, ' ')
+	         << "|";
+	
+	    // ===== Separator =====
+	    gotoxy(x, y + 2);
+	    cout << "+" << string(w - 2, '-') << "+";
+	
+	    // ===== Content =====
+	    for (int i = 3; i < h - 1; i++) {
+	        gotoxy(x, y + i);
+	        cout << "|" << string(w - 2, ' ') << "|";
+	    }
+	
+	    // ===== Bottom =====
+	    gotoxy(x, y + h - 1);
+	    cout << "+" << string(w - 2, '-') << "+";
+	
+	    setColor(7);
+	}
+	
+	// ================= DRAW INPUT FIELD =================
+	void drawInputField(int x, int y, const string& label, int width) {
+	    gotoxy(x, y);
+	    cout << label << " : [";
+	    cout << string(width, ' ');
+	    cout << "]";
+	}
+	
+	// ================= SHOW INPUT CURSOR =================
+	void showCursor(int x, int y) {
+	    gotoxy(x, y);
+	    cout << "|";
+	}
+	
+	// ================= POPUP INPUT SINH VIEN =================
+	bool inputSinhVien(
+	    const string& title,
+	    string& masv,
+	    int& hocky,
+	    string& nienkhoa
+	) {
+	    const int W = 60;
+	    const int H = 12;
+	
+	    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	    CONSOLE_SCREEN_BUFFER_INFO csbi;
+	    GetConsoleScreenBufferInfo(hConsole, &csbi);
+	
+	    int consoleWidth  = csbi.srWindow.Right  - csbi.srWindow.Left + 1;
+	    int consoleHeight = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
+	
+	    int X = (consoleWidth  - W) / 2;
+	    int Y = (consoleHeight - H) / 2;
+	
+	    while (true) {
+	        system("cls");
+	        drawPopupBox(X, Y, W, H, title);
+	
+	        // ===== Ma SV =====
+	        drawInputField(X + 3, Y + 4, "Ma sinh vien", 20);
+	        gotoxy(X + 20, Y + 4);
+	        cin >> masv;
+	
+	        // ===== Hoc ky =====
+	        drawInputField(X + 3, Y + 6, "Hoc ky (1-3)", 5);
+	        gotoxy(X + 20, Y + 6);
+	
+	        if (!(cin >> hocky) || hocky < 1 || hocky > 3) {
+	            cin.clear();
+	            cin.ignore(1000, '\n');
+	
+	            setColor(12);
+	            gotoxy(X + 3, Y + H - 2);
+	            cout << "Hoc ky phai la so tu 1 den 3! Nhan phim bat ky...";
+	            setColor(7);
+	            getch();
+	            continue;
+	        }
+	        cin.ignore(1000, '\n');
+	
+	        // ===== Nien khoa =====
+	        drawInputField(X + 3, Y + 8, "Nien khoa", 20);
+	        gotoxy(X + 20, Y + 8);
+	        getline(cin, nienkhoa);
+	
+	        // ===== Validate =====
+	        if (QuanLyDiem::dk_check_in4_sv(
+	                *QuanLyDiem::dsLopSV,
+	                masv,
+	                hocky,
+	                nienkhoa)) {
+	
+	            setColor(10);
+	            gotoxy(X + 3, Y + H - 2);
+	            cout << "Thong tin hop le!";
+	            setColor(7);
+	
+	            Sleep(1000);
+	            system("cls");
+	            return true;
+	        } else {
+	            setColor(12);
+	            gotoxy(X + 3, Y + H - 2);
+	            cout << "Thong tin KHONG hop le! Nhan phim bat ky de nhap lai.";
+	            setColor(7);
+	            getch();
+	        }
+	    }
+	}
 
 } // namespace UIPopup
 
 namespace dk_Border_Maker {
+	void SetColor(int text, int bg) {
+	    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	    SetConsoleTextAttribute(hConsole, (bg << 4) | text);
+	}
+	
 
     void textColor(int color) {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
@@ -602,7 +653,7 @@ namespace dk_Border_Maker {
     }
 	int dk_registration_table(const string& masv, int hocky, const string& nienkhoa) {
         string temp = "QUAN LI THONG TIN DANG KY LOP TIN CHI SINH VIEN";
-        drawHeader(temp);
+        main_UI::drawHeader(temp);
 
         // Tìm thông tin sinh viên
         string ho, ten;
@@ -638,7 +689,7 @@ namespace dk_Border_Maker {
 
         while (true) {
             system("cls");
-            drawHeader(temp);
+            main_UI::drawHeader(temp);
 
             // Thông tin sinh viên
             cout << endl;
@@ -957,7 +1008,11 @@ namespace score_Border_maker {
 	 void textColor(int color) {
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
     }
-
+	void SetColor(int text, int bg) {
+	    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	    SetConsoleTextAttribute(hConsole, (bg << 4) | text);
+	}
+	
     void gotoxy(int x, int y) {
         COORD coord = { (SHORT)x, (SHORT)y };
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
@@ -1000,7 +1055,7 @@ namespace score_Border_maker {
         QuanLyDiem::LopTinChi*& ltc		// duyet du lieu ltc
 	) {
 		string temp = "QUAN LI SCORE LOP TIN CHI SINH VIEN";
-        drawHeader(temp);	
+        main_UI::drawHeader(temp);	
         
         const int ROWS_PER_PAGE = 15;
 		int currentPage = 1;
@@ -1016,7 +1071,7 @@ namespace score_Border_maker {
 		
 		while (true) {
 		    system("cls");
-		    drawHeader(temp);
+		    main_UI::drawHeader(temp);
 			int printedRows = 0;
 			
 			int stt = (currentPage - 1) * ROWS_PER_PAGE + 1;
@@ -1135,7 +1190,7 @@ namespace score_Border_maker {
         QuanLyDiem::LopTinChi*& ltc		// duyet du lieu ltc
 	) {
 		string temp = "BANG DIEM MON HOC CUA LOP TIN CHI ___ ";
-        drawHeader(temp);
+        main_UI::drawHeader(temp);
         
         const int ROWS_PER_PAGE = 15;
 		int currentPage = 1;
@@ -1151,7 +1206,7 @@ namespace score_Border_maker {
 		
 		while (true) {
 		    system("cls");
-		    drawHeader(temp);
+		    main_UI::drawHeader(temp);
 			int printedRows = 0;
 			
 			int stt = (currentPage - 1) * ROWS_PER_PAGE + 1;
@@ -1254,7 +1309,7 @@ namespace score_Border_maker {
 
 	void score_print_dtb_malop(QuanLyDiem::LopSV*& lopsv) {
 		string temp = "BANG DIEM TRUNG BINH CUA LOP ___";
-        drawHeader(temp);
+        main_UI::drawHeader(temp);
         
         const int ROWS_PER_PAGE = 15;
 		int currentPage = 1;
@@ -1269,7 +1324,7 @@ namespace score_Border_maker {
 		
 		while (true) {
 		    system("cls");
-		    drawHeader(temp);
+		    main_UI::drawHeader(temp);
 			
 		    int printedRows = 0;
 		    int stt = (currentPage - 1) * ROWS_PER_PAGE + 1;
@@ -1452,7 +1507,7 @@ namespace score_Border_maker {
 		const int ROWS_PER_PAGE = 15;
 	    system("cls");
 	    string temp = "BANG DIEM TONG KET ___";
-	    drawHeader(temp);
+	    main_UI::drawHeader(temp);
 	
 	    cout << "\nMa lop: " << lop->MALOP
 	         << "    Ten lop: " << lop->TENLOP << "\n\n";
@@ -1578,6 +1633,15 @@ namespace score_Border_maker {
 }//namespace 
 
 namespace ltc_Border_Maker{
+	void SetColor(int text, int bg) {
+	    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	    SetConsoleTextAttribute(hConsole, (bg << 4) | text);
+	}
+	
+	void gotoxy(int x, int y) {
+	    COORD coord = { (SHORT)x, (SHORT)y };
+	    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+	}
 	
     void drawFunctionButtons(int x, int y) {
         gotoxy(x, y);

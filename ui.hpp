@@ -182,4 +182,12 @@ namespace ltc_Border_Maker{
 	void ltc_print_all();
 }
 
+namespace lopsv_Border_Maker{
+	void gotoxy(int x, int y);
+	void SetColor(int text, int bg);
+	void drawFunctionButtons();
+	int QuanliLopSinhVien();
+	int QuanLySinhVienTrongLopSV_UI();
+}
+
 #endif

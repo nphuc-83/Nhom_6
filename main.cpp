@@ -79,11 +79,11 @@ int main() {
         else if (mainMenu == 3) { // Quan Ly Sinh Vien
             if (subMenu == 1) {
                 // quan li lop sv 
-//                    QuanliLopSinhVien();
+                    lopsv_Border_Maker::QuanliLopSinhVien();
             }else if (subMenu == 2) {
                 // quan li sv trong lopsv 
-//                    QuanLySinhVienTrongLopSV_UI();
-                     }
+                    lopsv_Border_Maker::QuanLySinhVienTrongLopSV_UI();
+                    }
         }
         else if (mainMenu == 4) { // Quan Ly Dang Ki
 	        if (subMenu == 1){

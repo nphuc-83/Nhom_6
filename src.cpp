@@ -1135,21 +1135,27 @@ bool isValidMaMH(const string& s) {
 string inputMaMH() {
     string mamh;
     while (true) {
+    	textColor(10);
         cout << "Nhap ma mon hoc: ";
+        textColor(7);
         getline(cin, mamh);
 
         mamh = normalizeMaMH(mamh);
 
         if (!isValidMaMH(mamh)) {
+        	textColor(4);
             cout << "Ma mon hoc chi duoc A-Z, 0-9, toi da 10 ky tu!\n";
+            textColor(7);
             cin.get(); cin.get();
             clearLastLines(3);
             continue;
         }
 
-        // Ki?m tra t?n t?i b?ng mh_find
+        // Kiem tra ton tai bang mh_find
         if (mh_find(rootMonHoc, mamh) == nullptr) {
+        	textColor(4);
             cout << "Khong ton tai ma mon hoc trong file! Hay nhap lai!\n";
+            textColor(7);
             cin.get();
             clearLastLines(3);
             continue;
@@ -1162,12 +1168,16 @@ string inputNienKhoa() {
     string nk;
 
     while (true) {
+    	textColor(10);
         cout << "Nhap nien khoa (YYYY-YYYY): ";
+        textColor(7);
         getline(cin, nk);
 
         // kiem tra do dài & dau '-'
         if (nk.length() != 9 || nk[4] != '-') {
+        	textColor(4);
             cout << "Nien khoa khong hop le! Vi du: 2024-2025\n";
+            textColor(7);
             waitForEnter();
             clearLastLines(2);
             continue;
@@ -1184,7 +1194,9 @@ string inputNienKhoa() {
         }
 
         if (!hopLe) {
+        	textColor(4);
             cout << "Nien khoa khong hop le! Vi du: 2024-2025\n";
+            textColor(7);
             continue;
         }
 
@@ -1193,7 +1205,9 @@ string inputNienKhoa() {
 
         // nam sau > nam truoc dung 1 don vi
         if (namSau != namDau + 1) {
+        	textColor(4);
             cout << "Nien khoa phai cach nhau dung 1 nam! Vi du: 2024-2025\n";
+            textColor(7);
             waitForEnter();
             clearLastLines(2);
             continue;
@@ -1208,12 +1222,16 @@ int inputHocKy() {
     string hkStr;
 
     while (true) {
+    	textColor(10);
         cout << "Nhap hoc ky (1-3): ";
+        textColor(7);
         getline(cin, hkStr);
 
         // khong duoc bo trong, chi 1 ky tu
         if (hkStr.empty() || hkStr.length() != 1) {
+        	textColor(4);
             cout << "Hoc ky khong hop le! Chi duoc nhap 1 so (1-3)\n";
+            textColor(7);
             waitForEnter();
             clearLastLines(2);
             continue;
@@ -1221,7 +1239,9 @@ int inputHocKy() {
 
         // phai la ky tu so
         if (!isdigit(hkStr[0])) {
+        	textColor(4);
             cout << "Hoc ky khong hop le! Chi duoc nhap so\n";
+            textColor(7);
             waitForEnter();
             clearLastLines(2);
             continue;
@@ -1231,7 +1251,9 @@ int inputHocKy() {
 
         // gioi han toi da 3 hoc ky
         if (hk < 1 || hk > 3) {
+        	textColor(4);
             cout << "Hoc ky chi duoc tu 1 den 3!\n";
+            textColor(7);
             waitForEnter();
             clearLastLines(2);
             continue;
@@ -1246,13 +1268,17 @@ int inputNhom() {
     string s;
 
     while (true) {
+    	textColor(10);
         cout << "Nhap nhom: ";
+        textColor(7);
         getline(cin, s);
 
         // khong duoc bo trong
         if (s.empty()) {
+        	textColor(4);
             cout << "So nhom khong duoc bo trong!\n";
-            waitForEnter();
+            textColor(7);
+			waitForEnter();
             clearLastLines(2);
             continue;
         }
@@ -1267,8 +1293,10 @@ int inputNhom() {
         }
 
         if (!hopLe) {
+        	textColor(4);
             cout << "So nhom chi duoc nhap so!\n";
-            waitForEnter();
+            textColor(7);
+			waitForEnter();
             clearLastLines(2);
             continue;
         }
@@ -1277,8 +1305,10 @@ int inputNhom() {
 
         // rang buoc thuc te
         if (nhom < 1) {
+        	textColor(4);
             cout << "So nhom phai lon hon hoac bang 1!\n";
-            waitForEnter();
+            textColor(7);
+			waitForEnter();
             clearLastLines(2);
             continue;
         }
@@ -1296,16 +1326,22 @@ void clearLastLines(int lines) {
 // HÀM KIEM TRA BAT BUOC SV MIN < SV MAX
 void nhapSoLuongSV(int &minsv, int &maxsv) {
     while (true) {
+    	textColor(10);
         cout << "Nhap soSV min: ";
+        textColor(7);
         cin >> minsv;
+        textColor(10);
         cout << "Nhap soSV max: ";
+        textColor(7);
         cin >> maxsv;
 
         if (cin.fail()) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
+			textColor(4);
             cout << "Gia tri khong hop le! Nhan 1 phim bat ky de nhap lai.";
+            textColor(7);
             waitForEnter();	
             clearLastLines(3);   // xoá: l?i + max + min
             continue;
@@ -1317,7 +1353,9 @@ void nhapSoLuongSV(int &minsv, int &maxsv) {
         }
 
         // L?i sai min/max
+        textColor(4);
         cout << "ERROR: soSV min phai NHO HON soSV max! Vui long nhap lai.\n";
+		textColor(7);
 		waitForEnter();
 
         clearLastLines(3);  // xoá: dòng l?i + max + min
@@ -1444,6 +1482,7 @@ void ltc_clear_all() {
 void ltc_1_1() {
     int hk, nhom, minsv, maxsv;
     string mamh, nk;
+    cout << "\n\n";
     mamh = inputMaMH();
 
     nk = inputNienKhoa();
@@ -1457,7 +1496,9 @@ void ltc_1_1() {
 
     QuanLyDiem::LopTinChi* node = QuanLyDiem::ltc_add(mamh, nk, hk, nhom, minsv, maxsv);
 
+	textColor(10);
     cout << "Da them lop tin chi. Ma lop: " << node->MALOPTC << "\n";
+    textColor(7);
 
     QuanLyDiem::ltc_save_to_file("loptinchi.txt");
 
@@ -1482,13 +1523,13 @@ void ltc_1_2() {
     else if (cin.fail()) {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        textColor(10);
+        textColor(4);
         cout << "Ma lop khong hop le!\n";
         textColor(7);
     }
     else {
-    	textColor(10);
-        cout << "Khong tim thay hoac lop co dang ky.\n";
+    	textColor(4);
+        cout << "Khong tim thay hoac lop co dang ky!\n";
         textColor(7);
     }
 
@@ -1497,30 +1538,51 @@ void ltc_1_2() {
 
 void ltc_1_3() {
     int id;
+    cout << "\n\n";
+    textColor(10);
     cout << "Nhap ma lop can sua: ";
+    textColor(7);
     cin >> id;
     cin.ignore();
 
     LopTinChi* ltc = QuanLyDiem::ltc_find_by_id(id);
-    if (!ltc) {
-        cout << "Khong tim thay lop.\n";
+    
+    if (cin.fail()) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        textColor(4);
+        cout << "Ma lop khong hop le!\n";
+        textColor(7);
+        system("pause");
+        return;
+    }
+    else if (!ltc) {
+    	textColor(4);
+        cout << "Khong tim thay lop!\n";
+        textColor(7);
         system("pause");
         return;
     }
 
     // Nhap soSV min / max moi
     while (true) {
+    	textColor(10);
         cout << "Nhap soSV min moi: ";
+        textColor(7);
         cin >> ltc->SOSVMIN;
 
+		textColor(10);
         cout << "Nhap soSV max moi: ";
-        cin >> ltc->SOSVMAX;
+        textColor(7);
+		cin >> ltc->SOSVMAX;
 
         if (cin.fail()) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
+			textColor(4);
             cout << "Gia tri khong hop le! Nhan 1 phim bat ky de nhap lai.";
+            textColor(7);
             waitForEnter();
             clearLastLines(3);
             continue;
@@ -1530,16 +1592,22 @@ void ltc_1_3() {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             break;
         }
+        textColor(4);
         cout << "ERROR: soSV min phai NHO HON soSV max! Vui long nhap lai.\n";
-        waitForEnter();
+        textColor(7);
+		waitForEnter();
         clearLastLines(3);
     }
-
+	
+	textColor(10);
     cout << "Huy lop? (0: khong, 1: co): ";
+    textColor(7);
     cin >> ltc->HUYLOP;
     cin.ignore();
 
+	textColor(10);
     cout << "Da cap nhat.\n";
+	textColor(7);
 
     QuanLyDiem::ltc_save_to_file("loptinchi.txt");
 
@@ -1550,20 +1618,38 @@ void ltc_2() {
 
     QuanLyDiem::ltc_load_from_file("loptinchi.txt");
 
+    cout << "\n\n";
+    textColor(10);
     cout << "Nhap ma lop: ";
+    textColor(7);
+
     int ma;
     cin >> ma;
-    cin.ignore();
 
-    system("cls");
-
-    LopTinChi* lop = ltc_find_by_id(ma);
-
-    if (!lop) {
-        cout << "Khong tim thay lop!\n";
-    } else {
-        dsdk_ltc_print(lop, dsLopSV);
+    if (cin.fail()) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        textColor(4);
+        cout << "Ma lop khong hop le!\n";
+        textColor(7);
+        system("pause");
+        return;
     }
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+
+    LopTinChi* ltc = ltc_find_by_id(ma);
+
+    if (!ltc) {
+        textColor(4);
+        cout << "Khong tim thay lop!\n";
+        textColor(7);
+        system("pause");
+        return;
+    }
+
+    dsdk_ltc_print(ltc, dsLopSV);
 
     system("pause");
 }

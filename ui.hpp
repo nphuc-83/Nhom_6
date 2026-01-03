@@ -186,6 +186,8 @@ namespace lopsv_Border_Maker{
 	void gotoxy(int x, int y);
 	void SetColor(int text, int bg);
 	void drawFunctionButtons();
+	int dssv_print_all(int& currentPage);
+	void sv_print_all(QuanLyDiem::LopSV* lop);
 	int QuanliLopSinhVien();
 	int QuanLySinhVienTrongLopSV_UI();
 }

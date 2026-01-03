@@ -293,54 +293,75 @@ void sv_clear(nodeSV*& head) {
         delete t;
     }
 }
-void sv_print_all_in_class(LopSV* lop) {	
-	cout << "\n";
-    cout << setw(15) << "";
-    setBGColor(14, 4); // nen vang, chu do
-    cout << "DANH SACH SINH VIEN CUA LOP\n";
-    setBGColor(0, 7);  // nen den, chu trang
-    cout << "\n";
-    if (lop == nullptr) {
-        cout << ">> Lop khong ton tai!\n";
-        cout << string(100, '=') << "\n\n";
-        return;
+
+int sv_count(LopSV* lop) {
+    if (lop == nullptr) return 0;
+
+    int count = 0;
+    for (PTRSV sv = lop->FirstSV; sv != nullptr; sv = sv->next) {
+        ++count;
     }
-    cout << " Lop: " << lop->TENLOP << " (" << lop->MALOP << ")\n\n";
-    if (lop->FirstSV == nullptr) {
-        cout << "(Chua co sinh vien nao trong lop)\n";
-        cout << string(100, '=') << "\n\n";
-        return;
-    }
-    textColor(14);
-    cout << "+" << string(97, '-') << "+\n";
-    cout << "|" << center("STT", 6)
-         << "|" << center("MASV", 16)
-         << "|" << center("HO", 12)
-         << "|" << center("TEN", 10)
-         << "|" << center("PHAI", 8)
-         << "|" << center("SODT", 15)
-         << "|" << center("EMAIL",24 )
-         << "|\n";
-    cout << "|" << string(97, '-') << "|\n";
-    int stt = 0;
-    for (nodeSV* p = lop->FirstSV; p != nullptr; p = p->next) {
-        stt++;
-        cout << "|";
-        textColor(12); // do
-        cout << center(to_string(stt), 6);
-        textColor(14); // vang
-        cout << "|" << center(p->sv.MASV, 16)
-             << "|" << center(p->sv.HO, 12)
-             << "|" << center(p->sv.TEN, 10)
-             << "|" << center(p->sv.PHAI, 8)
-             << "|" << center(p->sv.SODT, 15)
-             << "|" << center(p->sv.Email, 24)
-             << "|\n";
-    }
-    cout << "+" << string(97, '-') << "+\n\n";
-    cout << string(100, '=') << "\n\n";
-    textColor(7); // reset chu trang
+    return count;
 }
+
+
+//void sv_print_all_in_class(LopSV* lop) {	
+//	cout << "\n";
+//    cout << setw(15) << "";
+//    setBGColor(14, 4); // nen vang, chu do
+//    cout << "DANH SACH SINH VIEN CUA LOP\n";
+//    setBGColor(0, 7);  // nen den, chu trang
+//    cout << "\n";
+//    if (lop == nullptr) {
+//        cout << ">> Lop khong ton tai!\n";
+//        cout << string(100, '=') << "\n\n";
+//        return;
+//    }
+//    if (lop->FirstSV == nullptr) {
+//        cout << "(Chua co sinh vien nao trong lop)\n";
+//        cout << string(100, '=') << "\n\n";
+//        return;
+//    }
+//    textColor(14);
+//    cout << "+" << string(97, '-') << "+\n";
+//    cout << "|" << center("STT", 6)
+//         << "|" << center("MASV", 16)
+//         << "|" << center("HO", 12)
+//         << "|" << center("TEN", 10)
+//         << "|" << center("PHAI", 8)
+//         << "|" << center("SODT", 15)
+//         << "|" << center("EMAIL",24 )
+//         << "|\n";
+//    cout << "|" << string(97, '-') << "|\n";
+//    int stt = 0;
+//    for (nodeSV* p = lop->FirstSV; p != nullptr; p = p->next) {
+//        stt++;
+//        cout << "|";
+//        textColor(12); // do
+//        cout << center(to_string(stt), 6);
+//        textColor(14); // vang
+//        cout << "|" << center(p->sv.MASV, 16)
+//             << "|" << center(p->sv.HO, 12)
+//             << "|" << center(p->sv.TEN, 10)
+//             << "|" << center(p->sv.PHAI, 8)
+//             << "|" << center(p->sv.SODT, 15)
+//             << "|" << center(p->sv.Email, 24)
+//             << "|\n";
+//    }
+//    for (int i = stt; i < 15; ++i) {
+//	    cout << "|"
+//	         << center("", 6)
+//	         << "|" << center("", 16)
+//	         << "|" << center("", 12)
+//	         << "|" << center("", 10)
+//	         << "|" << center("", 8)
+//	         << "|" << center("", 15)
+//	         << "|" << center("", 24)
+//	         << "|\n";
+//	}
+//    cout << "+" << string(97, '-') << "+\n\n";
+//    textColor(7); // reset chu trang
+//}
 // ==================== L?P SINH VIÊN ====================
 
 bool validate_MALOP(const string& malop) {
@@ -361,6 +382,19 @@ bool validate_MALOP(const string& malop) {
     }
     return true;
 }
+int dssv_collect_lop(DS_LOPSV* ds, LopSV* lop_list[]) {
+    if (!ds) return 0;
+
+    int count = 0;
+    for (int i = 0; i < MAX_LOPSV; ++i) {
+        if (ds->nodes[i]) {
+            lop_list[count++] = ds->nodes[i];
+        }
+    }
+    return count;
+}
+
+
 
 bool validate_TENLOP(const string& tenlop) {
     if (tenlop.empty()) {
@@ -431,42 +465,52 @@ bool dssv_edit(const string& malop, const string& newTen) {
     return true;
 }
 
-void dssv_print_all() {
-	cout << "\n";
-    cout << setw(20) << "";
-    setBGColor(14, 4); // nen vang, chu do 
-    cout << "DANH SACH LOP SINH VIEN\n";
-    setBGColor(0, 7);  // nen den, chu trang
-    cout << "\n";
-    if (dsLopSV == nullptr || dsLopSV->n == 0) {
-        cout << endl <<  "DANH SACH LOP RONG!\n" << endl;
-        cout << string(80, '=') << "\n\n";
-        return;
-    }
-    textColor(14);
-    cout << "+" << string(55, '-') << "+\n";
-    cout << "|" << center("STT", 6)
-         << "|" << center("MA LOP", 15)
-         << "|" << center("TEN LOP", 32)
-         << "|\n";
-    cout << "|" << string(55, '-') << "|\n";
-    int count=0; 
-    for (int i = 0; i < MAX_LOPSV; i++) {
-        if (dsLopSV->nodes[i] != nullptr) {
-            count++;
-            cout << "|";
-            textColor(12); // do 
-            cout << center(to_string(count), 6);
-            textColor(14); // vang
-            cout << "|" << center(dsLopSV->nodes[i]->MALOP, 15)
-                 << "|" << center(dsLopSV->nodes[i]->TENLOP, 32)
-                 << "|\n";
-        }
-    }
-    cout << "+" << string(55, '-') << "+\n\n";
-    cout << string(80, '=') << "\n\n";
-    textColor(7); // reset chu trang
-}
+//void dssv_print_all() {
+//	cout << "\n";
+//    cout << setw(20) << "";
+//    setBGColor(14, 4); // nen vang, chu do 
+//    cout << "DANH SACH LOP SINH VIEN\n";
+//    setBGColor(0, 7);  // nen den, chu trang
+//    cout << "\n";
+//    if (dsLopSV == nullptr || dsLopSV->n == 0) {
+//        cout << endl <<  "DANH SACH LOP RONG!\n" << endl;
+//        cout << string(80, '=') << "\n\n";
+//        return;
+//    }
+//    textColor(14);
+//    cout << "+" << string(55, '-') << "+\n";
+//    cout << "|" << center("STT", 6)
+//         << "|" << center("MA LOP", 15)
+//         << "|" << center("TEN LOP", 32)
+//         << "|\n";
+//    cout << "|" << string(55, '-') << "|\n";
+//    
+//    int count=0; 
+//    
+//    for (int i = 0; i < MAX_LOPSV; i++) {
+//        if (dsLopSV->nodes[i] != nullptr) {
+//            count++;
+//            cout << "|";
+//            textColor(12); // do 
+//            cout << center(to_string(count), 6);
+//            textColor(14); // vang
+//            cout << "|" << center(dsLopSV->nodes[i]->MALOP, 15)
+//                 << "|" << center(dsLopSV->nodes[i]->TENLOP, 32)
+//                 << "|\n";
+//        }
+//    }
+//    
+//    for (int i = count; i < 15; ++i) {
+//	    cout << "|"
+//	         << center("", 6)
+//	         << "|" << center("", 15)
+//	         << "|" << center("", 32)
+//	         << "|\n";
+//	}
+//    
+//    cout << "+" << string(55, '-') << "+\n\n";
+//    textColor(7); // reset chu trang
+//}
 
 LopSV* dssv_find(string &malop) {
 	for (int i = 0; i < MAX_LOPSV; i++) {
@@ -1743,7 +1787,6 @@ void mh_4() {
 	system("cls");
 	QuanLyDiem::mh_load_from_file("monhoc.txt");
     mh_Border_Maker::mh_table(rootMonHoc);
-    system("pause");
 }
 
 void dssv_1() {
@@ -1754,7 +1797,7 @@ void dssv_1() {
     setBGColor(0, 7);
     cout << "\n";
 
-    QuanLyDiem::dssv_print_all();
+//    lopsv_Border_Maker::dssv_print_all();
 
     cout << "\n";
     textColor(11);
@@ -1784,7 +1827,7 @@ void dssv_2() {
     cout <<"QUAN LY DANH SACH LOP SINH VIEN\n";
     setBGColor(0, 7);
     cout << "\n";
-    QuanLyDiem::dssv_print_all();
+//    lopsv_Border_Maker::dssv_print_all();
     cout << "\n";
     textColor(11);
     cout << ">>> XOA LOP SINH VIEN\n";
@@ -1810,7 +1853,7 @@ void dssv_3() {
     setBGColor(0, 7);
     cout << "\n";
 
-    QuanLyDiem::dssv_print_all();
+//    lopsv_Border_Maker::dssv_print_all();
     cout << "\n";
     textColor(11);
     cout << ">>> DIEU CHINH TEN LOP\n";
@@ -1834,7 +1877,7 @@ void dssv_3() {
 
 void dssv_4_1(LopSV* lop) {
 	system("cls");
-	sv_print_all_in_class(lop);
+	lopsv_Border_Maker::sv_print_all(lop);
     QuanLyDiem::SinhVien sv;
     cout << "\n";
     textColor(11);
@@ -1862,7 +1905,7 @@ void dssv_4_1(LopSV* lop) {
 
 void dssv_4_2(LopSV* lop) {
 	system("cls");
-	sv_print_all_in_class(lop);
+	lopsv_Border_Maker::sv_print_all(lop);
     string masv;
     textColor(11);
     cout << "\nNhap ma sinh vien can xoa: ";
@@ -1890,7 +1933,7 @@ void dssv_4_2(LopSV* lop) {
 
 void dssv_4_3(LopSV* lop) {
 	system("cls");
-	sv_print_all_in_class(lop);
+	lopsv_Border_Maker::sv_print_all(lop);
     string masv;
     textColor(11);
     cout << "\nNhap ma sinh vien can sua: ";

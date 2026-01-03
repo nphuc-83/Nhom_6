@@ -40,9 +40,10 @@ struct LopSV  {
         : MALOP(ma), TENLOP(ten), FirstSV(first) {}
 };
 struct DS_LOPSV {
-	int n=0;
-	LopSV* nodes[MAX_LOPSV];
+    int n = 0;
+    LopSV* nodes[MAX_LOPSV] = { nullptr };
 };
+
 
 struct MonHoc {
     std::string MAMH; 
@@ -100,16 +101,17 @@ std::vector<SinhVien*> sv_to_vector(SinhVien* head);
 void sv_print_sorted_by_name(SinhVien* head);
 void sv_clear(SinhVien*& head);
 bool sv_insert(LopSV* lop, const SinhVien& sv);
-void sv_print_all_in_class(LopSV* lop);
+int sv_count(LopSV* lop);
+
 
 
 // --- L?p sinh viên ---
 int dssv_find_index_lop(const std::string& malop);
+int dssv_collect_lop(DS_LOPSV* ds, LopSV* lop_list[]);
 bool dssv_insert(const string& malop, const std::string& tenlop);
 bool dssv_remove(const string& malop);
 bool dssv_edit(const string& malop, const string& newTen);
 LopSV* dssv_find(std::string &malop);
-void dssv_print_all();
 
 void dssv_save_to_file(const std::string& filename);
 void dssv_load_from_file(const std::string& filename);

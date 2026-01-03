@@ -369,7 +369,8 @@ namespace mh_Border_Maker {
 	                 << "|" << center("", 6)
 	                 << "|\n";
 	        }
-	
+			
+			int printedRows;			
 	        cout << "+" << string(khungW, '-') << "+\n";
 	        textColor(7);
 	
@@ -385,86 +386,11 @@ namespace mh_Border_Maker {
 	        else if (key == 27) return 0;
 	        else if (key == 'a' || key == 'A') return 1;
 	        else if (key == 'b' || key == 'B') return 2;
-	        else if (key == 'c' || key == 'C') return 2;
+	        else if (key == 'c' || key == 'C') return 3;
 	    }
 	}
 
 }	//namespace mh_UI
-//=========== QUAN LI LOP SV- SV TRONG LOPSV ==============
-//int QuanliLopSinhVien() {
-//	while (true) {
-//        system("cls");
-//        cout << "======= DIEU CHINH LOP SINH VIEN  =======\n";
-//        QuanLyDiem::dssv_print_all();
-//        
-//        gotoxy(5, 24);
-//        SetColor(11, 0);
-//        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
-//        SetColor(7, 0);  
-//        drawFunctionButtons();   
-//        int key = _getch();      
-//        if (key == 27) break; // ESC    
-//        if (key >= 'a' && key <= 'z') key = key - 32;       
-//        bool validKey = false;     
-//        switch (key) {
-//            case 'A': validKey = true; system("cls"); dssv_1(); break;
-//            case 'D': validKey = true; system("cls"); dssv_2(); break;
-//            case 'E': validKey = true; system("cls"); dssv_3(); break; 
-//            default : validKey = false; break;               
-//        }   
-//        if(!validKey && key != 27) {
-//            gotoxy(5, 26);
-//            SetColor(12, 0);
-//            cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
-//            SetColor(7, 0);
-//            Sleep(1000);
-//        }
-//    }  
-//    return 0;
-//}
-
-//int QuanLySinhVienTrongLopSV_UI() {
-//    system("cls");
-//    cout << "======= QUAN LY DANH SACH SINH VIEN TRONG LOPSV  =======\n";
-//    QuanLyDiem::dssv_print_all();
-//    string MALOP = checkMa(15, "Nhap ma lop can quan ly: ");
-//    QuanLyDiem::LopSV* lop = QuanLyDiem::dssv_find(MALOP);
-//    if (!lop) {
-//        cout << "Lop khong ton tai!\n";
-//        system("pause");
-//        return 0;
-//    }
-//    while (true) {
-//        system("cls");      
-//        cout << "======= QUAN LY SINH VIEN - LOP " << lop->MALOP << " =======\n";
-//        QuanLyDiem::sv_print_all_in_class(lop);
-//        gotoxy(5, 24);
-//        SetColor(11, 0);
-//        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
-//        SetColor(7, 0);
-//        drawFunctionButtons();
-//        int key = _getch();
-//        if (key == 27) break; // ESC
-//        if (key >= 'a' && key <= 'z') key = key - 32;
-//        bool validKey = false;  
-//        switch (key) {
-//            case 'A': validKey = true; system("cls"); dssv_4_1(lop); break;            
-//            case 'D': validKey = true; system("cls"); dssv_4_2(lop); break;
-//            case 'E': validKey = true; system("cls"); dssv_4_3(lop); break;              
-//            default:
-//                validKey = false;
-//                break;
-//        }        
-//if(!validKey && key != 27) {
-//            gotoxy(5, 26);
-//            SetColor(12, 0);
-//            cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
-//            SetColor(7, 0);
-//            Sleep(1000);
-//        }
-//    }    
-//    return 0;
-//}
 namespace lopsv_Border_Maker{
 	
 	// ================= CURSOR =================
@@ -497,79 +423,286 @@ namespace lopsv_Border_Maker{
 	    gotoxy(x + 3*gap + 5, y);   cout << ": EXIT";
 	}
 	
-	int QuanliLopSinhVien() {
-		while (true) {
-	        system("cls");
-	        cout << "======= DIEU CHINH LOP SINH VIEN  =======\n";
-	        QuanLyDiem::dssv_print_all();
-	        
-	        gotoxy(5, 24);
-	        SetColor(11, 0);
-	        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
-	        SetColor(7, 0);  
-	        drawFunctionButtons();   
-	        int key = _getch();      
-	        if (key == 27) break; // ESC    
-	        if (key >= 'a' && key <= 'z') key = key - 32;       
-	        bool validKey = false;     
-	        switch (key) {
-	            case 'A': validKey = true; system("cls"); dssv_1(); break;
-	            case 'D': validKey = true; system("cls"); dssv_2(); break;
-	            case 'E': validKey = true; system("cls"); dssv_3(); break; 
-	            default : validKey = false; break;               
-	        }   
-	        if(!validKey && key != 27) {
-	            gotoxy(5, 26);
-	            SetColor(12, 0);
-	            cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
-	            SetColor(7, 0);
-	            Sleep(1000);
-	        }
-	    }  
-	    return 0;
-	}
+	void drawPagination(int currentPage, int totalPages, int x, int y) {
+        gotoxy(x, y);
+        SetColor(11, 0);
+        cout << " Trang " << currentPage << " / " << totalPages 
+             << "   (Su dung phim len/xuong de chuyen trang)";
+        SetColor(7, 0);
+    };
+	int dssv_print_all(int& currentPage) {
+	    const int ROWS_PER_PAGE = 15;
+	    const int khungW = 55;
 	
-	int QuanLySinhVienTrongLopSV_UI() {
-	    system("cls");
-	    cout << "======= QUAN LY DANH SACH SINH VIEN TRONG LOPSV  =======\n";
-	    QuanLyDiem::dssv_print_all();
-	    string MALOP = checkMa(15, "Nhap ma lop can quan ly: ");
-	    QuanLyDiem::LopSV* lop = QuanLyDiem::dssv_find(MALOP);
-	    if (!lop) {
-	        cout << "Lop khong ton tai!\n";
-	        system("pause");
-	        return 0;
+	    // ===== COLLECT DATA =====
+	    LopSV* lop_list[1000];
+		int lop_count = dssv_collect_lop(dsLopSV, lop_list);
+	
+	    int totalPages = (lop_count == 0) ? 1
+	        : (lop_count + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
+	
+	    // ===== HEADER =====
+	    string temp = "DANH SACH LOP SINH VIEN";
+	    main_UI::drawHeader(temp);
+	    cout << "\n";
+	
+	    // ===== DS R?NG =====
+	    if (lop_count == 0) {
+	        textColor(12);
+	        cout << "\nDANH SACH LOP RONG!\n";
+	        textColor(7);
+	
+	        drawPagination(1, 1, 8, 24);
+	        return 1;   // ? LUÔN TR? V? totalPages
 	    }
+	
+	    // ===== V? B?NG =====
+	    textColor(14);
+	    cout << "+" << string(khungW, '-') << "+\n";
+	    cout << "|" << center("STT", 6)
+	         << "|" << center("MA LOP", 15)
+	         << "|" << center("TEN LOP", 32)
+	         << "|\n";
+	    cout << "|" << string(khungW, '-') << "|\n";
+	
+	    int start = (currentPage - 1) * ROWS_PER_PAGE;
+	    int end   = min(start + ROWS_PER_PAGE, lop_count);
+	
+	    for (int i = start; i < end; i++) {
+	        cout << "|";
+	        textColor(12);
+	        cout << center(to_string(i + 1), 6);
+	        textColor(14);
+	        cout << "|" << center(lop_list[i]->MALOP, 15)
+	             << "|" << center(lop_list[i]->TENLOP, 32)
+	             << "|\n";
+	    }
+	
+	    // ===== L?P DÒNG =====
+	    for (int i = end - start; i < ROWS_PER_PAGE; ++i) {
+	        cout << "|"
+	             << center("", 6)
+	             << "|" << center("", 15)
+	             << "|" << center("", 32)
+	             << "|\n";
+	    }
+	
+	    cout << "+" << string(khungW, '-') << "+\n";
+	    textColor(7);
+	
+	    // ===== PHÂN TRANG =====
+	    drawPagination(currentPage, totalPages, 8, 24);
+	    return totalPages;
+	}
+
+	void sv_print_all(LopSV* selectedLop) {
+	    if (!selectedLop) return;
+	    
+		const int ROWS_PER_PAGE = 15;
+    	int currentPage = 1;
+    	
 	    while (true) {
-	        system("cls");      
-	        cout << "======= QUAN LY SINH VIEN - LOP " << lop->MALOP << " =======\n";
-	        QuanLyDiem::sv_print_all_in_class(lop);
+	        system("cls");
+			
+			int totalSV = sv_count(selectedLop);
+			
+			int totalPages = (totalSV == 0) ? 1
+			    : (totalSV + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
+			
+			// Ch?n page vu?t biên
+		    if (currentPage < 1) currentPage = 1;
+		    if (currentPage > totalPages) currentPage = totalPages;
+
+			
+	        string title = "QUAN LI DSSV CUA LOP " + selectedLop->MALOP;
+	        main_UI::drawHeader(title);
+	        cout << endl;
+	
+	        if (selectedLop->FirstSV == nullptr) {
+	            cout << "(Chua co sinh vien nao trong lop)\n";
+	            cout << string(100, '=') << "\n\n";
+	        } else {
+	            textColor(14);
+	            cout << "+" << string(97, '-') << "+\n";
+	            cout << "|" << center("STT", 6)
+	                 << "|" << center("MASV", 16)
+	                 << "|" << center("HO", 12)
+	                 << "|" << center("TEN", 10)
+	                 << "|" << center("PHAI", 8)
+	                 << "|" << center("SODT", 15)
+	                 << "|" << center("EMAIL", 24)
+	                 << "|\n";
+	            cout << "|" << string(97, '-') << "|\n";
+	
+	            int startIndex = (currentPage - 1) * ROWS_PER_PAGE;
+				int endIndex   = startIndex + ROWS_PER_PAGE;
+				
+				int index = 0;
+				int sttSV = 0;
+				
+				for (nodeSV* p = selectedLop->FirstSV; p; p = p->next) {
+				    if (index >= startIndex && index < endIndex) {
+				        sttSV++;
+				        cout << "|";
+				        textColor(12);
+				        cout << center(to_string(index + 1), 6);
+				        textColor(14);
+				        cout << "|" << center(p->sv.MASV, 16)
+				             << "|" << center(p->sv.HO, 12)
+				             << "|" << center(p->sv.TEN, 10)
+				             << "|" << center(p->sv.PHAI, 8)
+				             << "|" << center(p->sv.SODT, 15)
+				             << "|" << center(p->sv.Email, 24)
+				             << "|\n";
+				    }
+				    index++;
+				    if (index >= endIndex) break;
+				}
+
+	
+	            for (int i = sttSV; i < 15; ++i) {
+	                cout << "|"
+	                     << center("", 6)
+	                     << "|" << center("", 16)
+	                     << "|" << center("", 12)
+	                     << "|" << center("", 10)
+	                     << "|" << center("", 8)
+	                     << "|" << center("", 15)
+	                     << "|" << center("", 24)
+	                     << "|\n";
+	            }
+	
+	            cout << "+" << string(97, '-') << "+\n\n";
+	            textColor(7);
+	        }
+	
+	        // Hu?ng d?n
 	        gotoxy(5, 24);
 	        SetColor(11, 0);
 	        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
 	        SetColor(7, 0);
+	
 	        drawFunctionButtons();
+			drawPagination(currentPage, totalPages, 5, 24);
+
+	
 	        int key = _getch();
-	        if (key == 27) break; // ESC
-	        if (key >= 'a' && key <= 'z') key = key - 32;
-	        bool validKey = false;  
+
+			// ===== PHÍM ÐI?U HU?NG =====
+			if (key == 224) {
+			    key = _getch();
+			    if (key == 72 && currentPage > 1)            // ?
+			        currentPage--;
+			    else if (key == 80 && currentPage < totalPages) // ?
+			        currentPage++;
+			    continue; // v? l?i b?ng
+			}
+
+	        if (key == 27) return;   // ESC ? quay l?i màn ch?n l?p
+	
+	        if (key >= 'a' && key <= 'z') key -= 32;
+	
 	        switch (key) {
-	            case 'A': validKey = true; system("cls"); dssv_4_1(lop); break;            
-	            case 'D': validKey = true; system("cls"); dssv_4_2(lop); break;
-	            case 'E': validKey = true; system("cls"); dssv_4_3(lop); break;              
-	            default:
-	                validKey = false;
-	                break;
-	        }        
-	if(!validKey && key != 27) {
-	            gotoxy(5, 26);
-	            SetColor(12, 0);
-	            cout << "Phim khong hop le! Chi nhan A, D, E hoac ESC.";
-	            SetColor(7, 0);
-	            Sleep(1000);
+	            case 'A': system("cls"); dssv_4_1(selectedLop); break;
+	            case 'D': system("cls"); dssv_4_2(selectedLop); break;
+	            case 'E': system("cls"); dssv_4_3(selectedLop); break;
 	        }
-	    }    
+	    }
+	}
+
+
+	int QuanliLopSinhVien() {
+	    int currentPage = 1;
+	
+	    while (true) {
+	        system("cls");
+	
+	        int totalPages = dssv_print_all(currentPage);
+	
+	        drawFunctionButtons();
+	
+	        int key = _getch();
+	
+	        if (key == 224) {
+	            key = _getch();
+	            if (key == 72 && currentPage > 1)
+	                currentPage--;
+	            else if (key == 80 && currentPage < totalPages)
+	                currentPage++;
+	        }
+	        else if (key == 27) break;
+	
+	        if (key >= 'a' && key <= 'z') key -= 32;
+	
+	        switch (key) {
+	            case 'A': system("cls"); dssv_1(); break;
+	            case 'D': system("cls"); dssv_2(); break;
+	            case 'E': system("cls"); dssv_3(); break;
+	        }
+	    }
 	    return 0;
+	}
+
+	
+	int QuanLySinhVienTrongLopSV_UI() {
+	    int currentPage = 1;
+	
+	    while (true) {
+	        system("cls");
+	
+	        string title = "QUAN LI DSSV";
+	        main_UI::drawHeader(title);
+	
+	        int totalPages = dssv_print_all(currentPage);
+	
+	        // ===== NÚT CH?C NANG =====
+	        int gap = 10;
+	        int x = 5;
+	        int y = 22;
+	
+	        SetColor(12, 15);
+	        gotoxy(x, y);             cout << " A ";
+	        gotoxy(x + 3 * gap, y);   cout << " ESC ";
+	
+	        SetColor(7, 0);
+	        gotoxy(x + 3, y);             cout << ": MANAGE CLASS";
+	        gotoxy(x + 3 * gap + 5, y);   cout << ": EXIT";
+	
+	        int key = _getch();
+	
+	        // ----- PHÂN TRANG -----
+	        if (key == 224) {
+	            key = _getch();
+	            if (key == 72 && currentPage > 1) currentPage--;
+	            else if (key == 80 && currentPage < totalPages) currentPage++;
+	            continue;
+	        }
+	
+	        if (key == 27) return 0;
+	
+	        if (key >= 'a' && key <= 'z') key -= 32;
+	
+	        // ----- CH?N L?P -----
+	        if (key == 'A') {
+	            gotoxy(5, 26);
+	            textColor(14);
+	
+	            string MALOP = checkMa(10, "Nhap ma lop can quan ly: ");
+	
+	            textColor(7);
+	
+	            LopSV* lop = QuanLyDiem::dssv_find(MALOP);
+	            if (!lop) {
+	                cout << "Lop khong ton tai!\n";
+	                system("pause");
+	                continue;
+	            }
+	
+	            // ?? G?I HÀM VÒNG 2
+	            sv_print_all(lop);
+	            currentPage = 1; // reset khi quay l?i
+	        }
+	    }
 	}
 }
 
@@ -1858,7 +1991,22 @@ namespace ltc_Border_Maker{
 		             << "|"  << center((p->HUYLOP ? string("DA HUY"): string("MO")), 12)
 		             << "|\n";
 	        }
-	
+			int printedRows = (totalClasses == 0) ? 1 : (endIdx - startIdx);
+            for (int i = printedRows; i < ROWS_PER_PAGE; ++i) {
+			    textColor(14);
+			    cout << "|"
+			         << center("", 5)   << "|"   // STT
+			         << center("", 8)   << "|"   // MA LOP
+			         << center("", 10)  << "|"   // MA MON
+			         << center("", 6)   << "|"   // NHOM
+			         << center("", 13)  << "|"   // NIEN KHOA
+			         << center("", 8)   << "|"   // HOC KI
+			         << center("", 9)   << "|"   // SI SO
+			         << center("", 8)   << "|"   // SL MIN
+			         << center("", 8)   << "|"   // SL MAX
+			         << center("", 12)  << "|"   // TRANG THAI
+			         << "\n";
+			}
 	        cout << "+" << string(96, '-') << "+\n";
 	
 	        // ===== NÚT CH?C NANG & PHÂN TRANG =====

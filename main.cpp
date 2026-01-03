@@ -20,6 +20,8 @@ int main() {
 
         int mainMenu = choice / 10;      // 1 d?n 6
         int subMenu = choice % 10;      // 1,2,... ho?c 0 n?u không có sub
+        
+        if (choice <= 0) continue;
 
         system("cls");  // Xóa màn hình tru?c khi vào ch?c nang
 
@@ -61,7 +63,6 @@ int main() {
 
 		            case 0:
 		                cout << "Quay lai menu chinh...\n";
-		                system("pause");
 		                subMenu = 0;
 		                break;
 		            default:
@@ -72,15 +73,18 @@ int main() {
 			}
             else if (subMenu == 2) {
                 mh_4();
-                cout << "\nNhan phim bat ky de quay lai...";
+                cout << endl << "\nNhan phim bat ky de quay lai...";
                 _getch();
             }
         }
         else if (mainMenu == 3) { // Quan Ly Sinh Vien
+        	dssv_load_from_file("lopSV.txt");   // ?? QUAN TR?NG
+		    ltc_load_from_file("loptinchi.txt");
+
             if (subMenu == 1) {
                 // quan li lop sv 
                     lopsv_Border_Maker::QuanliLopSinhVien();
-            }else if (subMenu == 2) {
+            } else if (subMenu == 2) {
                 // quan li sv trong lopsv 
                     lopsv_Border_Maker::QuanLySinhVienTrongLopSV_UI();
                     }

@@ -1642,101 +1642,6 @@ namespace score_Border_maker {
 		}
 	}
 
-//	void score_print_bangdiemtongket(QuanLyDiem::LopSV*& lopsv) {
-//		string temp = "BANG DIEM TONG KET CUA LOP ___";
-//        drawHeader(temp);
-//        
-//        const int ROWS_PER_PAGE = 15;
-//		int currentPage = 1;
-//		
-//		// ===== COUNT T?NG S? DÒNG =====
-//		int totalRecords = 0;
-//		for (PTRSV p = lopsv->FirstSV; p; p = p->next)
-//		    totalRecords++;
-//		
-//		int totalPages = (totalRecords + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
-//		if (totalPages == 0) totalPages = 1;
-//		
-//		while (true) {
-//		    system("cls");
-//		    drawHeader(temp);
-//			
-//		    int printedRows = 0;
-//		    int stt = (currentPage - 1) * ROWS_PER_PAGE + 1;
-//		
-//		    // ===== reset danh sách sinh viên c?a l?p =====
-//		    PTRSV node_sv = lopsv->FirstSV;
-//		
-//		    // skip d?n trang hi?n t?i
-//		    int skip = (currentPage - 1) * ROWS_PER_PAGE;
-//		    while (node_sv && skip--) node_sv = node_sv->next;
-//		
-//		    // ===== Thông tin l?p =====
-//		    cout << endl;
-//		    SetColor(10, 0);
-//		    cout << "Ma lop: " << lopsv->MALOP
-//		         << "    Ten lop: " << lopsv->TENLOP << endl;
-//		    SetColor(7, 0);
-//		
-//		    // ===== Khung b?ng =====
-//		    const int khungW = 65;
-//		    textColor(14);
-//		
-//		    cout << "+" << string(khungW, '-') << "+\n";
-//		    cout << "|"
-//		         << center("STT", 5)        << "|"
-//		         << center("MASV", 12)      << "|"
-//		         << center("HO", 20)        << "|"
-//		         << center("TEN", 12)       << "|"
-//		         << center("DIEM TB", 10)   << "  |\n";
-//		    cout << "|" << string(khungW, '-') << "|\n";
-//		
-//		    // ===== In d? li?u =====
-//		    while (node_sv && printedRows < ROWS_PER_PAGE) {
-//		    	// ===== CALCULATE DTB ======
-//		    	string dtb;
-//				dtb = score_tinhDTB(node_sv->sv.MASV);
-//				
-//		        cout << "|"
-//		             << center(to_string(stt++), 5) << "|"
-//		             << center(node_sv->sv.MASV, 12)     << "|"
-//		             << center(node_sv->sv.HO, 20)       << "|"
-//		             << center(node_sv->sv.TEN, 12)      << "|"
-//		             << center(dtb, 10)             
-//		             << "  |\n";
-//		
-//		        node_sv = node_sv->next;
-//		        printedRows++;
-//		    }
-//		
-//		    // ===== Bù dòng tr?ng =====
-//		    for (int i = printedRows; i < ROWS_PER_PAGE; i++) {
-//		        cout << "|"
-//		             << center("", 5)  << "|"
-//		             << center("", 12) << "|"
-//		             << center("", 20) << "|"
-//		             << center("", 12) << "|"
-//		             << center("", 10) << "  |\n";
-//		    }
-//		
-//		    cout << "+" << string(khungW, '-') << "+\n\n";
-//		    textColor(7);
-//		
-//		    // ===== Ði?u hu?ng + thoát =====
-//		    drawPagination(currentPage, totalPages, 8, 24);
-//		    gotoxy(8, 22);
-//		    SetColor(12, 15); cout << " ESC "; SetColor(7, 0); cout << ": Exit ";
-//		
-//		    int key = _getch();
-//		    if (key == 224) {
-//		        key = _getch();
-//		        if (key == 72 && currentPage > 1) currentPage--;
-//		        else if (key == 80 && currentPage < totalPages) currentPage++;
-//		    }
-//		    if (key == 27) break;
-//		}
-//	}
-
 	void drawPage(
 	    LopSV* lop,
 	    SinhVien dsSV[], int soSV,
@@ -1748,10 +1653,10 @@ namespace score_Border_maker {
 	    system("cls");
 	    string temp = "BANG DIEM TONG KET ___";
 	    main_UI::drawHeader(temp);
-	
-	    cout << "\nMa lop: " << lop->MALOP
-	         << "    Ten lop: " << lop->TENLOP << "\n\n";
-	
+//	
+//	    cout << "\nMa lop: " << lop->MALOP
+//	         << "    Ten lop: " << lop->TENLOP << "\n\n";
+		cout << endl;
 	    // ===== TÍNH CHI?U R?NG KHUNG =====
 	    const int colSTT = 5;
 	    const int colMASV = 12;

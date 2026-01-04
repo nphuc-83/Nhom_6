@@ -251,3 +251,5 @@ void dk_2(const string& masv, int hocky, const string& nienkhoa);
 string checkMa(int limit, string info);
 string checkTen(string info);
 int nhapSTC(const string &tenBien);
+string checkPHAI(string info);
+string checkSDT(string info);

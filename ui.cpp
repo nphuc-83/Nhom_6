@@ -686,7 +686,7 @@ namespace lopsv_Border_Maker{
 	        if (key == 'A') {
 	            gotoxy(5, 26);
 	            textColor(14);
-	
+	            
 	            string MALOP = checkMa(10, "Nhap ma lop can quan ly: ");
 	
 	            textColor(7);

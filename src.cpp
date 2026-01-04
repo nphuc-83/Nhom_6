@@ -1682,17 +1682,17 @@ void ltc_2() {
 }
 
 void mh_1() {
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
     QuanLyDiem::mh_load_from_file("monhoc.txt");
 	cout << endl;
     string MAMH, TENMH;
     int STCLT, STCTH;
 
     MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc: ");
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     TENMH = checkTen("Vui long nhap ten Mon Hoc: ");
     STCLT = nhapSTC("so tin chi ly thuyet");
     STCTH = nhapSTC("so tin chi thuc hanh");
-
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     QuanLyDiem::treeMH node = new QuanLyDiem::nodeMH;
     node->mh.MAMH  = MAMH;
     node->mh.TENMH = TENMH;
@@ -1710,6 +1710,7 @@ void mh_1() {
 
 
 void mh_2() {
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
     QuanLyDiem::mh_load_from_file("monhoc.txt");
     QuanLyDiem::ltc_load_from_file("loptinchi.txt");
 	cout << endl;
@@ -1745,6 +1746,7 @@ void mh_2() {
 
 
 void mh_3() {
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
     QuanLyDiem::mh_load_from_file("monhoc.txt");
 	cout << endl;
     string MAMH, TENMH;
@@ -1754,7 +1756,7 @@ void mh_3() {
     TENMH = checkTen("Vui long nhap ten Mon Hoc moi: ");
     STCLT = nhapSTC("Nhap so tin chi ly thuyet moi");
     STCTH = nhapSTC("Nhap so tin chi thuc hanh moi");
-
+   
     if (!QuanLyDiem::mh_edit(MAMH, TENMH, STCLT, STCTH)) {
         cout << ">> Khong tim thay mon hoc!\n";
         return;
@@ -1867,12 +1869,11 @@ void dssv_4_1(LopSV* lop) {
     cout << ">>> THEM SINH VIEN MOI ";
     textColor(7);
     cout << "\n";    
-    cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
-    cout << " Ma SV        : "; getline(cin, sv.MASV);
-    cout << " Ho           : "; getline(cin, sv.HO);
-    cout << " Ten          : "; getline(cin, sv.TEN);
-    cout << " Phai (Nam/Nu): "; getline(cin, sv.PHAI);
-    cout << " So dien thoai: "; getline(cin, sv.SODT);
+    sv.MASV = checkMa(15, " Ma SV        : ");
+    sv.HO    = checkTen(" Ho           : ");
+    sv.TEN   = checkTen(" Ten          : ");
+    sv.PHAI  = checkPHAI(" Phai (Nam/Nu): ");
+    sv.SODT  = checkSDT(" So dien thoai: ");
     cout << " Email        : "; getline(cin, sv.Email);
     if (QuanLyDiem::sv_insert(lop, sv)) {
     	textColor(10);
@@ -1889,11 +1890,7 @@ void dssv_4_1(LopSV* lop) {
 void dssv_4_2(LopSV* lop) {
 	system("cls");
 	lopsv_Border_Maker::sv_print_all(lop);
-    string masv;
-    textColor(11);
-    cout << "\nNhap ma sinh vien can xoa: ";
-    textColor(7);
-    getline(cin, masv);
+    string masv = checkMa(15, "Nhap ma sinh vien can xoa: ");
     QuanLyDiem::nodeSV*& head = lop->FirstSV;
     QuanLyDiem::nodeSV* cur = head;
     QuanLyDiem::nodeSV* prev = nullptr;
@@ -1917,12 +1914,7 @@ void dssv_4_2(LopSV* lop) {
 void dssv_4_3(LopSV* lop) {
 	system("cls");
 	lopsv_Border_Maker::sv_print_all(lop);
-    string masv;
-    textColor(11);
-    cout << "\nNhap ma sinh vien can sua: ";
-    textColor(7);  
-    cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
-    getline(cin, masv);
+    string masv = checkMa(15, "Nhap ma sinh vien can sua: ");
     QuanLyDiem::nodeSV* p = lop->FirstSV;
     while (p && p->sv.MASV != masv) p = p->next;
     if (!p) {
@@ -1933,10 +1925,10 @@ void dssv_4_3(LopSV* lop) {
     textColor(11);
     cout << "=== SUA THONG TIN SINH VIEN ===\n";
     textColor(7);
-cout << "Ho (" << p->sv.HO << "): "; getline(cin, p->sv.HO);
-    cout << "Ten (" << p->sv.TEN << "): "; getline(cin, p->sv.TEN);
-    cout << "Phai (" << p->sv.PHAI << "): "; getline(cin, p->sv.PHAI);
-    cout << "So dien thoai (" << p->sv.SODT << "): "; getline(cin, p->sv.SODT);
+    p->sv.HO   = checkTen(" Ho   : ");
+    p->sv.TEN  = checkTen(" Ten   : ");
+    p->sv.PHAI = checkPHAI(" Phai  : ");
+    p->sv.SODT = checkSDT(" SDT   : ");
     cout << "Email (" << p->sv.Email << "): "; getline(cin, p->sv.Email);
     cout << ">> Cap nhat thanh cong!\n";
     QuanLyDiem::dssv_save_to_file("lopSV.txt");
@@ -2030,20 +2022,24 @@ void dk_2(const string& masv, int hocky, const string& nienkhoa) {
 //===== check thong tin can nhap vao ===
 
 string checkMa(int limit, std::string info) {
-    string MAMH;
+    string ma;
 
-    while (true) {
+    while (true) {   	
         cout << info;
-        cin >> MAMH;
-
-        // 1?? Ki?m tra d? dài
-        if (MAMH.length() > limit) {
-            cout << "? Mã môn h?c không du?c quá 10 ký t?.\n";
+        getline(cin, ma);
+        
+        if (ma.empty()) {
+            cout << " Ma khong duoc rong.\n";
             continue;
         }
+        // 1?? Ki?m tra d? dài
+        if (ma.length() > limit) {
+            cout << " Loi: Ma khong duoc qua " << limit << " ky tu.\n";
+            continue;
+        } 
 
         bool hopLe = true;
-        for (char &ch : MAMH) {
+        for (char &ch : ma) {
             if (!isalnum((unsigned char)ch)) { // ch? cho ch? ho?c s?
                 hopLe = false;
                 break;
@@ -2052,33 +2048,37 @@ string checkMa(int limit, std::string info) {
         }
 
         if (!hopLe) {
-            cout << "? Mã môn h?c ch? du?c ch?a ch? cái và s? (không có ký t? d?c bi?t).\n";
+            cout << " Loi:  Ma chi duoc chua chu cai va so (khong co ky tu dac biet).\n";
             continue;
         }
 
-        // n?u h?p l? thì thoát vòng l?p
+        // n?u h?p l? th? thoát v?ng l?p
         break;
     }
 
-    return MAMH;
+    return ma;
 }
 
 string checkTen(string info) {
-    string TENMH;
+    string TEN;
 
     while (true) {
         cout << info;
-        cin.ignore(); // xoá b? d?m còn sót
-        getline(cin, TENMH); // cho phép kho?ng tr?ng
+        getline(cin, TEN); // cho phép kho?ng tr?ng
 
+
+        if (TEN.empty()) {
+            cout << " Khong duoc rong.\n";
+            continue;
+        }
         // 1?? Ki?m tra d? dài
-        if (TENMH.length() > 50) {
-            cout << "? Tên không du?c quá 50 ký t?.\n";
+        if (TEN.length() > 50) {
+            cout << " Khong duoc qua 50 ky tu.\n";
             continue;
         }
 
         bool hopLe = true;
-        for (char &ch : TENMH) {
+        for (char &ch : TEN) {
             if (!(isalpha((unsigned char)ch) || isspace((unsigned char)ch))) {
                 hopLe = false;
                 break;
@@ -2087,33 +2087,33 @@ string checkTen(string info) {
         }
 
         if (!hopLe) {
-            cout << "? Tên ch? du?c ch?a ch? cái và kho?ng tr?ng.\n";
+            cout << " Chi duoc chua chu cai va khoang trang.\n";
             continue;
         }
 
-        // N?u h?p l? thì thoát vòng l?p
+        // N?u h?p l? th? thoát v?ng l?p
         break;
     }
 
-    return TENMH;
+    return TEN;
 }
 
 int nhapSTC(const string&tenBien) {
     int STC;
 
     while (true) {
-        cout << "Vui lòng nh?p " << tenBien << ": ";
+        cout << "Vui long nhap " << tenBien << ": ";
         cin >> STC;
 
-        if (cin.fail()) {
-            cout << "? Ch? du?c nh?p s? nguyên h?p l?.\n";
+        if (cin.fail()) { 
+            cout << " Chi duoc nhap so nguyen hop le.\n";
             cin.clear(); // xóa tr?ng thái l?i
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // b? ph?n còn l?i c?a dòng
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // b? ph?n c?n l?i c?a d?ng
             continue;
         }
 
         if (STC < 0) {
-            cout << "? " << tenBien << " không du?c âm.\n";
+            cout << "Loi " << tenBien << " khong duoc am.\n";
             continue;
         }
 
@@ -2121,5 +2121,67 @@ int nhapSTC(const string&tenBien) {
     }
 
     return STC;
+}
+
+string checkPHAI(string info) {
+    string phai;
+
+    while (true) {
+        cout << info;
+        getline(cin, phai);
+
+        if (phai.empty()) {
+            cout << " Phai khong duoc rong.\n";
+            continue;
+        }
+
+        for (char& c : phai)
+            c = tolower((unsigned char)c);
+
+        if (phai != "nam" && phai != "nu") {
+            cout << " Phai chi duoc la Nam hoac Nu.\n";
+            continue;
+        }
+
+        phai[0] = toupper(phai[0]); // Nam / Nu
+        break;
+    }
+
+    return phai;
+}
+string checkSDT(string info) {
+    string sdt;
+
+    while (true) {
+        cout << info;
+        getline(cin, sdt);
+
+        if (sdt.empty()) {
+            cout << " So dien thoai khong duoc rong.\n";
+            continue;
+        }
+
+        if (sdt.length() != 10) {
+            cout << " So dien thoai phai dung 10 chu so.\n";
+            continue;
+        }
+
+        bool hopLe = true;
+        for (char c : sdt) {
+            if (!isdigit((unsigned char)c)) {
+                hopLe = false;
+                break;
+            }
+        }
+
+        if (!hopLe) {
+            cout << " So dien thoai chi duoc chua so.\n";
+            continue;
+        }
+
+        break;
+    }
+
+    return sdt;
 }
 

@@ -915,7 +915,7 @@ void ltc_sort_asc() {
     for (LopTinChi* i = dsLopTC; i->next != nullptr; i = i->next) {
         for (LopTinChi* j = i->next; j != nullptr; j = j->next) {
             if (i->MALOPTC > j->MALOPTC) {
-                // Ð?i d? li?u 2 node
+
                 std::swap(i->MALOPTC, j->MALOPTC);
                 std::swap(i->MAMH, j->MAMH);
                 std::swap(i->NIENKHOA, j->NIENKHOA);
@@ -1123,7 +1123,7 @@ void buildBangDiem(
 
 
 
-// === T? Ð?NG LOAD KHI KH?I Ð?NG ===
+// === TU DONG LOAD ===
 void ltc_auto_load() {
     ltc_load_from_file("loptinchi.txt");
 }
@@ -1131,7 +1131,7 @@ void ltc_auto_load() {
 // HAM CAN GIUA (CENTER TEXT)
 string center(const string &text, int width) {
     int len = text.length();
-    if (len >= width) return text; // n?u dài hon thì tr? l?i luôn
+    if (len >= width) return text; 
 
     int left = (width - len) / 2;
     int right = width - len - left;
@@ -1160,7 +1160,7 @@ void waitForEnter() {
 string normalizeMaMH(string s) {
     for (char &c : s) {
         if (islower(c))
-            c = toupper(c);   // t? d?ng d?i sang ch? hoa
+            c = toupper(c);
     }
     return s;
 }
@@ -1172,6 +1172,53 @@ bool isValidMaMH(const string& s) {
     for (char c : s) {
         if (!isalnum(c)) return false; // ph?i là A-Z ho?c 0-9
     }
+    return true;
+}
+
+// HAM KIEM TRA LOI NHOM TU DONG TANG
+int isValid_Nhom(string mamh, string nk, int hk) {
+    int maxNhom = 0;
+
+    for (QuanLyDiem::LopTinChi* p = QuanLyDiem::dsLopTC; p; p = p->next) {
+        if (p->MAMH == mamh &&
+            p->NIENKHOA == nk &&
+            p->HOCKY == hk) {
+
+            if (p->NHOM > maxNhom)
+                maxNhom = p->NHOM;
+        }
+    }
+    return maxNhom + 1;
+}
+
+// HAM BAT LOI INPUT SO LUONG SV MIN MAX
+bool isValid_SV(const string& label, int& value, int x) {
+    string s;
+
+    textColor(10);
+    cout << label;
+    textColor(7);
+    getline(cin, s);
+
+    if (s.empty()) {
+        textColor(4);
+        cout << "Khong duoc bo trong! Nhan phim bat ky de nhap lai.\n";
+        textColor(7);
+        system("pause");
+        clearLastLines(x);
+        return false;
+    }
+
+    stringstream ss(s);
+    if (!(ss >> value) || value < 0 || !ss.eof()) {
+        textColor(4);
+        cout << "Gia tri khong hop le! Nhan phim bat ky de nhap lai.\n";
+        textColor(7);
+        system("pause");
+        clearLastLines(x);
+        return false;
+    }
+
     return true;
 }
 
@@ -1208,6 +1255,8 @@ string inputMaMH() {
         return mamh;
     }
 }
+
+// HAM NHAP NIEN KHOA
 string inputNienKhoa() {
     string nk;
 
@@ -1307,99 +1356,12 @@ int inputHocKy() {
     }
 }
 
-// HAM NHAP SO NHOM
-int inputNhom() {
-    string s;
 
-    while (true) {
-    	textColor(10);
-        cout << "Nhap nhom: ";
-        textColor(7);
-        getline(cin, s);
-
-        // khong duoc bo trong
-        if (s.empty()) {
-        	textColor(4);
-            cout << "So nhom khong duoc bo trong!\n";
-            textColor(7);
-			waitForEnter();
-            clearLastLines(2);
-            continue;
-        }
-
-        // kiem tra tat ca la chu so
-        bool hopLe = true;
-        for (char c : s) {
-            if (!isdigit(c)) {
-                hopLe = false;
-                break;
-            }
-        }
-
-        if (!hopLe) {
-        	textColor(4);
-            cout << "So nhom chi duoc nhap so!\n";
-            textColor(7);
-			waitForEnter();
-            clearLastLines(2);
-            continue;
-        }
-
-        int nhom = stoi(s);
-
-        // rang buoc thuc te
-        if (nhom < 1) {
-        	textColor(4);
-            cout << "So nhom phai lon hon hoac bang 1!\n";
-            textColor(7);
-			waitForEnter();
-            clearLastLines(2);
-            continue;
-        }
-
-        return nhom;
-    }
-}
 void clearLastLines(int lines) {
     for (int i = 0; i < lines; i++) {
         cout << "\033[F";  // move cursor up 1 line
         cout << "\033[2K"; // clear the entire line
     }
-}
-
-// HAM BAT LOI INPUT SO LUONG SV MIN MAX
-bool isValid_SV(
-    const string& label,
-    int& value,
-    int x
-) {
-    string s;
-
-    textColor(10);
-    cout << label;
-    textColor(7);
-    getline(cin, s);
-
-    if (s.empty()) {
-        textColor(4);
-        cout << "Khong duoc bo trong! Nhan phim bat ky de nhap lai.\n";
-        textColor(7);
-        system("pause");
-        clearLastLines(x);
-        return false;
-    }
-
-    stringstream ss(s);
-    if (!(ss >> value) || value < 0 || !ss.eof()) {
-        textColor(4);
-        cout << "Gia tri khong hop le! Nhan phim bat ky de nhap lai.\n";
-        textColor(7);
-        system("pause");
-        clearLastLines(x);
-        return false;
-    }
-
-    return true;
 }
 
 void nhapSoLuongSV(int &minsv, int &maxsv) {
@@ -1429,49 +1391,6 @@ void nhapSoLuongSV(int &minsv, int &maxsv) {
     }
 }
 
-
-
-// HÀM KIEM TRA BAT BUOC SV MIN < SV MAX
-//void nhapSoLuongSV(int &minsv, int &maxsv) {
-//    while (true) {
-//    	textColor(10);
-//        cout << "Nhap soSV min: ";
-//        textColor(7);
-//        cin >> minsv;
-//        textColor(10);
-//        cout << "Nhap soSV max: ";
-//        textColor(7);
-//        cin >> maxsv;
-//
-//        if (cin.fail()) {
-//            cin.clear();
-//            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-//
-//			textColor(4);
-//            cout << "Gia tri khong hop le! Nhan 1 phim bat ky de nhap lai.";
-//            textColor(7);
-////            waitForEnter();	
-//            system("pause");
-//            clearLastLines(3);   // xoá: l?i + max + min
-//            continue;
-//        }
-//
-//        if (minsv < maxsv) {
-//            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-//            return;
-//        }
-//
-//        // L?i sai min/max
-//        textColor(4);
-//        cout << "ERROR: soSV min phai NHO HON soSV max! Vui long nhap lai.\n";
-//		textColor(7);
-////		waitForEnter();
-//		system("pause");
-//
-//        clearLastLines(3);  // xoá: dòng l?i + max + min
-//    }
-//}
-
 // HAM DINH DANG 2 CHU SO KHI N < 10
 string pad2(int n) {
     if (n < 10) return "0" + to_string(n);
@@ -1493,8 +1412,6 @@ void dsdk_ltc_print(LopTinChi* p, DS_LOPSV* dsLopSV) {
     cout << endl;
     textColor(14);
     cout << "+" << string(63, '-') << "+\n";
-//    cout << "        | STT | MASV       | HO TEN                  | DIEM  | TT     \n";
-//    cout << "        |-----|------------|-------------------------|-------|--------\n";
 	cout<< "|" << center("STT", 5)
 		<< "|" << center("MASV", 12) 
 		<< "|" << center("HO TEN", 24)
@@ -1599,7 +1516,7 @@ void ltc_1_1() {
     
     hk = inputHocKy();
     
-    nhom = inputNhom();
+    nhom = isValid_Nhom(mamh, nk, hk);
 
     nhapSoLuongSV(minsv, maxsv);
     cin.ignore(numeric_limits<streamsize>::max(), '\n');

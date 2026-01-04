@@ -311,7 +311,81 @@ namespace mh_Border_Maker {
              << "   (Su dung phim len/xuong de chuyen trang)";
         SetColor(7, 0);
     };
+	void mh_table_print(treeMH rootMonHoc) {
+	    treeMH mh_list[1000];
+	    int mh_count = 0;
 	
+	    mh_inorder_collect(rootMonHoc, mh_list, mh_count);
+	
+	    const int ROWS_PER_PAGE = 15;
+	    const int khungW = 72;
+	
+	    int currentPage = 1;
+	    int totalPages = (mh_count == 0) ? 1
+	                   : (mh_count + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
+	
+	    while (true) {
+	        system("cls");
+	
+	        string temp = "QUAN LI MON HOC";
+	        main_UI::drawHeader(temp);
+	
+	        textColor(14);
+	    	cout << endl;
+	        cout << "+" << string(khungW, '-') << "+\n";
+	        cout << "|"
+	             << center("MA MH", 12)
+	             << "|" << center("TEN MON HOC", 45)
+	             << "|" << center("LT", 6)
+	             << "|" << center("TH", 6)
+	             << "|\n";
+	        cout << "|" << string(khungW, '-') << "|\n";
+	
+	        int start = (currentPage - 1) * ROWS_PER_PAGE;
+	        int end   = min(start + ROWS_PER_PAGE, mh_count);
+	
+	        if (mh_count == 0) {
+	            textColor(12);
+	            cout << "|" << center("Danh sach trong", khungW) << "|\n";
+	        } else {
+	            for (int i = start; i < end; i++) {
+	                treeMH p = mh_list[i];
+	                cout << "|"
+	                     << center(p->mh.MAMH, 12)
+	                     << "|" << center(p->mh.TENMH, 45)
+	                     << "|" << center(to_string(p->mh.STCLT), 6)
+	                     << "|" << center(to_string(p->mh.STCTH), 6)
+	                     << "|\n";
+	            }
+	        }
+	
+	        int printed = end - start;
+	        for (int i = printed; i < ROWS_PER_PAGE; i++) {
+	            cout << "|"
+	                 << center("", 12)
+	                 << "|" << center("", 45)
+	                 << "|" << center("", 6)
+	                 << "|" << center("", 6)
+	                 << "|\n";
+	        }
+			
+			int printedRows;			
+	        cout << "+" << string(khungW, '-') << "+\n";
+	        textColor(7);
+	
+	        gotoxy(8 + 18, 22);
+        	SetColor(12, 15); cout << " ESC "; SetColor(7, 0); cout << ": EXIT     ";
+	        drawPagination(currentPage, totalPages, 8, 24);
+	
+	        int key = _getch();
+	        if (key == 224) {
+	            key = _getch();
+	            if (key == 72 && currentPage > 1) currentPage--;
+	            else if (key == 80 && currentPage < totalPages) currentPage++;
+	        }
+	        else if (key == 27) return;
+	    }
+	}
 	int mh_table(treeMH rootMonHoc) {
 	    treeMH mh_list[1000];
 	    int mh_count = 0;
@@ -391,6 +465,7 @@ namespace mh_Border_Maker {
 	}
 
 }	//namespace mh_UI
+
 namespace lopsv_Border_Maker{
 	
 	// ================= CURSOR =================
@@ -912,17 +987,28 @@ namespace dk_Border_Maker {
             if (foundSV) break;
         }
 
-        // L?c t?t c? l?p tin ch? phù h?p
-        vector<LopTinChi*> filteredClasses;
-        for (LopTinChi* p = dsLopTC; p; p = p->next) {
-            if (p->HOCKY == hocky && p->NIENKHOA == nienkhoa) {
-                filteredClasses.push_back(p);
-            }
-        }	// don't use vector here
-        	// xai mang con tro
+        // ==== Ð?m s? l?p phù h?p ====
+		int totalClasses = 0;
+		for (LopTinChi* p = dsLopTC; p; p = p->next) {
+		    if (p->HOCKY == hocky && p->NIENKHOA == nienkhoa) {
+		        totalClasses++;
+		    }
+		}
+		
+		// ==== C?p m?ng con tr? ====
+		LopTinChi** filteredClasses = nullptr;
+		if (totalClasses > 0) {
+		    filteredClasses = new LopTinChi*[totalClasses];
+		
+		    int idx = 0;
+		    for (LopTinChi* p = dsLopTC; p; p = p->next) {
+		        if (p->HOCKY == hocky && p->NIENKHOA == nienkhoa) {
+		            filteredClasses[idx++] = p;
+		        }
+		    }
+		}       	// xai mang con tro
 
         const int ROWS_PER_PAGE = 15;
-        int totalClasses = filteredClasses.size();
         int totalPages = (totalClasses == 0) ? 1 : (totalClasses + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
 
         int currentPage = 1;
@@ -1653,9 +1739,6 @@ namespace score_Border_maker {
 	    system("cls");
 	    string temp = "BANG DIEM TONG KET ___";
 	    main_UI::drawHeader(temp);
-//	
-//	    cout << "\nMa lop: " << lop->MALOP
-//	         << "    Ten lop: " << lop->TENLOP << "\n\n";
 		cout << endl;
 	    // ===== TÍNH CHI?U R?NG KHUNG =====
 	    const int colSTT = 5;

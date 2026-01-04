@@ -61,36 +61,54 @@ treeMH mh_left_rotate(treeMH x) {
 }
 
 // ---- Thêm node m?i (AVL Insert) ----
-treeMH mh_insert(treeMH root, treeMH node) {
-    if (!root) return node;
+treeMH mh_insert(treeMH root, const MonHoc& mh, bool& duplicated) {
+    if (!root) {
+        treeMH node = new nodeMH;
+        node->mh = mh;
+        node->mh.height = 1;
+        node->left = node->right = nullptr;
+        return node;
+    }
 
-    if (node->mh.MAMH < root->mh.MAMH)
-        root->left = mh_insert(root->left, node);
-    else if (node->mh.MAMH > root->mh.MAMH)
-        root->right = mh_insert(root->right, node);
-    else {
-        root->mh.TENMH = node->mh.TENMH;
-        root->mh.STCLT = node->mh.STCLT;
-        root->mh.STCTH = node->mh.STCTH;
-        delete node;
+    if (mh.MAMH < root->mh.MAMH) {
+        root->left = mh_insert(root->left, mh, duplicated);
+        if (duplicated) return root;
+    }
+    else if (mh.MAMH > root->mh.MAMH) {
+        root->right = mh_insert(root->right, mh, duplicated);
+        if (duplicated) return root;
+    }
+    else if (mh.MAMH == root->mh.MAMH) {
+        duplicated = true;
         return root;
     }
 
     mh_update_height(root);
     int bal = mh_balance(root);
 
-    if (bal > 1 && node->mh.MAMH < root->left->mh.MAMH) return mh_right_rotate(root);
-    if (bal < -1 && node->mh.MAMH > root->right->mh.MAMH) return mh_left_rotate(root);
-    if (bal > 1 && node->mh.MAMH > root->left->mh.MAMH) {
+    // LL
+    if (bal > 1 && mh.MAMH < root->left->mh.MAMH)
+        return mh_right_rotate(root);
+
+    // RR
+    if (bal < -1 && mh.MAMH > root->right->mh.MAMH)
+        return mh_left_rotate(root);
+
+    // LR
+    if (bal > 1 && mh.MAMH > root->left->mh.MAMH) {
         root->left = mh_left_rotate(root->left);
         return mh_right_rotate(root);
     }
-    if (bal < -1 && node->mh.MAMH < root->right->mh.MAMH) {
+
+    // RL
+    if (bal < -1 && mh.MAMH < root->right->mh.MAMH) {
         root->right = mh_right_rotate(root->right);
         return mh_left_rotate(root);
     }
+
     return root;
 }
+
 
 // ktra  mon hoc co dang duoc su dung 
 bool mh_is_used_in_loptc(const string& mamh) {
@@ -143,6 +161,7 @@ void mh_clear(treeMH root) {
     mh_clear(root->left);
     mh_clear(root->right);
     delete root;
+    root = nullptr;
 }
 
 // ---- Tìm node nh? nh?t ----
@@ -236,41 +255,103 @@ void mh_save_to_file(const string& filename) {
 
 // ---- T?i d? li?u t? file ----
 void mh_load_from_file(const string& filename) {
+	mh_clear(rootMonHoc);
     ifstream fin(filename);
     if (!fin) {
         cout << "Khong tim thay file, bat dau voi cay rong.\n";
         return;
     }
+
     string line;
+    bool firstLine = true;
+
     while (getline(fin, line)) {
         if (line.empty()) continue;
+        
+        if (line.size() >= 3 &&
+	        (unsigned char)line[0] == 0xEF &&
+	        (unsigned char)line[1] == 0xBB &&
+	        (unsigned char)line[2] == 0xBF) {
+	        line.erase(0, 3);
+	    }
+
+        // ---------- X? lý BOM ? dòng d?u ----------
+        if (firstLine) {
+            firstLine = false;
+            if (line.size() >= 3 &&
+                (unsigned char)line[0] == 0xEF &&
+                (unsigned char)line[1] == 0xBB &&
+                (unsigned char)line[2] == 0xBF) {
+                line.erase(0, 3);
+            }
+        }
+
         size_t pos1 = line.find('|');
         if (pos1 == string::npos) continue;
-        string mamh = line.substr(0, pos1);
-        mamh = normalizeMaMH(mamh);
+
         size_t pos2 = line.find('|', pos1 + 1);
         if (pos2 == string::npos) continue;
-        string tenmh = line.substr(pos1 + 1, pos2 - pos1 - 1);
+
         size_t pos3 = line.find('|', pos2 + 1);
         if (pos3 == string::npos) continue;
-        string stclt_str = line.substr(pos2 + 1, pos3 - pos2 - 1);
-        string stcth_str = line.substr(pos3 + 1);
-        int stclt = stoi(stclt_str);
-        int stcth = stoi(stcth_str);
 
-        treeMH node = new nodeMH;
-        node->mh.MAMH = mamh;
-        node->mh.TENMH = tenmh;
-        node->mh.STCLT = stclt;
-        node->mh.STCTH = stcth;
-        node->mh.height = 1;
-        node->left = node->right = nullptr;
+        // ---------- Tách và làm s?ch MAMH ----------
+        string mamh = line.substr(0, pos1);
+		 // ===== FIX BOM + KÝ T? L? Ð?U CHU?I =====
+		if (mamh.size() >= 3 &&
+		    (unsigned char)mamh[0] == 0xEF &&
+		    (unsigned char)mamh[1] == 0xBB &&
+		    (unsigned char)mamh[2] == 0xBF) {
+		    mamh.erase(0, 3);
+		}
+		
+		// lo?i b? kho?ng tr?ng / ký t? th?a
+		while (!mamh.empty() && (mamh[0] == ' ' || mamh[0] == '\t' || mamh[0] == '\r'))
+		    mamh.erase(0, 1);
+		
+		while (!mamh.empty() && (mamh.back() == ' ' || mamh.back() == '\t' || mamh.back() == '\r'))
+		    mamh.pop_back();
 
-        rootMonHoc = mh_insert(rootMonHoc, node);
+        // trim th? công
+        size_t l = mamh.find_first_not_of(" \t\r\n");
+        size_t r = mamh.find_last_not_of(" \t\r\n");
+        if (l == string::npos) continue;
+        mamh = mamh.substr(l, r - l + 1);
+
+        mamh = normalizeMaMH(mamh);
+
+        // ---------- TENMH ----------
+        string tenmh = line.substr(pos1 + 1, pos2 - pos1 - 1);
+
+        // ---------- STCLT / STCTH ----------
+        int stclt = 0, stcth = 0;
+        try {
+            string s1 = line.substr(pos2 + 1, pos3 - pos2 - 1);
+            string s2 = line.substr(pos3 + 1);
+
+            stclt = stoi(s1);
+            stcth = stoi(s2);
+        }
+        catch (...) {
+            continue;
+        }
+
+        // ---------- Insert ----------
+        MonHoc mh;
+        mh.MAMH  = mamh;
+        mh.TENMH = tenmh;
+        mh.STCLT = stclt;
+        mh.STCTH = stcth;
+
+        bool duplicated = false;
+        rootMonHoc = mh_insert(rootMonHoc, mh, duplicated);
     }
+
     fin.close();
     cout << "Da tai du lieu tu file thanh cong!\n";
 }
+
+
 
 // ==================== SINH VIÊN ====================
 
@@ -304,64 +385,6 @@ int sv_count(LopSV* lop) {
     return count;
 }
 
-
-//void sv_print_all_in_class(LopSV* lop) {	
-//	cout << "\n";
-//    cout << setw(15) << "";
-//    setBGColor(14, 4); // nen vang, chu do
-//    cout << "DANH SACH SINH VIEN CUA LOP\n";
-//    setBGColor(0, 7);  // nen den, chu trang
-//    cout << "\n";
-//    if (lop == nullptr) {
-//        cout << ">> Lop khong ton tai!\n";
-//        cout << string(100, '=') << "\n\n";
-//        return;
-//    }
-//    if (lop->FirstSV == nullptr) {
-//        cout << "(Chua co sinh vien nao trong lop)\n";
-//        cout << string(100, '=') << "\n\n";
-//        return;
-//    }
-//    textColor(14);
-//    cout << "+" << string(97, '-') << "+\n";
-//    cout << "|" << center("STT", 6)
-//         << "|" << center("MASV", 16)
-//         << "|" << center("HO", 12)
-//         << "|" << center("TEN", 10)
-//         << "|" << center("PHAI", 8)
-//         << "|" << center("SODT", 15)
-//         << "|" << center("EMAIL",24 )
-//         << "|\n";
-//    cout << "|" << string(97, '-') << "|\n";
-//    int stt = 0;
-//    for (nodeSV* p = lop->FirstSV; p != nullptr; p = p->next) {
-//        stt++;
-//        cout << "|";
-//        textColor(12); // do
-//        cout << center(to_string(stt), 6);
-//        textColor(14); // vang
-//        cout << "|" << center(p->sv.MASV, 16)
-//             << "|" << center(p->sv.HO, 12)
-//             << "|" << center(p->sv.TEN, 10)
-//             << "|" << center(p->sv.PHAI, 8)
-//             << "|" << center(p->sv.SODT, 15)
-//             << "|" << center(p->sv.Email, 24)
-//             << "|\n";
-//    }
-//    for (int i = stt; i < 15; ++i) {
-//	    cout << "|"
-//	         << center("", 6)
-//	         << "|" << center("", 16)
-//	         << "|" << center("", 12)
-//	         << "|" << center("", 10)
-//	         << "|" << center("", 8)
-//	         << "|" << center("", 15)
-//	         << "|" << center("", 24)
-//	         << "|\n";
-//	}
-//    cout << "+" << string(97, '-') << "+\n\n";
-//    textColor(7); // reset chu trang
-//}
 // ==================== L?P SINH VIÊN ====================
 
 bool validate_MALOP(const string& malop) {
@@ -1682,37 +1705,40 @@ void ltc_2() {
 }
 
 void mh_1() {
-	cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    QuanLyDiem::mh_load_from_file("monhoc.txt");
-	cout << endl;
-    string MAMH, TENMH;
-    int STCLT, STCTH;
+    // Load d? li?u hi?n có
+    cout << endl;
 
-    MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc: ");
-    TENMH = checkTen("Vui long nhap ten Mon Hoc: ");
-    STCLT = nhapSTC("so tin chi ly thuyet");
-    STCTH = nhapSTC("so tin chi thuc hanh");
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    QuanLyDiem::treeMH node = new QuanLyDiem::nodeMH;
-    node->mh.MAMH  = MAMH;
-    node->mh.TENMH = TENMH;
-    node->mh.STCLT = STCLT;
-    node->mh.STCTH = STCTH;
-    node->mh.height = 1;
-    node->left = nullptr;
-    node->right = nullptr;
+    // Nh?p d? li?u
+    string MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc: ");
+    string TENMH = checkTen("Vui long nhap ten Mon Hoc: ");
+    int STCLT = nhapSTC("so tin chi ly thuyet");
+    int STCTH = nhapSTC("so tin chi thuc hanh");
 
+    // T?o d? li?u môn h?c (KHÔNG c?p phát node)
+    MonHoc mh;
+    mh.MAMH  = MAMH;
+    mh.TENMH = TENMH;
+    mh.STCLT = STCLT;
+    mh.STCTH = STCTH;
+
+    // Insert an toàn
+    bool duplicated = false;
     QuanLyDiem::rootMonHoc =
-        QuanLyDiem::mh_insert(QuanLyDiem::rootMonHoc, node);
+        QuanLyDiem::mh_insert(QuanLyDiem::rootMonHoc, mh, duplicated);
 
+    // Thông báo
+    if (duplicated) {
+        cout << "Ma mon hoc da ton tai!\n";
+        return;
+    }
+
+    // N?u không trùng thì có th? luu file
     QuanLyDiem::mh_save_to_file("monhoc.txt");
 }
 
 
+
 void mh_2() {
-	cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    QuanLyDiem::mh_load_from_file("monhoc.txt");
-    QuanLyDiem::ltc_load_from_file("loptinchi.txt");
 	cout << endl;
     string MAMH = checkMa(10, "Vui long nhap Ma Mon Hoc can xoa: ");
 
@@ -1746,8 +1772,6 @@ void mh_2() {
 
 
 void mh_3() {
-	cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    QuanLyDiem::mh_load_from_file("monhoc.txt");
 	cout << endl;
     string MAMH, TENMH;
     int STCLT, STCTH;
@@ -1770,7 +1794,6 @@ void mh_3() {
 
 void mh_4() {
 	system("cls");
-	QuanLyDiem::mh_load_from_file("monhoc.txt");
     mh_Border_Maker::mh_table(rootMonHoc);
 }
 
@@ -1781,8 +1804,10 @@ void dssv_1() {
     cout << "QUAN LY DANH SACH LOP SINH VIEN\n";
     setBGColor(0, 7);
     cout << "\n";
+    
+	int currentPage = 1;
 
-//    lopsv_Border_Maker::dssv_print_all();
+    lopsv_Border_Maker::dssv_print_all(currentPage);
 
     cout << "\n";
     textColor(11);

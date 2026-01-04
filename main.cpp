@@ -10,7 +10,7 @@ using namespace std;
 using namespace QuanLyDiem;
 
 int main() {
-    mh_load_from_file("monhoc.txt");
+	mh_load_from_file("monhoc.txt");
     dssv_load_from_file("lopSV.txt");
     ltc_load_from_file("loptinchi.txt");
 
@@ -31,13 +31,21 @@ int main() {
             }
         }
         else if (mainMenu == 2) { // Quan Ly Mon Hoc
+        
             if (subMenu == 1) {
             	int menu_choice = mh_Border_Maker::mh_table(rootMonHoc);
+            	// ===== D?N BUFFER AN TOÀN SAU _getch =====
+				cin.clear();
+				while (cin.rdbuf()->in_avail() > 0)
+					cin.get();
             	switch (menu_choice) {
 		            case 1:
+		            	
+				        // ===== D?N BUFFER AN TOÀN SAU _getch =====
+						cin.clear();
+						while (cin.rdbuf()->in_avail() > 0)
+						cin.get();	
 					    mh_1();
-					    system("cls");
-					    mh_Border_Maker::mh_table(rootMonHoc);
 					    cout << "\n>> Da them mon hoc thanh cong!";
 					    system("pause");
 					    break;
@@ -45,8 +53,6 @@ int main() {
 					
 					case 2: {
 					    mh_2();
-					    system("cls");
-					    mh_Border_Maker::mh_table(rootMonHoc);
 					    cout << "\n>> Xoa mon hoc thanh cong!";
 					    system("pause");
 					    break;
@@ -54,8 +60,6 @@ int main() {
 					
 					case 3: {
 					    mh_3();
-					    system("cls");
-					    mh_Border_Maker::mh_table(rootMonHoc);
 					    cout << "\n>> Dieu Chinh mon hoc thanh cong!";
 					    system("pause");
 					    break;
@@ -72,9 +76,8 @@ int main() {
             	
 			}
             else if (subMenu == 2) {
-                mh_4();
-                cout << endl << "\nNhan phim bat ky de quay lai...";
-                _getch();
+                mh_Border_Maker::mh_table_print(rootMonHoc);
+                system("pause");
             }
         }
         else if (mainMenu == 3) { // Quan Ly Sinh Vien

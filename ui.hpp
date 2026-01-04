@@ -59,7 +59,7 @@ namespace mh_Border_Maker {
     // ===== UI components =====
     void drawFunctionButtons(int x, int y);
     void drawPagination(int currentPage, int totalPages, int x, int y);
-
+	void mh_table_print(QuanLyDiem::treeMH rootMonHoc);
     // ===== Main table =====
     // return:
     // 0 = EXIT

@@ -122,7 +122,12 @@ int mh_balance(treeMH n);
 void mh_update_height(treeMH n);
 treeMH mh_right_rotate(treeMH y);
 treeMH mh_left_rotate(treeMH x);
-treeMH mh_insert(treeMH root, treeMH node);
+treeMH mh_insert(
+    treeMH root,
+    const MonHoc& mh,
+    bool& duplicated
+);
+
 treeMH mh_remove(treeMH root, const string& mamh);
 treeMH mh_find(treeMH root, const string& mamh);
 treeMH mh_find_by_name(treeMH root, const std::string& tenmh);

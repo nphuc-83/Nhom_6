@@ -1210,9 +1210,9 @@ bool isValid_SV(const string& label, int& value, int x) {
     }
 
     stringstream ss(s);
-    if (!(ss >> value) || value < 0 || !ss.eof()) {
+    if (!(ss >> value) || value < 1 || !ss.eof()) {
         textColor(4);
-        cout << "Gia tri khong hop le! Nhan phim bat ky de nhap lai.\n";
+        cout << "Gia tri khong hop le! (SV min phai >= 1)\n";
         textColor(7);
         system("pause");
         clearLastLines(x);

@@ -1880,6 +1880,11 @@ namespace ltc_Border_Maker{
 	            for (DangKy* dk = p->DSDK; dk; dk = dk->next)
 	                if (!dk->HUYDK) siSo++;
 	
+				
+				// tu dong cap nhat trang thai lop
+				p->HUYLOP = (siSo < p->SOSVMIN);
+				
+				
 	            cout << "|";
 	            textColor(12);
 	            cout << center(to_string(stt++), 5);
@@ -1893,7 +1898,7 @@ namespace ltc_Border_Maker{
 		             << "|"  << center(to_string(siSo) +  "/" + pad2(p->SOSVMAX), 9)	
 		             << "|"  << center(pad2(p->SOSVMIN), 8)                   
 					 << "|"  << center(pad2(p->SOSVMAX), 8)                  
-		             << "|"  << center((p->HUYLOP ? string("DA HUY"): string("MO")), 12)
+		             << "|"  << center((p->HUYLOP ? string("HUY"): string("MO")), 12)
 		             << "|\n";
 	        }
 			int printedRows = (totalClasses == 0) ? 1 : (endIdx - startIdx);

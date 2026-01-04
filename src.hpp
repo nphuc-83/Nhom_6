@@ -210,12 +210,11 @@ void textColor(int color); // ham text color
 void setBGColor(int bg, int text);  // ham console color
 std::string normalizeMaMH(std::string s); // HÀM CHU THUONG -> CHU HOA
 bool isValidMaMH(const std::string& s); // KIEM TRA SAU KHI VIET HOA VÀ GIOI HAN KI TU
-int isValid_Nhom(string mamh, string nk, int hk);  
+int isValid_Nhom(string mamh, string nk, int hk);  // HAM KIEM TRA LOI SO NHOM
 bool isValid_SV(const string& label, int& value, int x);  // HAM BAT LOI INPUT SO LUONG SV MIN MAX
 std::string inputMaMH();  // HÀM NHAP MÃ MÔN HOC
 std::string inputNienKhoa(); // HÀM NHAP NIEN KHOA
 int inputHocKy();  // HAM NHAP HOC KI
-//int inputNhom();  // HAM NHAP SO NHOM
 void nhapSoLuongSV(int &minsv, int &maxsv);  // HÀM KIEM TRA BAT BUOC SV MIN < SV MAX
 void clearLastLines(int lines);  // HAM XOA DONG CUOI
 int split_fields(const std::string& s, std::string out[], int max_fields); // Hàm tách chuoi bang '|' không dùng vector

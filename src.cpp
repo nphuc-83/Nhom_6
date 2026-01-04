@@ -1527,6 +1527,23 @@ void ltc_clear_all() {
 	}
 }
 
+// HAM XAC NHAN THUC HIEN
+bool confirmYN() {
+    string s;
+    while (true) {
+        cout << "Xac nhan? (Y/N): ";
+        getline(cin, s);
+
+        if (s == "y" || s == "Y"){
+        	cout << "\nDa xac nhan. nhan enter de tiep tuc!";
+			return true;
+		}
+        if (s == "n" || s == "N") return false;
+
+        cout << "Chi duoc nhap Y hoac N!\n";
+    }
+}
+
 
 // Ham Menu
 void ltc_1_1() {
@@ -1542,6 +1559,14 @@ void ltc_1_1() {
     nhom = isValid_Nhom(mamh, nk, hk);
 
     nhapSoLuongSV(minsv, maxsv);
+    
+    
+    if (!confirmYN()) {
+        cout << "Da huy thao tac!\n";
+        system("pause");
+        return; 
+    }
+    
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     QuanLyDiem::LopTinChi* node = QuanLyDiem::ltc_add(mamh, nk, hk, nhom, minsv, maxsv);
@@ -1561,7 +1586,15 @@ void ltc_1_2() {
     textColor(10);
     cout << "Nhap ma lop can xoa: ";
     textColor(7);
-    cin >> id; 
+    cin >> id;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    if (!confirmYN()) {
+        cout << "Da huy thao tac!\n";
+        system("pause");
+        return; 
+    }
+    
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     if (QuanLyDiem::ltc_remove_by_id(id)) {
@@ -1613,50 +1646,57 @@ void ltc_1_3() {
         system("pause");
         return;
     }
-
-    // Nhap soSV min / max moi
+    
+    // ----- Bi?n t?m d? nh?p -----
+    int tmpMin, tmpMax, tmpHUY;
+    
+    
     while (true) {
-    	textColor(10);
-        cout << "Nhap soSV min moi: ";
-        textColor(7);
-        cin >> ltc->SOSVMIN;
 
-		textColor(10);
-        cout << "Nhap soSV max moi: ";
-        textColor(7);
-		cin >> ltc->SOSVMAX;
+        // ===== NHAP MIN =====
+        if (!isValid_SV("Nhap soSV min: ", tmpMin, 3))
+            continue;
 
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-			textColor(4);
-            cout << "Gia tri khong hop le! Nhan 1 phim bat ky de nhap lai.";
+        // ===== NHAP MAX =====
+        while (true) {
+            if (!isValid_SV("Nhap soSV max: ", tmpMax, 3))
+                continue;
+            break; // max hop le
+        }
+        
+        if (tmpMin >= tmpMax) {
+            textColor(4);
+            cout << "ERROR: soSV min phai NHO HON soSV max!\n";
             textColor(7);
-            waitForEnter();
-            clearLastLines(3);
+            system("pause");
+            clearLastLines(4); // loi + max
             continue;
         }
+        break;
 
-        if (ltc->SOSVMIN < ltc->SOSVMAX) {
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            break;
-        }
-        textColor(4);
-        cout << "ERROR: soSV min phai NHO HON soSV max! Vui long nhap lai.\n";
-        textColor(7);
-		waitForEnter();
-        clearLastLines(3);
+//        return; // min + max hop le
     }
 	
 	textColor(10);
     cout << "Huy lop? (0: khong, 1: co): ";
     textColor(7);
-    cin >> ltc->HUYLOP;
-    cin.ignore();
+    cin >> tmpHUY;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	
+	if (!confirmYN()) {
+        cout << "Da huy thao tac!\n";
+        system("pause");
+        return;
+    }
+    
+    ltc->SOSVMIN = tmpMin;
+    ltc->SOSVMAX = tmpMax;
+    ltc->HUYLOP  = tmpHUY;
 
-	textColor(10);
-    cout << "Da cap nhat.\n";
+    
+//    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
+    cout << "\nDa cap nhat.\n";
 	textColor(7);
 
     QuanLyDiem::ltc_save_to_file("loptinchi.txt");
@@ -1675,7 +1715,8 @@ void ltc_2() {
 
     int ma;
     cin >> ma;
-
+	system("cls");
+	
     if (cin.fail()) {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');

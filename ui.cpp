@@ -1634,7 +1634,7 @@ namespace score_Border_maker {
 	}
 
 	void score_print_dtb_malop(QuanLyDiem::LopSV*& lopsv) {
-		string temp = "BANG DIEM TRUNG BINH CUA LOP ___";
+		string temp = center("___ BANG DIEM TRUNG BINH CUA LOP ___", 44);
         main_UI::drawHeader(temp);
         
         const int ROWS_PER_PAGE = 15;

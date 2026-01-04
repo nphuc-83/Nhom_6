@@ -226,6 +226,7 @@ int split_fields(const std::string& s, std::string out[], int max_fields); // Hà
 void waitForEnter(); // HAM DOI PHIM ENTER
 std::string pad2(int n); //// HAM DINH DANG 2 CHU SO KHI N < 10
 void dsdk_ltc_print(LopTinChi* p, DS_LOPSV* dsLopSV);  // IN DSSV DANG KI LOP TIN CHI
+bool confirmYN(); // HAM XAC NHAN THUC HIEN
 
 
 // Ham Menu

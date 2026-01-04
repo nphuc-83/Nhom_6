@@ -1884,6 +1884,15 @@ void dssv_2() {
     cout << ">>> XOA LOP SINH VIEN\n";
     textColor(7);
     string MALOP = checkMa(15, "Nhap MA LOP can xoa: ");
+    cout << ">> Xac nhan xoa '" << MALOP << "' (Y/N): ";
+    char c;
+    cin >> c;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    if (c != 'Y' && c != 'y') {
+        cout << ">> Da huy thao tac.\n";
+        return;
+    }
     if (QuanLyDiem::dssv_remove(MALOP)) {
         textColor(10);
         cout << "\nXoa lop thanh cong!\n";
@@ -1957,6 +1966,15 @@ void dssv_4_2(LopSV* lop) {
 	system("cls");
 	lopsv_Border_Maker::sv_print_all(lop);
     string masv = checkMa(15, "Nhap ma sinh vien can xoa: ");
+	cout << ">> Xac nhan xoa '" << masv << "' (Y/N): ";
+    char c;
+    cin >> c;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    if (c != 'Y' && c != 'y') {
+        cout << ">> Da huy thao tac.\n";
+        return;
+    }
     QuanLyDiem::nodeSV*& head = lop->FirstSV;
     QuanLyDiem::nodeSV* cur = head;
     QuanLyDiem::nodeSV* prev = nullptr;

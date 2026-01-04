@@ -1190,7 +1190,7 @@ string inputMaMH() {
         	textColor(4);
             cout << "Ma mon hoc chi duoc A-Z, 0-9, toi da 10 ky tu!\n";
             textColor(7);
-            cin.get(); cin.get();
+			system("pause");
             clearLastLines(3);
             continue;
         }
@@ -1200,7 +1200,7 @@ string inputMaMH() {
         	textColor(4);
             cout << "Khong ton tai ma mon hoc trong file! Hay nhap lai!\n";
             textColor(7);
-            cin.get();
+            system("pause");
             clearLastLines(3);
             continue;
         }
@@ -1367,44 +1367,110 @@ void clearLastLines(int lines) {
     }
 }
 
-// HÀM KIEM TRA BAT BUOC SV MIN < SV MAX
+// HAM BAT LOI INPUT SO LUONG SV MIN MAX
+bool isValid_SV(
+    const string& label,
+    int& value,
+    int x
+) {
+    string s;
+
+    textColor(10);
+    cout << label;
+    textColor(7);
+    getline(cin, s);
+
+    if (s.empty()) {
+        textColor(4);
+        cout << "Khong duoc bo trong! Nhan phim bat ky de nhap lai.\n";
+        textColor(7);
+        system("pause");
+        clearLastLines(x);
+        return false;
+    }
+
+    stringstream ss(s);
+    if (!(ss >> value) || value < 0 || !ss.eof()) {
+        textColor(4);
+        cout << "Gia tri khong hop le! Nhan phim bat ky de nhap lai.\n";
+        textColor(7);
+        system("pause");
+        clearLastLines(x);
+        return false;
+    }
+
+    return true;
+}
+
 void nhapSoLuongSV(int &minsv, int &maxsv) {
     while (true) {
-    	textColor(10);
-        cout << "Nhap soSV min: ";
-        textColor(7);
-        cin >> minsv;
-        textColor(10);
-        cout << "Nhap soSV max: ";
-        textColor(7);
-        cin >> maxsv;
 
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        // ===== NHAP MIN =====
+        if (!isValid_SV("Nhap soSV min: ", minsv, 3))
+            continue;
 
-			textColor(4);
-            cout << "Gia tri khong hop le! Nhan 1 phim bat ky de nhap lai.";
+        // ===== NHAP MAX =====
+        while (true) {
+            if (!isValid_SV("Nhap soSV max: ", maxsv, 3))
+                continue;
+            break; // max hop le
+        }
+        
+        if (minsv >= maxsv) {
+            textColor(4);
+            cout << "ERROR: soSV min phai NHO HON soSV max!\n";
             textColor(7);
-            waitForEnter();	
-            clearLastLines(3);   // xoá: l?i + max + min
+            system("pause");
+            clearLastLines(4); // loi + max
             continue;
         }
 
-        if (minsv < maxsv) {
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            return;
-        }
-
-        // L?i sai min/max
-        textColor(4);
-        cout << "ERROR: soSV min phai NHO HON soSV max! Vui long nhap lai.\n";
-		textColor(7);
-		waitForEnter();
-
-        clearLastLines(3);  // xoá: dòng l?i + max + min
+        return; // min + max hop le
     }
 }
+
+
+
+// HÀM KIEM TRA BAT BUOC SV MIN < SV MAX
+//void nhapSoLuongSV(int &minsv, int &maxsv) {
+//    while (true) {
+//    	textColor(10);
+//        cout << "Nhap soSV min: ";
+//        textColor(7);
+//        cin >> minsv;
+//        textColor(10);
+//        cout << "Nhap soSV max: ";
+//        textColor(7);
+//        cin >> maxsv;
+//
+//        if (cin.fail()) {
+//            cin.clear();
+//            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+//
+//			textColor(4);
+//            cout << "Gia tri khong hop le! Nhan 1 phim bat ky de nhap lai.";
+//            textColor(7);
+////            waitForEnter();	
+//            system("pause");
+//            clearLastLines(3);   // xoá: l?i + max + min
+//            continue;
+//        }
+//
+//        if (minsv < maxsv) {
+//            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+//            return;
+//        }
+//
+//        // L?i sai min/max
+//        textColor(4);
+//        cout << "ERROR: soSV min phai NHO HON soSV max! Vui long nhap lai.\n";
+//		textColor(7);
+////		waitForEnter();
+//		system("pause");
+//
+//        clearLastLines(3);  // xoá: dòng l?i + max + min
+//    }
+//}
 
 // HAM DINH DANG 2 CHU SO KHI N < 10
 string pad2(int n) {

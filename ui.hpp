@@ -177,6 +177,8 @@ namespace score_Border_maker {
 }
 
 namespace ltc_Border_Maker{
+	void SetColor(int text, int bg);
+	void gotoxy(int x, int y);
 	void drawFunctionButtons(int x, int y);
 	void drawPagination(int currentPage, int totalPages, int x, int y);
 	void ltc_print_all();

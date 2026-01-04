@@ -210,6 +210,7 @@ void textColor(int color); // ham text color
 void setBGColor(int bg, int text);  // ham console color
 std::string normalizeMaMH(std::string s); // HÀM CHU THUONG -> CHU HOA
 bool isValidMaMH(const std::string& s); // KIEM TRA SAU KHI VIET HOA VÀ GIOI HAN KI TU
+bool isValid_SV(const string& label, int& value, int x);  // HAM BAT LOI INPUT SO LUONG SV MIN MAX
 std::string inputMaMH();  // HÀM NHAP MÃ MÔN HOC
 std::string inputNienKhoa(); // HÀM NHAP NIEN KHOA
 int inputHocKy();  // HAM NHAP HOC KI

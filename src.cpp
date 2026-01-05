@@ -469,7 +469,10 @@ bool dssv_remove(const string& malop) {
     }
     sv_clear(dsLopSV->nodes[idx]->FirstSV);
     delete dsLopSV->nodes[idx];
-    dsLopSV->nodes[idx] = nullptr;
+    for (int i = idx; i < dsLopSV->n - 1; i++) {
+        dsLopSV->nodes[i] = dsLopSV->nodes[i + 1];
+    }
+    dsLopSV->nodes[dsLopSV->n - 1] = nullptr;
     dsLopSV->n--;
     cout << " Da xoa lop '" << malop << "' thanh cong!\n";
     return true;
@@ -487,53 +490,6 @@ bool dssv_edit(const string& malop, const string& newTen) {
     dsLopSV->nodes[idx]->TENLOP = newTen;
     return true;
 }
-
-//void dssv_print_all() {
-//	cout << "\n";
-//    cout << setw(20) << "";
-//    setBGColor(14, 4); // nen vang, chu do 
-//    cout << "DANH SACH LOP SINH VIEN\n";
-//    setBGColor(0, 7);  // nen den, chu trang
-//    cout << "\n";
-//    if (dsLopSV == nullptr || dsLopSV->n == 0) {
-//        cout << endl <<  "DANH SACH LOP RONG!\n" << endl;
-//        cout << string(80, '=') << "\n\n";
-//        return;
-//    }
-//    textColor(14);
-//    cout << "+" << string(55, '-') << "+\n";
-//    cout << "|" << center("STT", 6)
-//         << "|" << center("MA LOP", 15)
-//         << "|" << center("TEN LOP", 32)
-//         << "|\n";
-//    cout << "|" << string(55, '-') << "|\n";
-//    
-//    int count=0; 
-//    
-//    for (int i = 0; i < MAX_LOPSV; i++) {
-//        if (dsLopSV->nodes[i] != nullptr) {
-//            count++;
-//            cout << "|";
-//            textColor(12); // do 
-//            cout << center(to_string(count), 6);
-//            textColor(14); // vang
-//            cout << "|" << center(dsLopSV->nodes[i]->MALOP, 15)
-//                 << "|" << center(dsLopSV->nodes[i]->TENLOP, 32)
-//                 << "|\n";
-//        }
-//    }
-//    
-//    for (int i = count; i < 15; ++i) {
-//	    cout << "|"
-//	         << center("", 6)
-//	         << "|" << center("", 15)
-//	         << "|" << center("", 32)
-//	         << "|\n";
-//	}
-//    
-//    cout << "+" << string(55, '-') << "+\n\n";
-//    textColor(7); // reset chu trang
-//}
 
 LopSV* dssv_find(string &malop) {
 	for (int i = 0; i < MAX_LOPSV; i++) {
@@ -1878,7 +1834,9 @@ void dssv_2() {
     cout <<"QUAN LY DANH SACH LOP SINH VIEN\n";
     setBGColor(0, 7);
     cout << "\n";
-//    lopsv_Border_Maker::dssv_print_all();
+	int currentPage = 1;
+
+    lopsv_Border_Maker::dssv_print_all(currentPage);
     cout << "\n";
     textColor(11);
     cout << ">>> XOA LOP SINH VIEN\n";
@@ -1936,15 +1894,37 @@ void dssv_3() {
 }
 
 void dssv_4_1(LopSV* lop) {
-	system("cls");
 	lopsv_Border_Maker::sv_print_all(lop);
     QuanLyDiem::SinhVien sv;
-    cout << "\n";
+    cout << endl;
     textColor(11);
     cout << ">>> THEM SINH VIEN MOI ";
     textColor(7);
     cout << "\n";    
+    while (true){ 
     sv.MASV = checkMa(15, " Ma SV        : ");
+    bool isDuplicate = false;
+        PTRSV p = lop->FirstSV;
+        while (p) {
+            if (p->sv.MASV == sv.MASV) {
+                isDuplicate = true;
+                break;
+            }
+            p = p->next;
+        }
+        
+        if (isDuplicate) {
+            textColor(12);
+            cout << " >> LOI: Ma sinh vien '" << sv.MASV 
+                 << "' da ton tai trong lop nay!\n";
+            cout << " >> Vui long nhap ma khac.\n\n";
+            textColor(7);
+            // Quay l?i nh?p l?i MASV
+        } else {
+            // MASV h?p l? và không trùng
+            break;
+        }
+      }
     sv.HO    = checkTen(" Ho           : ");
     sv.TEN   = checkTen(" Ten          : ");
     sv.PHAI  = checkPHAI(" Phai (Nam/Nu): ");
@@ -1963,7 +1943,6 @@ void dssv_4_1(LopSV* lop) {
 }
 
 void dssv_4_2(LopSV* lop) {
-	system("cls");
 	lopsv_Border_Maker::sv_print_all(lop);
     string masv = checkMa(15, "Nhap ma sinh vien can xoa: ");
 	cout << ">> Xac nhan xoa '" << masv << "' (Y/N): ";
@@ -2022,7 +2001,14 @@ void dssv_4_3(LopSV* lop) {
 void dk_1(const string& masv, int hocky, const string& nienkhoa) {
     int maLopTC;
     cout << "Nhap MALOPTC can dang ky (0 de thoat): ";
-    cin >> maLopTC;
+
+    if (!(cin >> maLopTC)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Nhap khong hop le!\n";
+        system("pause");
+        return;
+    }
 
     if (maLopTC == 0) return;
 
@@ -2033,24 +2019,30 @@ void dk_1(const string& masv, int hocky, const string& nienkhoa) {
     else if (lop->HUYLOP) {
         cout << "Lop da bi huy!\n";
     }
-    else if (dk_find(lop->DSDK, masv)) {
-        cout << "Ban da dang ky lop nay roi!\n";
+    else if (lop->HOCKY != hocky || lop->NIENKHOA != nienkhoa) {
+        cout << "Lop khong thuoc hoc ky hien tai!\n";
     }
     else {
-        int siSo = 0;
-        for (DangKy* dk = lop->DSDK; dk; dk = dk->next)
-            if (!dk->HUYDK) siSo++;
-
-        if (siSo >= lop->SOSVMAX) {
-            cout << "Lop da day!\n";
+        DangKy* dk = dk_find(lop->DSDK, masv);
+        if (dk && !dk->HUYDK) {
+            cout << "Ban da dang ky lop nay roi!\n";
         } else {
-            QuanLyDiem::ltc_add_registration(maLopTC, masv);
-            cout << "DANG KY THANH CONG!\n";
+            int siSo = 0;
+            for (DangKy* p = lop->DSDK; p; p = p->next)
+                if (!p->HUYDK) siSo++;
+
+            if (siSo >= lop->SOSVMAX) {
+                cout << "Lop da day!\n";
+            } else {
+                QuanLyDiem::ltc_add_registration(maLopTC, masv);
+                cout << "DANG KY THANH CONG!\n";
+            }
         }
     }
 
     system("pause");
 }
+
 
 void dk_2(const string& masv, int hocky, const string& nienkhoa) {
     int maLopTC;
@@ -2223,7 +2215,7 @@ string checkPHAI(string info) {
             c = tolower((unsigned char)c);
 
         if (phai != "nam" && phai != "nu") {
-            cout << " Phai chi duoc la Nam hoac Nu.\n";
+            cout << " Phai chi duoc la Nam hoac Nu.\n";	
             continue;
         }
 

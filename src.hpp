@@ -94,7 +94,7 @@ extern DS_LOPSV* dsLopSV;
 
 // --- Sinh viên ---
 SinhVien* sv_find(SinhVien* head, const std::string& masv);
-bool sv_remove(SinhVien*& head, const std::string& masv);
+//bool sv_remove(SinhVien*& head, const std::string& masv);
 bool sv_edit(SinhVien* head, const std::string& masv, const std::string& ho, const std::string& ten, char phai, const std::string& sodt);
 void sv_print(SinhVien* head);
 std::vector<SinhVien*> sv_to_vector(SinhVien* head);

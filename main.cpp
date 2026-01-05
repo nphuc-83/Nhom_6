@@ -81,9 +81,6 @@ int main() {
             }
         }
         else if (mainMenu == 3) { // Quan Ly Sinh Vien
-        	dssv_load_from_file("lopSV.txt");   // ?? QUAN TR?NG
-		    ltc_load_from_file("loptinchi.txt");
-
             if (subMenu == 1) {
                 // quan li lop sv 
                     lopsv_Border_Maker::QuanliLopSinhVien();
@@ -112,8 +109,8 @@ int main() {
 					choice = dk_Border_Maker::dk_registration_table(masv, hocky, nienkhoa);
 			
 			        switch (choice) {
-			            case 1: system("cls"); dk_1(masv, hocky, nienkhoa); break;
-			    		case 2: system("cls"); dk_2(masv, hocky, nienkhoa); break;
+			            case 1:  cout << endl; dk_1(masv, hocky, nienkhoa); break;
+			    		case 2:  cout << endl; dk_2(masv, hocky, nienkhoa); break;
 			            case 0:
 			                cout << "Quay lai menu chinh...\n";
 			                system("pause");

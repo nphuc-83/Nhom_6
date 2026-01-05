@@ -676,11 +676,13 @@ namespace lopsv_Border_Maker{
 	        if (key == 27) return;   // ESC ? quay l?i màn ch?n l?p
 	
 	        if (key >= 'a' && key <= 'z') key -= 32;
-	
+			
+			// loi buffer
+			
 	        switch (key) {
-	            case 'A': system("cls"); dssv_4_1(selectedLop); break;
-	            case 'D': system("cls"); dssv_4_2(selectedLop); break;
-	            case 'E': system("cls"); dssv_4_3(selectedLop); break;
+	            case 'A': cout << endl; dssv_4_1(selectedLop); break;
+	            case 'D': cout << endl; dssv_4_2(selectedLop); break;
+	            case 'E': cout << endl; dssv_4_3(selectedLop); break;
 	        }
 	    }
 	}
@@ -762,19 +764,23 @@ namespace lopsv_Border_Maker{
 	            gotoxy(5, 26);
 	            textColor(14);
 	            
-	            string MALOP = checkMa(10, "Nhap ma lop can quan ly: ");
+//	            if (cin.peek() == '\n') {
+//				    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+//				}
+				
+				string MALOP = checkMa(10, "Nhap ma lop can quan ly: ");
 	
 	            textColor(7);
 	
 	            LopSV* lop = QuanLyDiem::dssv_find(MALOP);
-	            if (!lop) {
+	            if (!lop) {	
 	                cout << "Lop khong ton tai!\n";
 	                system("pause");
 	                continue;
 	            }
 	
 	            // ?? G?I HÀM VÒNG 2
-	            sv_print_all(lop);
+	            sv_print_all(lop);	//Menu cap nhat danh sach sinh vien
 	            currentPage = 1; // reset khi quay l?i
 	        }
 	    }

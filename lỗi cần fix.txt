@@ -1,1 +1,9 @@
-1. đăng ký lớp tín chỉ phần học kỳ, niên khóa miễn đúng là hiển thị dù không có lớp chứ không phải báo lỗi
+trạng thái hủy được hiểu là lớp chưa đủ điều kiện để bắt đầu dạy, còn xóa lớp trực tiếp phải xóa thủ công
++lớp đã hủy vẫn đăng ký được (để lấp đầy số sv min)	\fixed
++không được đăng ký 1 môn trùng niên khóa, trùng nhóm	\fixed
+
+
++ quản lí môn học đang lỗi buffer			\fail
++ điều chỉnh lại ràng buộc input
++ việc điều chỉnh input phần số tín chỉ lt và th 	\fixed
+có thể dẫn đến sai sót khi tính điểm trung bình tích lũy

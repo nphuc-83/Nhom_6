@@ -33,47 +33,37 @@ int main() {
         else if (mainMenu == 2) { // Quan Ly Mon Hoc
         
             if (subMenu == 1) {
-            	int menu_choice = mh_Border_Maker::mh_table(rootMonHoc);
-            	// ===== D?N BUFFER AN TOÀN SAU _getch =====
-				cin.clear();
-				while (cin.rdbuf()->in_avail() > 0)
-					cin.get();
-            	switch (menu_choice) {
-		            case 1:
-		            	
-				        // ===== D?N BUFFER AN TOÀN SAU _getch =====
-						cin.clear();
-						while (cin.rdbuf()->in_avail() > 0)
-						cin.get();	
-					    mh_1();
-					    cout << "\n>> Da them mon hoc thanh cong!";
-					    system("pause");
-					    break;
-
-					
-					case 2: {
-					    mh_2();
-					    cout << "\n>> Xoa mon hoc thanh cong!";
-					    system("pause");
-					    break;
-					}
-					
-					case 3: {
-					    mh_3();
-					    cout << "\n>> Dieu Chinh mon hoc thanh cong!";
-					    system("pause");
-					    break;
-					}
-
-		            case 0:
-		                cout << "Quay lai menu chinh...\n";
-		                subMenu = 0;
-		                break;
-		            default:
-		                cout << "Lua chon khong hop le!\n";
-		                system("pause");
-		        }
-            	
+            	while(true) {
+            		system("cls");
+            		bool flag = false;
+            		int menu_choice = mh_Border_Maker::mh_table(rootMonHoc);
+	            	switch (menu_choice) {
+			            case 1:
+						    mh_1();
+						    cout << "\n>> Da them mon hoc thanh cong!";
+						    system("pause");
+						    break;
+						case 2:
+						    mh_2();
+						    cout << "\n>> Xoa mon hoc thanh cong!";
+						    system("pause");
+						    break;
+						case 3: {
+						    mh_3();
+						    break;
+						}
+			            case 0:
+			                flag = true;
+			                break;
+			            default:
+			                cout << "Lua chon khong hop le!\n";
+			                system("pause");
+			        }
+			        subMenu = 0;
+	                cout << "Quay lai menu chinh...\n";
+	                system ("pause");
+			        if(flag) break;
+				}
 			}
             else if (subMenu == 2) {
                 mh_Border_Maker::mh_table_print(rootMonHoc);

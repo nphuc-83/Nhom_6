@@ -149,6 +149,13 @@ void dk_print(DangKy* head);
 
 bool dk_check_in4_sv(DS_LOPSV& dsLopSV, const string& masv, int hocky, const string& nienkhoa);
 
+bool dk_check_sv_khong_dangky_trung_nhom(
+    const std::string& masv,
+    const std::string& mamh,
+    int hocky,
+    const std::string& nienkhoa
+);
+
 //void dk_registration_table(const string& masv, int hocky, const string& nienkhoa);
 
 // --- L?p tín ch? ---

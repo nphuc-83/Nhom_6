@@ -961,7 +961,7 @@ namespace dk_Border_Maker {
         SetColor(12, 15); cout << " B "; SetColor(7, 0); cout << ": Unregis  ";
         
         gotoxy(x + 36, y);
-        SetColor(12, 15); cout << " C "; SetColor(7, 0); cout << ": Exit     ";
+        SetColor(12, 15); cout << " ESC "; SetColor(7, 0); cout << ": Exit     ";
     }
 
     // Hàm ph?: v? thanh tr?ng thái phân trang
@@ -1012,8 +1012,21 @@ namespace dk_Border_Maker {
 		            filteredClasses[idx++] = p;
 		        }
 		    }
-		}       	// xai mang con tro
+		}       	
+		
+		bool* daDangKy = new bool[totalClasses];	//mang trang thai dang ky cua sinh vien
+		
+		for (int i = 0; i < totalClasses; ++i) {
+		    daDangKy[i] = false;
+		    for (DangKy* dk = filteredClasses[i]->DSDK; dk; dk = dk->next) {
+		        if (!dk->HUYDK && dk->MASV == masv) {
+		            daDangKy[i] = true;
+		            break;
+		        }
+		    }
+		}
 
+		
         const int ROWS_PER_PAGE = 15;
         int totalPages = (totalClasses == 0) ? 1 : (totalClasses + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
 
@@ -1082,7 +1095,7 @@ namespace dk_Border_Maker {
                          << "|" << center(to_string(siSo) + "/" + to_string(p->SOSVMAX),9)
                          << "|" << center(to_string(p->SOSVMIN),8)
                          << "|" << center(to_string(p->SOSVMAX),8)
-                         << "|" << center(p->HUYLOP ? "DA HUY" : "MO",12)
+                         << "|" << center(daDangKy[i] ? "DA DANG KY" : "CHUA DK", 12)
                          << "|\n";
                 }
             }
@@ -1127,7 +1140,9 @@ namespace dk_Border_Maker {
                     currentPage++;
                 }
             }
-            else if (key == 'c' || key == 'C' || key == 27) { 
+            else if (key == 27) { 
+            	delete[] daDangKy;
+				delete[] filteredClasses;
                 return 0;
             }
             else if (key == 'a' || key == 'A') {

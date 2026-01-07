@@ -191,7 +191,7 @@ int QuanLiChucNang() {
         {"Quan Ly Lop Tin Chi", {"Dieu Chinh Danh Sach Lop Tin Chi"}},
         {"Quan Ly Mon Hoc", {"Dieu Chinh Mon Hoc", "In Danh Sach Mon Hoc"}},
         {"Quan Ly Sinh Vien", {"Dieu Chinh Lop Hoc", "Cap Nhat Danh Sach Sinh Vien"}},
-        {"Quan Ly Dang Ki", {"Dang Ki Mon Hoc", "Huy Dang Ki"}},
+        {"Quan Ly Dang Ki", {"Dang Ki Mon Hoc"}},
         {"Score board", {
             "Nhap Diem",
             "In Bang Diem Lop Tin Chi",

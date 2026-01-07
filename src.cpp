@@ -1144,6 +1144,16 @@ string normalizeMaMH(string s) {
     return s;
 }
 
+// HAM CHI CHO NHAP SO
+bool isNumber(const string& s) {
+    if (s.empty()) return false;
+    for (char c : s) {
+        if (!isdigit((unsigned char)c))
+            return false;
+    }
+    return true;
+}
+
 // KIEM TRA SAU KHI VIET HOA VÀ GIOI HAN KI TU
 bool isValidMaMH(const string& s) {
     if (s.length() == 0 || s.length() > 10) return false;
@@ -1537,37 +1547,41 @@ void ltc_1_1() {
 }
 
 void ltc_1_2() {
+    string input;
     int id;
+
     cout << "\n\n";
     textColor(10);
     cout << "Nhap ma lop can xoa: ";
     textColor(7);
-    cin >> id;
+
+    cin >> input;
+
+    // ? N?u có ch? ho?c ký t? l?
+    if (!isNumber(input)) {
+        textColor(4);
+        cout << "Ma lop khong hop le! Chi duoc nhap so.\n";
+        textColor(7);
+        system("pause");
+        return;
+    }
+
+    id = stoi(input);  // an toàn vì dã ki?m tra
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    
+
     if (!confirmYN()) {
         cout << "Da huy thao tac!\n";
         system("pause");
-        return; 
+        return;
     }
-    
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     if (QuanLyDiem::ltc_remove_by_id(id)) {
-    	textColor(10);
+        textColor(10);
         cout << "Da xoa.\n";
         textColor(7);
         QuanLyDiem::ltc_save_to_file("loptinchi.txt");
-    } 
-    else if (cin.fail()) {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    } else {
         textColor(4);
-        cout << "Ma lop khong hop le!\n";
-        textColor(7);
-    }
-    else {
-    	textColor(4);
         cout << "Khong tim thay hoac lop co dang ky!\n";
         textColor(7);
     }

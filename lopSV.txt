@@ -1,4 +1,5 @@
 E24CQCE01N|CONG-NGHE-THONG-TIN
+N24DECE120|AN|BUI|Nam|0909090909|phuc@gmail.com
 N24DECE112|NGUYEN|PHUC|Nam|1234567890|hoangphucasd9wq
 n24dece120|truong|son|nam|0923456790|son120@gmail.com
 n24dece119|dang|ha|nu|0923456789|ha119@gmail.com
@@ -20,6 +21,7 @@ n24dece104|nguyen|linh|nu|0912345674|linh104@gmail.com
 n24dece103|pham|anh|nu|0912345673|anh103@gmail.com
 n24dece102|le|hoang|nam|0912345672|hoang102@gmail.com
 n24dece101|tran|minh|nam|0912345671|minh101@gmail.com
+N24DECE121|NGUYEN|PHUC|Nam|1234567890|phuc@gmail.com
 ---
 E25ABCE01N|CONG-NGHE-PHAN-MEM
 ---

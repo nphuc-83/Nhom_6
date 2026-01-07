@@ -111,9 +111,10 @@ int main() {
 			                system("pause");
 			        }
 			    } while (choice != 0);
-			} else if (subMenu == 2) {
-				system("pause");
-			}
+			} 
+//			else if (subMenu == 2) {
+//				system("pause");
+//			}
         }
         else if (mainMenu == 5) { // Score board
         	string tenMH = "", nienkhoa = "";

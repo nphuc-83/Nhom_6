@@ -66,7 +66,7 @@ int main() {
 				}
 			}
             else if (subMenu == 2) {
-                mh_Border_Maker::mh_table_print(rootMonHoc);
+                mh_Border_Maker::mh_table_sort_by_name(rootMonHoc);
                 system("pause");
             }
         }

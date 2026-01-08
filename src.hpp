@@ -102,6 +102,12 @@ void sv_print_sorted_by_name(SinhVien* head);
 void sv_clear(SinhVien*& head);
 bool sv_insert(LopSV* lop, const SinhVien& sv);
 int sv_count(LopSV* lop);
+bool sv_is_registered_in_ltc(const string& masv);
+bool sv_compare_name(const SinhVien& a, const SinhVien& b);
+int sv_collect_sorted(LopSV* lop, SinhVien arr[], int maxSize);
+void toLowerString(string& s);
+char toLowerChar(char c);
+bool sv_remove(LopSV* lop, const string& masv);
 
 
 
@@ -139,13 +145,14 @@ bool mh_is_used_in_loptc(const string& mamh);
 void mh_save_to_file(const string& filename);
 void mh_load_from_file(const string& filename);
 void mh_print_all();  		// CHECK XEM MÔN H?C NH?P ?N CHUA
-
+void mh_sort_by_name(treeMH arr[], int count);
 // --- Ðang ký ---
 void dk_add_head(DangKy*& head, DangKy* node);
-DangKy* dk_find(DangKy* head, const string& masv);
-bool dk_remove(DangKy*& head, const string& masv);
-void dk_clear(DangKy*& head);
-void dk_print(DangKy* head);
+DangKy* dk_find(DangKy* head, const string& masv); // KIEM TRA SV DANG KI LTC HAY CHUA (NEU CÓ THÌ K DC DK TRÙNG, HUY THI DC DK LAI)
+bool dk_remove(DangKy*& head, const string& masv); // XÓA  SV ra khoi danh sách dang ký cua LOP TC ,khi SV do huy dk
+void dk_clear(DangKy*& head);  // XÓA TOÀN BO DSDK CUA LOP TC
+string sv_get_ho_ten(QuanLyDiem::DS_LOPSV* dsLopSV, const string& masv);
+
 
 bool dk_check_in4_sv(DS_LOPSV& dsLopSV, const string& masv, int hocky, const string& nienkhoa);
 
@@ -163,18 +170,16 @@ int nextMaLopTC();
 int next_MALOPTC();
 LopTinChi* ltc_add(const string& mamh, const string& nk, int hk, int nhom, int minsv, int maxsv, bool huy = false);
 LopTinChi* ltc_find_by_id(int id);
-bool ltc_remove_by_id(int id);
+bool ltc_remove_by_id(int id);  
 void ltc_print_all();
 
-// thêm dang ký (MASV) vào l?p (n?u dã có thì không thêm duplicate)
+//thêm (dang ký) 1 SV vao LOP TC
 bool ltc_add_registration(int maLopTC, const string& masv);
-// tìm dang ký trong l?p
+// tìm xem SV có dk LOP TC do chua
 DangKy* ltc_find_registration(int maLopTC, const string& masv);
 
-// in danh sách theo b? l?c (niên khóa, hoc ky, nhom, mamh)
-void ltc_print_filtered(const std::string& nk, int hk, int nhom, const std::string& mamh);
+
 // gi?i phóng toàn b? ds
-void ltc_clear_all();
 LopTinChi* ltc_find(const string& nk, int hk, int nhom, const std::string& mamh);
 void print_score_table(LopTinChi* ltc, DS_LOPSV* ds);
 void ltc_load_from_file(const string& filename = "loptinchi.txt");
@@ -267,3 +272,6 @@ string checkTen(string info);
 int nhapSTC(const string &tenBien);
 string checkPHAI(string info);
 string checkSDT(string info);
+string inputTENLOP(string info);
+string inputEmail();
+string inputHOTEN(string info);

@@ -10,6 +10,7 @@
 #include <conio.h>
 #include <bits/stdc++.h>
 #include <limits>
+#include <cctype>
 #include <cmath>
 
 using namespace std;
@@ -144,6 +145,37 @@ treeMH mh_find_by_name(treeMH root, const string& tenmh) {
 
     // tìm bên ph?i
     return mh_find_by_name(root->right, tenmh);
+}
+// ---- Hàm so sánh tên môn hoc (không phân biet hoa thuong) ----
+bool mh_compare_by_name(treeMH a, treeMH b) {
+    string tenA = a->mh.TENMH;
+    string tenB = b->mh.TENMH;
+    toLowerString(tenA);
+    toLowerString(tenB);
+    
+    if (tenA != tenB) {
+        return tenA < tenB;  // So sánh ten trc
+		// Neu ten giong nhau thi so sánh MaMH 
+      return a->mh.MAMH < b->mh.MAMH;
+  } 
+}
+// ---- Sap xep mang mon hoc theo ten ----
+void mh_sort_by_name(treeMH arr[], int count) {
+    for (int i = 0; i < count - 1; i++) {
+        int minIndex = i;
+        // Tim môn hc có tên nho nhat trong doan chua sap xep
+        for (int j = i + 1; j < count; j++) {
+            if (mh_compare_by_name(arr[j], arr[minIndex])) {
+                minIndex = j;
+            }
+        }
+// Hoán doi neu can
+        if (minIndex != i) {
+            treeMH temp = arr[i];
+            arr[i] = arr[minIndex];
+            arr[minIndex] = temp;
+        }
+    }
 }
 
 // ---- Duy?t in LNR ----
@@ -374,7 +406,25 @@ void sv_clear(nodeSV*& head) {
         delete t;
     }
 }
-
+bool sv_edit(LopSV* lop, const string& masv, const string& ho, const string& ten, const string& phai, const string& sodt, 
+                const string& email) {
+    if (!lop) return false;
+    
+    PTRSV p = lop->FirstSV;
+    while (p && p->sv.MASV != masv) 
+        p = p->next;
+    
+    if (!p) return false;
+    
+    // C?p nh?t thông tin
+    p->sv.HO = ho;
+    p->sv.TEN = ten;
+    p->sv.PHAI = phai;
+    p->sv.SODT = sodt;
+    p->sv.Email = email;
+    
+    return true;
+}
 int sv_count(LopSV* lop) {
     if (lop == nullptr) return 0;
 
@@ -385,26 +435,95 @@ int sv_count(LopSV* lop) {
     return count;
 }
 
-// ==================== L?P SINH VIÊN ====================
+bool sv_remove(LopSV* lop, const string& masv) {
+    if (!lop || lop->FirstSV == nullptr)
+        return false;
 
-bool validate_MALOP(const string& malop) {
-    if (malop.empty()) {
-        cout << "Loi: Ma lop khong duoc de trong!\n";
-        return false;
+    PTRSV cur = lop->FirstSV;
+    PTRSV prev = nullptr;
+
+    while (cur != nullptr) {
+        if (cur->sv.MASV == masv) {
+            if (prev == nullptr) {
+                // Xóa node dau
+                lop->FirstSV = cur->next;
+            } else {
+                // Xóa node giua / cuoi
+                prev->next = cur->next;
+            }
+
+            delete cur;
+            return true;
+        }
+        prev = cur;
+        cur = cur->next;
     }
-    if (malop.length() > 15) {
-        cout << " Loi: Ma lop khong duoc qua 15 ky tu! (Hien tai: " 
-             << malop.length() << " ky tu)\n";
-        return false;
-    }
-    for (char ch : malop) {
-        if (!isalnum((unsigned char)ch)) {
-            cout << " Loi: Ma lop chi duoc chua chu cai va so!\n";
-            return false;
+    return false; // Không tim thay sinh viên
+}
+bool sv_is_registered_in_ltc(const string& masv) {
+    for (LopTinChi* ltc = dsLopTC; ltc; ltc = ltc->next) {
+        for (DangKy* dk = ltc->DSDK; dk; dk = dk->next) {
+            if (dk->MASV == masv) {
+                return true;  
+            }
         }
     }
-    return true;
+    return false;
 }
+char toLowerChar(char c) {
+    if (c >= 'A' && c <= 'Z')
+        return c + ('a' - 'A');
+    return c;
+}
+
+void toLowerString(string& s) {
+    for (int i = 0; i < s.length(); i++)
+        s[i] = toLowerChar(s[i]);
+}
+bool sv_compare_name(const SinhVien& a, const SinhVien& b) {
+    string tenA = a.TEN;
+    string tenB = b.TEN;
+    toLowerString(tenA);
+    toLowerString(tenB);
+    
+    if (tenA != tenB) {
+        return tenA < tenB;
+    }
+    string hoA = a.HO;
+    string hoB = b.HO; 
+    toLowerString(hoA);
+    toLowerString(hoB);
+    
+    return hoA < hoB;
+}
+int sv_collect_sorted(LopSV* lop, SinhVien arr[], int maxSize) {
+    if (!lop || lop->FirstSV == nullptr)
+        return 0;
+    int count = 0;
+    // B1: Thu thap sinh viên tu DSLK vào mang
+    for (PTRSV p = lop->FirstSV; p != nullptr && count < maxSize; p = p->next) {
+        arr[count] = p->sv;
+        count++;
+    }
+    // B2: Selection Sort theo tên
+    for (int i = 0; i < count - 1; i++) {
+        int minIndex = i;
+        for (int j = i + 1; j < count; j++) {
+            if (sv_compare_name(arr[j], arr[minIndex])) {
+                minIndex = j;
+            }
+        }
+        if (minIndex != i) {
+            SinhVien temp = arr[i];
+            arr[i] = arr[minIndex];
+            arr[minIndex] = temp;
+        }
+    }
+    return count;
+}
+
+// ==================== L?P SINH VIÊN ====================
+
 int dssv_collect_lop(DS_LOPSV* ds, LopSV* lop_list[]) {
     if (!ds) return 0;
 
@@ -419,19 +538,46 @@ int dssv_collect_lop(DS_LOPSV* ds, LopSV* lop_list[]) {
 
 
 
+bool validate_MALOP(const string& malop) {
+    if (malop.empty()) {
+        cout << "Loi: Ma lop khong duoc de trong!\n";
+        return false;
+    }
+    if (!isalpha((unsigned char)malop[0])) {
+        cout << "Loi: Ky tu dau tien phai la chu cai!\n";
+        return false;
+    }
+    if (malop.length() > 15) {
+        cout << "Loi: Ma lop khong duoc qua 15 ky tu! (Hien tai: " 
+             << malop.length() << " ky tu)\n";
+        return false;
+    }
+    for (char ch : malop) {
+        if (!isalnum((unsigned char)ch)) {
+            cout << "Loi: Ma lop chi duoc chua chu cai va so!\n";
+            return false;
+        }
+    }
+    return true;
+}
+
 bool validate_TENLOP(const string& tenlop) {
     if (tenlop.empty()) {
-        cout << " Loi: Ten lop khong duoc de trong!\n";
+        cout << "Loi: Ten lop khong duoc de trong!\n";
+        return false;
+    }
+    if (!isalpha((unsigned char)tenlop[0])) {
+        cout << "Loi: Ky tu dau tien phai la chu cai!\n";
         return false;
     }
     if (tenlop.length() > 50) {
-        cout << " Loi: Ten lop khong duoc qua 50 ky tu! (Hien tai: " 
+        cout << "Loi: Ten lop khong duoc qua 50 ky tu! (Hien tai: " 
              << tenlop.length() << " ky tu)\n";
         return false;
     }
     for (char ch : tenlop) {
-        if (!isalnum((unsigned char)ch) && !isspace((unsigned char)ch) && ch != '-') {
-            cout << " Loi: Ten lop chi duoc chua chu, so, khoang trang va dau gach ngang!\n";
+        if (!(isalpha((unsigned char)ch) || isdigit((unsigned char)ch) || isspace((unsigned char)ch))) {
+            cout << "Loi: Ten lop chi duoc chua chu cai, chu so va khoang trang.\n";
             return false;
         }
     }
@@ -463,17 +609,30 @@ bool dssv_insert(const string& malop, const string& tenlop) {
 
 bool dssv_remove(const string& malop) {
     int idx = dssv_find_index_lop(malop);
-    if (idx == -1){
+    if (idx == -1) {
         cout << " Loi: Khong tim thay lop co ma '" << malop << "'!\n";
         return false;
     }
+
+    // sd sv count de ktra co sv trong lop khong 
+    int soSV = sv_count(dsLopSV->nodes[idx]);
+    if (soSV > 0) {
+        cout << " Loi: Lop '" << malop 
+             << "' hien dang co " << soSV << " sinh vien, khong the xoa!\n";
+        return false;
+    }
+
+    // ?? Ch? xóa khi l?p r?ng
     sv_clear(dsLopSV->nodes[idx]->FirstSV);
     delete dsLopSV->nodes[idx];
+
     for (int i = idx; i < dsLopSV->n - 1; i++) {
         dsLopSV->nodes[i] = dsLopSV->nodes[i + 1];
     }
+
     dsLopSV->nodes[dsLopSV->n - 1] = nullptr;
     dsLopSV->n--;
+
     cout << " Da xoa lop '" << malop << "' thanh cong!\n";
     return true;
 }
@@ -526,36 +685,63 @@ void dssv_load_from_file(const string& filename) {
         cout << "Khong tim thay file lopSV, bat dau voi danh sach rong.\n";
         return;
     }
+
     string line;
     LopSV* currentLop = nullptr;
+
     while (getline(fin, line)) {
         if (line.empty()) continue;
+
         if (line == "---") {
             currentLop = nullptr;
             continue;
         }
-        stringstream ss(line);
-        string token;
-        vector<string> parts;
-        while (getline(ss, token, '|')) {
-            parts.push_back(token);
+
+        string parts[6];
+        int count = 0;
+        string temp = "";
+
+        for (int i = 0; i < line.length(); i++) {
+            if (line[i] == '|') {
+                parts[count++] = temp;
+                temp = "";
+            } else {
+                temp += line[i];
+            }
         }
-        if (parts.size() == 2) {  // Dòng l?p: MALOP|TENLOP
+        parts[count++] = temp;
+
+        // Dòng l?p: MALOP|TENLOP
+        if (count == 2) {
             string malop = parts[0];
             string tenlop = parts[1];
-            dssv_insert(malop, tenlop);
-            currentLop = dssv_find(malop);
-        } else if (parts.size() == 6 && currentLop) {  // Dòng sinh viên: MASV|HO|TEN|PHAI|SODT|Email
+            
+            // ===== FIX: KI?M TRA TRU?C KHI INSERT =====
+            if (dssv_find_index_lop(malop) == -1) {
+                // Ch? insert khi chua t?n t?i
+                if (dsLopSV->n < MAX_LOPSV) {
+                    dsLopSV->nodes[dsLopSV->n++] = new LopSV(malop, tenlop);
+                }
+            }
+            
+            currentLop = dssv_find(malop);  // L?y l?p (dù m?i hay cu)
+        }
+        // Dòng sinh viên
+        else if (count == 6 && currentLop != nullptr) {
             SinhVien sv;
-            sv.MASV = parts[0];
-            sv.HO = parts[1];
-            sv.TEN = parts[2];
-            sv.PHAI = parts[3];
-            sv.SODT = parts[4];
+            sv.MASV  = parts[0];
+            for (char& c : sv.MASV)
+                c = toupper((unsigned char)c);
+            sv.HO    = parts[1];
+            sv.TEN   = parts[2];
+            sv.PHAI  = parts[3];
+            sv.SODT  = parts[4];
             sv.Email = parts[5];
+
             sv_insert(currentLop, sv);
         }
     }
+
     fin.close();
     cout << "Da tai du lieu lop sinh vien tu file thanh cong!\n";
 }
@@ -586,12 +772,12 @@ bool dk_check_in4_sv(
         return false;
     }
 
-    // --- 2. Ki?m tra h?c k? ---
+    // --- 2. Kiem tra hoc ki ---
     if (hocky < 1 || hocky > 3) {
         return false;
     }
 
-    // --- 3. Ki?m tra niên khóa ---
+    // --- 3. Kiem tra niên khóa ---
     if (nienkhoa.size() != 9 || nienkhoa[4] != '-') {
         return false;
     }
@@ -616,7 +802,7 @@ void dk_add_head(DangKy*& head, DangKy* node) {
 	head = node;
 }
 
-// TÌM ÐANG KÝ C?A SINH VIÊN TRONG DANH SÁCH ÐANG KÝ (ch? l?y n?u chua h?y)
+// KIEM TRA SV DANG KI LTC HAY CHUA (NEU CÓ THÌ K DC DK TRÙNG, HUY THI DC DK LAI)
 DangKy* dk_find(DangKy* head, const string& masv) {
     for (DangKy* p = head; p != nullptr; p = p->next) {
         if (p->MASV == masv && !p->HUYDK) {  // ? Thêm !p->HUYDK vào dây
@@ -626,6 +812,7 @@ DangKy* dk_find(DangKy* head, const string& masv) {
     return nullptr;
 }
 
+// XÓA  SV ra khoi danh sách dang ký cua LOP TC ,khi SV do huy dk
 bool dk_remove(DangKy*& head, const string& masv) {
 	DangKy* p = head;
 	DangKy* prev = nullptr;
@@ -642,6 +829,7 @@ bool dk_remove(DangKy*& head, const string& masv) {
 	return false;
 }
 
+// XÓA TOÀN BO DSDK CUA LOP TC
 void dk_clear(DangKy*& head) {
 	while (head) {
 		DangKy* t = head;
@@ -650,19 +838,21 @@ void dk_clear(DangKy*& head) {
 	}
 }
 
-void dk_print(DangKy* head) {
-	cout << "MASV\t| DIEM\t| HUY\n";
-	cout << "---------------------------\n";
-	if (!head) {
-		cout << "(Chua co sinh vien dang ky)\n";
-		return;
-	}
-	for (DangKy* p = head; p; p = p->next) {
-		cout << p->MASV << "\t| ";
-		if (p->DIEM < 0) cout << "Chua co\t| "; else cout << fixed << setprecision(2) << p->DIEM << "\t| ";
-		cout << (p->HUYDK ? "Co" : "Khong") << "\n";
-		}
+string sv_get_ho_ten(DS_LOPSV* dsLopSV, const string& masv) {
+    if (!dsLopSV) return "";
+
+    for (int i = 0; i < dsLopSV->n; ++i) {
+        PTRSV p = dsLopSV->nodes[i]->FirstSV;
+        while (p) {
+            if (normalizeMaMH(p->sv.MASV) == normalizeMaMH(masv)) {
+                return p->sv.HO + " " + p->sv.TEN;
+            }
+            p = p->next;
+        }
+    }
+    return ""; // không tìm th?y
 }
+
 
 // ==================== Lop TÍN CHi ====================
 
@@ -1415,31 +1605,19 @@ void dsdk_ltc_print(LopTinChi* p, DS_LOPSV* dsLopSV) {
         if (dk->HUYDK) continue;
         stt++;
 
-        string ho = "", ten = "";
-
-        // ----- Tìm h? tên t? dsLopSV -----
-        for (int i = 0; i < dsLopSV->n; ++i) {
-            PTRSV sv = dsLopSV->nodes[i]->FirstSV;
-            while (sv) {
-                if (sv->sv.MASV == dk->MASV) {
-                    ho = sv->sv.HO;
-                    ten = sv->sv.TEN;
-                    break;
-                }
-                sv = sv->next;
-            }
-            if (!ho.empty()) break;
-        }
-
-        string hoten = ho + " " + ten;
+		string hoten = sv_get_ho_ten(dsLopSV, dk->MASV);
+		if (hoten.length() > 23)
+		    hoten = hoten.substr(0, 20) + "...";
         if (hoten.length() > 23) hoten = hoten.substr(0, 20) + "...";
+        
+        string masv = normalizeMaMH(dk->MASV);
 
         cout << "|";
 		textColor(12);
 	    cout << center(to_string(stt), 5);
 	    textColor(14);
 //             << setw(3)  << left << stt
-		cout << "| " << center(dk->MASV,11)
+		cout << "| " << center(masv,11)
              << "| " << center(hoten,23)
              << "| " << center((dk->DIEM < 0 ? "Chua" : to_string((int)dk->DIEM)),5)
              << "| " << 
@@ -1447,9 +1625,10 @@ void dsdk_ltc_print(LopTinChi* p, DS_LOPSV* dsLopSV) {
              << "|\n";
     }
     cout << "+" << string(63, '-') << "+\n";
+    ltc_save_to_file("loptinchi.txt");
 }
 
-
+//thêm (dang ký) 1 SV vao LOP TC
 bool ltc_add_registration(int maLopTC, const string& masv) {
     LopTinChi* ltc = ltc_find_by_id(maLopTC);
     if (!ltc) return false;
@@ -1458,12 +1637,13 @@ bool ltc_add_registration(int maLopTC, const string& masv) {
     DangKy* node = new DangKy{masv, -1.0f, false, nullptr};
     dk_add_head(ltc->DSDK, node);
 
-    // T? Ð?NG GHI FILE SAU KHI THÊM DK
+    // GHI FILE SAU KHI THÊM DK
     ltc_save_to_file("loptinchi.txt");
 
     return true;
 }
 
+// tìm xem SV có dk LOP TC do chua
 DangKy* ltc_find_registration(int maLopTC, const string& masv) {
 	LopTinChi* ltc = ltc_find_by_id(maLopTC);
 	if (!ltc) return nullptr;
@@ -1471,27 +1651,6 @@ DangKy* ltc_find_registration(int maLopTC, const string& masv) {
 }
 
 
-void ltc_print_filtered(const string& nk, int hk, int nhom, const string& mamh) {
-	bool found = false;
-	for (LopTinChi* p = dsLopTC; p; p = p->next) {
-		if (p->NIENKHOA == nk && p->HOCKY == hk && p->NHOM == nhom && p->MAMH == mamh) {
-			found = true;
-			cout << "\n=== LOP TC Ma: " << p->MALOPTC << " ===\n";
-			ltc_Border_Maker::ltc_print_all(); // optional: could print only this; keep simple: print registrations next
-			dk_print(p->DSDK);
-		}
-	}
-	if (!found) cout << "(Khong tim thay lop thoa yeu cau)\n";
-}
-
-void ltc_clear_all() {
-	while (dsLopTC) {
-		LopTinChi* t = dsLopTC;
-		dsLopTC = dsLopTC->next;
-		dk_clear(t->DSDK);
-		delete t;
-	}
-}
 
 // HAM XAC NHAN THUC HIEN
 bool confirmYN() {
@@ -1853,7 +2012,7 @@ void dssv_1() {
     textColor(7);
 
     string MALOP = checkMa(15, "Nhap MA LOP: ");
-    string TENLOP = checkTen("Nhap TEN LOP: ");
+    string TENLOP = ::inputTENLOP("Nhap TEN LOP: ");
 
     if (QuanLyDiem::dssv_insert(MALOP, TENLOP)) {
         textColor(10);
@@ -1911,15 +2070,15 @@ void dssv_3() {
     cout <<"QUAN LY DANH SACH LOP SINH VIEN\n";
     setBGColor(0, 7);
     cout << "\n";
-
-//    lopsv_Border_Maker::dssv_print_all();
+    int currentPage = 1;
+    lopsv_Border_Maker::dssv_print_all(currentPage);
     cout << "\n";
     textColor(11);
     cout << ">>> DIEU CHINH TEN LOP\n";
     textColor(7);
 
     string MALOP = checkMa(15, "Nhap MA LOP can sua: ");
-    string newTen = checkTen("Nhap TEN LOP moi: ");
+    string newTen = ::inputTENLOP("Nhap TEN LOP moi: ");
 
     if (QuanLyDiem::dssv_edit(MALOP, newTen)) {
         textColor(10);
@@ -1955,7 +2114,7 @@ void dssv_4_1(LopSV* lop) {
         }
         
         if (isDuplicate) {
-            textColor(12);
+textColor(12);
             cout << " >> LOI: Ma sinh vien '" << sv.MASV 
                  << "' da ton tai trong lop nay!\n";
             cout << " >> Vui long nhap ma khac.\n\n";
@@ -1966,11 +2125,11 @@ void dssv_4_1(LopSV* lop) {
             break;
         }
       }
-    sv.HO    = checkTen(" Ho           : ");
-    sv.TEN   = checkTen(" Ten          : ");
+    sv.HO    = ::inputHOTEN(" Ho           : ");
+    sv.TEN   = ::inputHOTEN(" Ten          : ");
     sv.PHAI  = checkPHAI(" Phai (Nam/Nu): ");
     sv.SODT  = checkSDT(" So dien thoai: ");
-    cout << " Email        : "; getline(cin, sv.Email);
+    sv.Email = ::inputEmail();
     if (QuanLyDiem::sv_insert(lop, sv)) {
     	textColor(10);
         cout << ">> Them thanh cong!\n";
@@ -1986,6 +2145,15 @@ void dssv_4_1(LopSV* lop) {
 void dssv_4_2(LopSV* lop) {
 	lopsv_Border_Maker::sv_print_all(lop);
     string masv = checkMa(15, "Nhap ma sinh vien can xoa: ");
+    
+    if (QuanLyDiem::sv_is_registered_in_ltc(masv)) {
+        textColor(12);
+        cout << "\n>> LOI: Sinh vien dang co dang ky lop tin chi!\n";
+        cout << ">> Khong the xoa. Vui long huy dang ky truoc!\n";
+        textColor(7);
+        system("pause");
+        return;
+    }
 	cout << ">> Xac nhan xoa '" << masv << "' (Y/N): ";
     char c;
     cin >> c;
@@ -1995,23 +2163,12 @@ void dssv_4_2(LopSV* lop) {
         cout << ">> Da huy thao tac.\n";
         return;
     }
-    QuanLyDiem::nodeSV*& head = lop->FirstSV;
-    QuanLyDiem::nodeSV* cur = head;
-    QuanLyDiem::nodeSV* prev = nullptr;
-    bool found = false;
-    while (cur) {
-        if (cur->sv.MASV == masv) {
-            if (!prev) head = cur->next;
-            else prev->next = cur->next;
-            delete cur;
-            found = true;
-            break;
-        }
-        prev = cur;
-        cur = cur->next;
+    if (sv_remove(lop, masv)) {
+        cout << ">> Da xoa thanh cong!\n";
+        QuanLyDiem::dssv_save_to_file("lopSV.txt");
+    } else {
+        cout << ">> Khong tim thay sinh vien!\n";
     }
-    cout << (found ? ">> Da xoa thanh cong!\n" : ">> Khong tim thay sinh vien!\n");
-    QuanLyDiem::dssv_save_to_file("lopSV.txt");
     system("pause");
 }
 
@@ -2029,13 +2186,17 @@ void dssv_4_3(LopSV* lop) {
     textColor(11);
     cout << "=== SUA THONG TIN SINH VIEN ===\n";
     textColor(7);
-    p->sv.HO   = checkTen(" Ho   : ");
-    p->sv.TEN  = checkTen(" Ten   : ");
-    p->sv.PHAI = checkPHAI(" Phai  : ");
-    p->sv.SODT = checkSDT(" SDT   : ");
-    cout << "Email (" << p->sv.Email << "): "; getline(cin, p->sv.Email);
-    cout << ">> Cap nhat thanh cong!\n";
-    QuanLyDiem::dssv_save_to_file("lopSV.txt");
+    string ho    = ::inputHOTEN(" Ho   : ");
+    string ten   = ::inputHOTEN(" Ten  : ");
+    string phai  = checkPHAI(" Phai : ");
+    string sodt  = checkSDT(" SDT  : ");
+    string email = ::inputEmail();
+    if (sv_edit(lop, masv, ho, ten, phai, sodt, email)) {
+        cout << ">> Cap nhat thanh cong!\n";
+        QuanLyDiem::dssv_save_to_file("lopSV.txt");
+    } else {
+        cout << ">> Loi cap nhat!\n";
+    }
     system("pause");
 }
 
@@ -2367,5 +2528,138 @@ string checkSDT(string info) {
     }
 
     return sdt;
+}
+
+string inputTENLOP(string info) { // ten lop ten mon hoc 
+    const int MAX_LENGTH = 50;
+	string TEN;
+    while (true) {
+        cout << info;
+        getline(cin, TEN); // cho phép kho?ng tr?ng
+      // Loai bo khoang trang dau/cuoi
+        size_t start = TEN.find_first_not_of(" ");
+        size_t end   = TEN.find_last_not_of(" ");
+        if (start != string::npos)
+            TEN = TEN.substr(start, end - start + 1);
+            
+        if (TEN.empty()) {
+            cout << " Khong duoc rong.\n";
+            continue;
+        }
+        if (TEN.length() > MAX_LENGTH) {
+            cout << " Loi: Ten toi da " << MAX_LENGTH << " ky tu.\n";
+            continue;
+        }
+        // ky tu dau tien phai là chu 
+        if (!isalpha((unsigned char)TEN[0])) {
+            cout << " Loi: Ky tu dau tien phai la chu cai.\n";
+            continue;
+        }
+
+        bool hopLe = true;
+        for (char ch : TEN) {
+        if (!(isalpha((unsigned char)ch) || isdigit((unsigned char)ch) || isspace((unsigned char)ch))) {
+            hopLe = false;
+                break;
+            }
+        }
+
+        if (!hopLe) {
+            cout << " Loi: Chi duoc chua chu cai, chu so va khoang trang.\n";
+            continue;
+        }
+
+    for (char& ch : TEN) {
+            ch = toupper((unsigned char)ch);
+        }
+
+        break; 
+    }
+    return TEN;
+}
+
+string inputHOTEN(string info){
+	const int MAX_LENGTH = 50;
+	string hoten;
+	while (true) {
+        cout << info;
+        getline(cin, hoten);
+
+        // Loai bo khoang trang dau/cuoi
+        size_t start = hoten.find_first_not_of(" ");
+        size_t end = hoten.find_last_not_of(" ");
+        if (start != string::npos && end != string::npos) {
+            hoten = hoten.substr(start, end - start + 1);
+        }
+        if (hoten.empty() || hoten.length() > MAX_LENGTH) {
+            cout << "Loi: Nhap toi da " << MAX_LENGTH << " ky tu va khong duoc rong.\n";
+            continue;
+        }
+        if (!isalpha((unsigned char)hoten[0])) {
+            cout << "Loi: Ky tu dau tien phai la chu cai.\n";
+            continue;
+        }
+        bool Hople = true;
+        for (char c : hoten) {
+            if (!isalpha(c) && c != ' ') {
+                Hople = false;
+                break;
+            }
+        }
+        if (!Hople) {
+            cout << "Loi: Chi duoc nhap chu cai va khoang trang.\n";
+            continue;
+        }
+        break;
+    }
+
+    return hoten;
+}
+string inputEmail() {
+    const int MAX_LENGTH = 20; 
+    string email;
+
+    while (true) {
+        cout << "Nhap email (toi da 20 ky tu): ";
+        getline(cin, email);
+
+        // Loai bo khoang trang dau/cuoi
+        size_t start = email.find_first_not_of(" ");
+        size_t end = email.find_last_not_of(" ");
+        if (start != string::npos && end != string::npos) {
+            email = email.substr(start, end - start + 1);
+        }
+
+        // Kiem tra do dài
+        if (email.empty() || email.length() > MAX_LENGTH) {
+            cout << "Loi: Email khong duoc rong va toi da 20 ky tu.\n";
+            continue;
+        }
+
+        // Không dc có khoang trang
+        if (email.find(' ') != string::npos) {
+            cout << "Loi: Email khong duoc chua khoang trang.\n";
+            continue;
+        }
+
+        // Pa?i có '@' và không o dau /cuoi
+        size_t atPos = email.find('@');
+        if (atPos == string::npos || atPos == 0 || atPos == email.length() - 1) {
+            cout << "Loi: Email phai chua ky tu '@' va co ky tu truoc va sau '@'.\n";
+            continue;
+        }
+
+        // Phai có '.' sau '@'
+        size_t dotPos = email.find('.', atPos);
+        if (dotPos == string::npos || dotPos == atPos + 1 || dotPos == email.length() - 1) {
+            cout << "Loi: Email phai co dau '.' sau ky tu '@'.\n";
+            continue;
+        }
+
+        // Neu hop le, thoat vong lap
+        break;
+    }
+
+    return email;
 }
 

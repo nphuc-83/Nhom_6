@@ -311,11 +311,13 @@ namespace mh_Border_Maker {
              << "   (Su dung phim len/xuong de chuyen trang)";
         SetColor(7, 0);
     };
-	void mh_table_print(treeMH rootMonHoc) {
+	void mh_table_sort_by_name(QuanLyDiem::treeMH rootMonHoc) {
 	    treeMH mh_list[1000];
 	    int mh_count = 0;
 	
 	    mh_inorder_collect(rootMonHoc, mh_list, mh_count);
+	    
+        QuanLyDiem::mh_sort_by_name(mh_list, mh_count);
 	
 	    const int ROWS_PER_PAGE = 15;
 	    const int khungW = 72;
@@ -394,7 +396,7 @@ namespace mh_Border_Maker {
 	
 	    const int ROWS_PER_PAGE = 15;
 	    const int khungW = 72;
-	
+	    
 	    int currentPage = 1;
 	    int totalPages = (mh_count == 0) ? 1
 	                   : (mh_count + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
@@ -571,29 +573,30 @@ namespace lopsv_Border_Maker{
 	}
 
 	void sv_print_all(LopSV* selectedLop) {
-	    if (!selectedLop) return;
+	        if (!selectedLop) return;
 	    
-		const int ROWS_PER_PAGE = 15;
-    	int currentPage = 1;
-    	
-	    while (true) {
-	        system("cls");
-			
-			int totalSV = sv_count(selectedLop);
-			
-			int totalPages = (totalSV == 0) ? 1
-			    : (totalSV + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
-			
-			// Ch?n page vu?t biên
-		    if (currentPage < 1) currentPage = 1;
-		    if (currentPage > totalPages) currentPage = totalPages;
-
-			
+	        const int ROWS_PER_PAGE = 15;
+	        int currentPage = 1;
+	    
+	        while (true) {
+	          system("cls");
+	        
+	          // ===== THU TH?P VÀ S?P X?P =====
+	          SinhVien dsSV[1000];  
+	          int totalSV = QuanLyDiem::sv_collect_sorted(selectedLop, dsSV, 1000);
+	
+	          int totalPages = (totalSV == 0) ? 1
+	            : (totalSV + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE;
+	        
+	        // Ch?n page vu?t biên
+	        if (currentPage < 1) currentPage = 1;
+	        if (currentPage > totalPages) currentPage = totalPages;
+	
 	        string title = "QUAN LI DSSV CUA LOP " + selectedLop->MALOP;
 	        main_UI::drawHeader(title);
 	        cout << endl;
 	
-	        if (selectedLop->FirstSV == nullptr) {
+	        if (totalSV == 0) {
 	            cout << "(Chua co sinh vien nao trong lop)\n";
 	            cout << string(100, '=') << "\n\n";
 	        } else {
@@ -609,33 +612,29 @@ namespace lopsv_Border_Maker{
 	                 << "|\n";
 	            cout << "|" << string(97, '-') << "|\n";
 	
+	            // ===== DUY?T M?NG Ð? S?P X?P =====
 	            int startIndex = (currentPage - 1) * ROWS_PER_PAGE;
-				int endIndex   = startIndex + ROWS_PER_PAGE;
-				
-				int index = 0;
-				int sttSV = 0;
-				
-				for (nodeSV* p = selectedLop->FirstSV; p; p = p->next) {
-				    if (index >= startIndex && index < endIndex) {
-				        sttSV++;
-				        cout << "|";
-				        textColor(12);
-				        cout << center(to_string(index + 1), 6);
-				        textColor(14);
-				        cout << "|" << center(p->sv.MASV, 16)
-				             << "|" << center(p->sv.HO, 12)
-				             << "|" << center(p->sv.TEN, 10)
-				             << "|" << center(p->sv.PHAI, 8)
-				             << "|" << center(p->sv.SODT, 15)
-				             << "|" << center(p->sv.Email, 24)
-				             << "|\n";
-				    }
-				    index++;
-				    if (index >= endIndex) break;
-				}
-
+	            int endIndex = min(startIndex + ROWS_PER_PAGE, totalSV);
+	       
+	            for (int i = startIndex; i < endIndex; i++) {
+	                cout << "|";
+	                textColor(12);
+	                cout << center(to_string(i + 1), 6);
+	                textColor(14);
+	                
+	                
+	                cout << "|" << center(dsSV[i].MASV, 16)
+	                     << "|" << center(dsSV[i].HO, 12)
+	                     << "|" << center(dsSV[i].TEN, 10)
+	                     << "|" << center(dsSV[i].PHAI, 8)
+	                     << "|" << center(dsSV[i].SODT, 15)
+	                     << "|" << center(dsSV[i].Email, 24)
+	                     << "|\n";
+	            }
 	
-	            for (int i = sttSV; i < 15; ++i) {
+	            // Bù d?ng tr?ng
+	            int printedRows = endIndex - startIndex;
+	            for (int i = printedRows; i < ROWS_PER_PAGE; ++i) {
 	                cout << "|"
 	                     << center("", 6)
 	                     << "|" << center("", 16)
@@ -656,33 +655,29 @@ namespace lopsv_Border_Maker{
 	        SetColor(11, 0);
 	        cout << "Su dung phim chuc nang hoac ESC de quay lai...";
 	        SetColor(7, 0);
-	
-	        drawFunctionButtons();
-			drawPagination(currentPage, totalPages, 5, 24);
-
+			drawFunctionButtons();
+	        drawPagination(currentPage, totalPages, 5, 24);
 	
 	        int key = _getch();
-
-			// ===== PHÍM ÐI?U HU?NG =====
-			if (key == 224) {
-			    key = _getch();
-			    if (key == 72 && currentPage > 1)            // ?
-			        currentPage--;
-			    else if (key == 80 && currentPage < totalPages) // ?
-			        currentPage++;
-			    continue; // v? l?i b?ng
-			}
-
+	
+	        // ===== PHÍM ÐI?U HU?NG =====
+	        if (key == 224) {
+	            key = _getch();
+	            if (key == 72 && currentPage > 1)            // ?
+	                currentPage--;
+	            else if (key == 80 && currentPage < totalPages) // ?
+	                currentPage++;
+	            continue;
+	        }
+	
 	        if (key == 27) return;   // ESC ? quay l?i màn ch?n l?p
 	
 	        if (key >= 'a' && key <= 'z') key -= 32;
-			
-			// loi buffer
-			
+	
 	        switch (key) {
-	            case 'A': cout << endl; dssv_4_1(selectedLop); break;
-	            case 'D': cout << endl; dssv_4_2(selectedLop); break;
-	            case 'E': cout << endl; dssv_4_3(selectedLop); break;
+	            case 'A': system("cls"); dssv_4_1(selectedLop); break;
+	            case 'D': system("cls"); dssv_4_2(selectedLop); break;
+	            case 'E': system("cls"); dssv_4_3(selectedLop); break;
 	        }
 	    }
 	}
@@ -879,6 +874,8 @@ namespace dk_UIPopup {
 	        drawInputField(X + 3, Y + 4, "Ma sinh vien", 20);
 	        gotoxy(X + 20, Y + 4);
 	        cin >> masv;
+			masv = normalizeMaMH(masv);
+
 	
 	        // ===== Hoc ky =====
 	        drawInputField(X + 3, Y + 6, "Hoc ky (1-3)", 5);
@@ -1758,7 +1755,7 @@ namespace score_Border_maker {
 	) {
 		const int ROWS_PER_PAGE = 15;
 	    system("cls");
-	    string temp = "BANG DIEM TONG KET ___";
+	    string temp = center("___BANG DIEM TONG KET ___",50);
 	    main_UI::drawHeader(temp);
 		cout << endl;
 	    // ===== TÍNH CHI?U R?NG KHUNG =====
